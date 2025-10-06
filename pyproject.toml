@@ -1,0 +1,66 @@
+# ============================== Project metadata ==============================
+
+[project]
+name = "cc-churn"
+version = "0.1.0"
+description = "Use ML to identify customers at risk of churning for proactive targeting."
+authors = [{name = "edesz"}]
+requires-python = ">= 3.10"
+# These are the PyPI dependencies, added with: pixi add --pypi PACKAGE_NAME
+dependencies = []
+
+[tool.pixi.project]
+channels = ["https://prefix.dev/conda-forge"]
+platforms = [
+    "linux-64",
+]
+
+# ============================= Conda dependencies =============================
+
+[tool.pixi.dependencies]
+python = "3.12.10.*"
+# use conda-forge pyarrow in order to get required C dependencies
+numpy = "*"
+pyarrow = "*"
+python-dotenv = "*"
+openpyxl = "*"
+boto3 = "*"
+pandas = "*"
+matplotlib = "*"
+seaborn = "*"
+scikit-learn = "*"
+xgboost = "*"
+lightgbm = "*"
+imbalanced-learn = "*"
+statsmodels = "*"
+shap = "*"
+
+# ================== Make this project available as a package ==================
+
+[tool.pixi.pypi-dependencies]
+cc-churn = { path = ".", editable = true }
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+# ========= Specify non-essential dependencies in features ========
+
+[tool.pixi.feature.notebooks.dependencies]
+# create a notebooks feature for exploration
+ipywidgets = "==8.1.7"
+jupyterlab = "==4.4.6"
+pandas = "==2.3.2"
+
+# ========= Specify non-essential dependencies in environments ========
+
+[tool.pixi.environments]
+# create environments that use features created above
+notebooks = { features = ["notebooks"], solve-group = "default" }
+default = { solve-group = "default" }
+
+# ========================== Define tasks (shortcuts) ==========================
+
+[tool.pixi.feature.notebooks.tasks]
+# run development tasks for the notebooks feature
+jlab = { cmd = "jupyter lab", depends-on = [] }
