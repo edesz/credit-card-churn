@@ -198,10 +198,12 @@ When ML models are trained on imbalanced data, they are biased towards the major
 
 In order to satisfy the two requirements above (decision threshold tuning and catching true churners), a separate ML scoring metric should be used during different stages of ML model development
 
-1. Phase 1: Model Selection
+1. Phase 1: Model Validation (Model Selection)
    - **For model selection and (optional) hyperparameter tuning, PR AUC should be used as the primary metric** since it is insensitive to the decision threshold and it evaluates model performance across all decision thresholds.
-2. Phase 2: Optimization of Decision Threshold for the best model from Phase 1
-   - **During optimization of the decision threshold for a single (best) ML model, F2-score should be used as the primary metric and Recall should be monitored as the secondary metric.** Thresholded metrics such as F2-score or Recall are impacted by the decision cut-off threshold. Therefore, looking at these metrics for a single decision threshold can be misleading. For the current churn use-case, F2-score it is easy to explain to non-technical stakeholders: *This score balances catching churners (Recall) versus avoiding false positives (Precision), but it weights catching chuurners more heavily*. During this phase, Recall and PR AUC should also be monitored, but as secondary metrics only.
+2. Phase 2: Model Validation (Optimization of Decision Threshold for the best model from Phase 1)
+   - **During optimization of the decision threshold for a single (best) ML model, F2-score should be used as the primary metric and Recall should be monitored as the secondary metric.** Thresholded metrics such as F2-score or Recall are impacted by the decision cut-off threshold. Therefore, looking at these metrics for a single decision threshold can be misleading. During this phase, Recall and PR AUC should also be monitored, but as secondary metrics only.
+3. Phase 3: Model Evaluation
+   - **During evaluation of a single (best) ML model, the F2-score should be used as the primary metric and Recall should be monitored as the secondary metric.** For the current churn use-case, the most important type of model error that should be punished is false negatives. F2-score captures this requirement and it is easy to explain to non-technical stakeholders: *This score balances catching churners (Recall) versus avoiding false positives (Precision), but it weights catching churners more heavily*.
 
 ## Schedule
 
@@ -216,25 +218,39 @@ October 7 (Tuesday) - October 12 (Sunday): Complete assigned tasks and push to G
 
 ## Project Deliverables
 
-### ML Model Development
+The following contents will be provided to the client.
 
-The following contents will be created in a private Cloudflare R2 storage bucket
+### Analysis
 
-1. data splits (train, validation, test)
+1. Python notebooks as discussed in the project `README.md` on github repository ([link](https://github.com/edesz/credit-card-churn/blob/main/README.md#analysis))
+
+### Data Preparation
+
+The following will be provided in a private Cloudflare R2 storage bucket
+
+1. (Data Files) Train, Validation, Test data splits
    - `train_data.parquet.gzip`
    - `validation_data.parquet.gzip`
    - `test_data.parquet.gzip`
-2. Validation and train data split used in model development with the (a) ML model predictions (in the `y_pred` and `y_pred_proba` columns), (b) model name of best model (in the `model_name` column) and (c) best decision threshold (`best_decision_threshold`)
-   - below are two example file names
-     - `validation_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
-     - `train_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
-3. trained ML model object in `.joblib` format ([link](https://joblib.readthedocs.io/en/stable/generated/joblib.dump.html)) for model trained on
-   - train+validation data
-     - example: `logisticregression__train_val.joblib`
-   - all data (train+validation+test)
-     - example: `logisticregression__all.joblib`
-4. Python notebooks as discussed in the project `README.md` on github repository ([link](https://github.com/edesz/credit-card-churn/blob/main/README.md#analysis))
 
-### Business User
+### ML Model Development
+
+The following will be provided in a private Cloudflare R2 storage bucket
+
+1. (Data Files with Churn Predictions) Validation and test data splits used in model development with the following columns
+   - ML model predictions (in the `y_pred` and `y_pred_proba` columns)
+   - model name of best model (in the `model_name` column)
+   - best decision threshold (in the `best_decision_threshold` column)
+
+   Below are the two example file names to be used for a `LogisticRegression` model
+   - `validation_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
+   - `train_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
+2. (Best Trained ML Model Object) trained ML model object in `.joblib` format ([link](https://joblib.readthedocs.io/en/stable/generated/joblib.dump.html)) for model trained on
+   - train+validation data
+     - example: `logisticregression__train_val__YYmmdd_HHMMSS.joblib`
+   - all data (train+validation+test)
+     - example: `logisticregression__all__YYmmdd_HHMMSS.joblib`
+
+### Business Requirements
 
 1. (optional) Dashboard to visualize at-risk customers predicted by model, with business metrics
