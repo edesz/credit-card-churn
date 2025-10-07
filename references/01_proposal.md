@@ -213,3 +213,28 @@ October 7 (Tuesday) - October 12 (Sunday): Complete assigned tasks and push to G
 - I, S.: EDA, Starter ML development
 - I. Y.: ML Model development using metrics discussed above
 - E. D.: Calculate Business costs for best ML model
+
+## Project Deliverables
+
+### ML Model Development
+
+The following contents will be created in a private Cloudflare R2 storage bucket
+
+1. data splits (train, validation, test)
+   - `train_data.parquet.gzip`
+   - `validation_data.parquet.gzip`
+   - `test_data.parquet.gzip`
+2. Validation and train data split used in model development with the (a) ML model predictions (in the `y_pred` and `y_pred_proba` columns), (b) model name of best model (in the `model_name` column) and (c) best decision threshold (`best_decision_threshold`)
+   - below are two example file names
+     - `validation_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
+     - `train_predictions__logisticregression__YYmmdd_HHMMSS.parquet.gzip`
+3. trained ML model object in `.joblib` format ([link](https://joblib.readthedocs.io/en/stable/generated/joblib.dump.html)) for model trained on
+   - train+validation data
+     - example: `logisticregression__train_val.joblib`
+   - all data (train+validation+test)
+     - example: `logisticregression__all.joblib`
+4. Python notebooks as discussed in the project `README.md` on github repository ([link](https://github.com/edesz/credit-card-churn/blob/main/README.md#analysis))
+
+### Business User
+
+1. (optional) Dashboard to visualize at-risk customers predicted by model, with business metrics
