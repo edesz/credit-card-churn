@@ -49,9 +49,9 @@ requires = ["hatchling"]
 
 [tool.pixi.feature.notebooks.dependencies]
 # create a notebooks feature for exploration
-ipywidgets = "==8.1.7"
-jupyterlab = "==4.4.6"
-pandas = "==2.3.2"
+ipywidgets = "*"
+jupyterlab = "*"
+pandas = "*"
 
 # ========= Specify non-essential dependencies in environments ========
 
