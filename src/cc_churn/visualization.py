@@ -17,6 +17,7 @@ def plot_roi_curves(
     ptitle,
     legend_loc,
     xlabel,
+    ylabel,
     fig_size=(12, 8),
 ):
     """."""
@@ -38,7 +39,7 @@ def plot_roi_curves(
         alpha=0.5,
     )
     ax.set_xlabel(xlabel, fontsize=14)
-    ax.set_ylabel("Expected Savings ($)", fontsize=14)
+    ax.set_ylabel(ylabel, fontsize=14)
     for k, v in optimal_n_roi_dict.items():
         ax.axvline(v["x"], color=v["colour"], linestyle="--", label=k)
 
@@ -74,66 +75,78 @@ def plot_roi_curves(
     ax2.tick_params(axis="both", labelsize=12)
 
 
-def plot_lift_curves(
-    n,
-    true_savings,
-    predicted_savings,
-    random_savings,
-    lift,
-    lift_pred,
-    optimal_n_lift_dict,
-    ptitle,
-    xlabel,
-    fig_size=(12, 8),
+def plot_class_imbalance_proba_distribution(
+    df_clasS_imbalance,
+    df_probabilities,
+    ptitle1,
+    title1_xloc,
+    ptitle2,
+    vline_label,
+    decision_threshold,
+    subfigure_width_ratios=[1.15, 3],
+    fig_size=(12, 4),
 ):
     """."""
-    _, ax = plt.subplots(figsize=fig_size)
-    ax.plot(
-        n,
-        random_savings,
-        label="Random Targeting (Expected Savings)",
+    _, (ax1, ax2) = plt.subplots(
+        nrows=1,
+        ncols=2,
+        gridspec_kw={"width_ratios": subfigure_width_ratios},
+        figsize=fig_size,
+    )
+
+    # class imbalance in true labels
+    ax1 = df_clasS_imbalance.plot.bar(
+        grid=False,
+        color={"True": "darkgreen", "Predicted": "Red"},
+        zorder=2,
+        width=0.7,
+        edgecolor="white",
+        linewidth=3,
+        ax=ax1,
+    )
+    ax1.legend(frameon=False, handletextpad=0.2)
+    ax1.bar_label(ax1.containers[0], fmt="%.3f")
+    ax1.set_title(ptitle1, x=title1_xloc, loc="left", fontsize=11)
+    ax1.set_xlabel("Churn Outcome", fontsize=14)
+    ax1.set_ylabel("Fraction of Customers", fontsize=14)
+    ax1.yaxis.set_major_locator(ticker.MultipleLocator(0.15))
+    ax1.tick_params(axis="both", which="both", labelsize=10, labelcolor="grey")
+    ax1.tick_params(axis="y", left=False)
+    ax1.tick_params(axis="x", labelrotation=0)
+    ax1.grid(True, axis="y", alpha=0.4)
+    ax1.spines[["left", "right", "top"]].set_visible(False)
+
+    # distribution of predicted probabilities
+    ax2 = df_probabilities.plot.hist(
+        bins=50,
+        grid=False,
+        color="#86bf91",
+        zorder=2,
+        rwidth=0.9,
+        ax=ax2,
+        label="",
+    )
+    ax2.axvline(
+        x=decision_threshold * 100,
+        color="black",
         linestyle="--",
         linewidth=2,
+        zorder=3,
+        label=vline_label,
     )
-    ax.plot(
-        n,
-        predicted_savings,
-        label="Expected Savings (Predicted)",
-        linestyle="-",
-        linewidth=1,
-        color="orange",
-        alpha=0.4,
+    ax2.xaxis.set_major_locator(ticker.MultipleLocator(10))
+    ax2.set_title(ptitle2, loc="left", fontsize=12.5)
+    ax2.legend(
+        frameon=False,
+        handletextpad=0.2,
+        handlelength=0,
+        loc="upper right",
+        bbox_to_anchor=(0.85, 0.65),
     )
-    ax.plot(
-        n,
-        true_savings,
-        label="Expected Savings (True)",
-        linewidth=1,
-        color="purple",
-        alpha=0.4,
-    )
-    ax.plot(
-        n,
-        lift_pred,
-        label="Incremental Lift Curve vs Random (Predicted)",
-        linewidth=2,
-        color="magenta",
-    )
-    ax.plot(
-        n,
-        lift,
-        label="Incremental Lift Curve vs Random (True)",
-        linewidth=2,
-        color="green",
-    )
-    for k, v in optimal_n_lift_dict.items():
-        ax.axvline(v["x"], color=v["colour"], linestyle="--", label=k)
-    ax.tick_params(axis="both", labelsize=12)
-    ax.set_xlabel(xlabel, fontsize=14)
-    ax.set_ylabel("Expected Savings, Lift", fontsize=14)
-    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
-    ax.set_title(ptitle, loc="left", fontsize=14)
-    ax.set_xlim(xmin=0)
-    ax.legend(frameon=False, loc="upper left")
-    ax.grid(True, alpha=0.4)
-    ax.spines[["right", "top"]].set_visible(False)
+    ax2.set_xlim(0)
+    ax2.tick_params(axis="both", which="both", labelsize=14, labelcolor="grey")
+    ax2.tick_params(axis="y", left=False)
+    ax2.set_ylabel("Number of Customers", fontsize=14)
+    ax2.set_xlabel("Prediction Probability (%)", fontsize=14)
+    ax2.grid(True, axis="x", alpha=0.4)
+    ax2.spines[["left", "right", "top"]].set_visible(False)

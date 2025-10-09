@@ -86,11 +86,6 @@ def get_cost(
             n=lambda df: np.arange(1, len(df) + 1),
             random_savings=lambda df: df["n"] * df["true_savings"].mean(),
         )
-        # incremental lift
-        .assign(
-            lift=lambda df: df["cum_true_savings"] - df["random_savings"],
-            lift_ml=lambda df: df["cum_pred_savings"] - df["random_savings"],
-        )
         # ROI
         .assign(
             # 1. compute total intervention cost per N

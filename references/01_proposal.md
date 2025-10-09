@@ -222,6 +222,8 @@ The following contents will be provided to the client.
 
 ### Analysis
 
+The following will be provided in a Github repository
+
 1. Python notebooks as discussed in the project `README.md` on github repository ([link](https://github.com/edesz/credit-card-churn/blob/main/README.md#analysis))
 
 ### Data Preparation
@@ -253,4 +255,6 @@ The following will be provided in a private Cloudflare R2 storage bucket
 
 ### Business Requirements
 
-1. (optional) Dashboard to visualize at-risk customers predicted by model, with business metrics
+The following will be provided in a private Cloudflare R2 storage bucket
+
+1. (File with At-Risk Customers) File with at-risk customers and with identification of at-risk customers that are predicted by the model to maximize Return on Investment (ROI) if they are targeted.
