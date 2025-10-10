@@ -7966,8 +7966,8 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 58.3 ms, sys: 19 ms, total: 77.3 ms
-Wall time: 372 ms
+<pre>CPU times: user 88.1 ms, sys: 15.1 ms, total: 103 ms
+Wall time: 182 ms
 </pre>
 </div>
 </div>
@@ -8200,8 +8200,8 @@ Wall time: 372 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 56.9 ms, sys: 2.8 ms, total: 59.7 ms
-Wall time: 184 ms
+<pre>CPU times: user 31.6 ms, sys: 624 μs, total: 32.2 ms
+Wall time: 89.9 ms
 </pre>
 </div>
 </div>
@@ -8420,8 +8420,8 @@ Wall time: 184 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 16 ms, sys: 1 ms, total: 17 ms
-Wall time: 15.8 ms
+<pre>CPU times: user 17.7 ms, sys: 25 μs, total: 17.7 ms
+Wall time: 16.2 ms
 </pre>
 </div>
 </div>
@@ -8788,8 +8788,8 @@ Wall time: 15.8 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 63.7 ms, sys: 869 μs, total: 64.6 ms
-Wall time: 156 ms
+<pre>CPU times: user 23.2 ms, sys: 1.09 ms, total: 24.3 ms
+Wall time: 93.7 ms
 </pre>
 </div>
 </div>
@@ -9278,8 +9278,8 @@ Wall time: 156 ms
 <span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_val_scaled</span><span class="p">,</span> <span class="n">y_train_val</span><span class="p">)</span>
 
 <span class="c1"># Predictions</span>
-<span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">model_best</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">)</span>
 <span class="n">y_prob_test</span> <span class="o">=</span> <span class="n">model_best</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test_scaled</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">y_pred_test</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_prob_test</span> <span class="o">&gt;=</span> <span class="n">best_decision_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
 <span class="c1"># Evaluation</span>
 <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_test</span><span class="p">)</span>
@@ -9401,11 +9401,11 @@ Wall time: 156 ms
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The best model is now trained on all available data train+validation+test data, so it can be used to make inference predictions on live data during production</p>
+<p>The best model is now trained on all available data (train+validation+test data), so it can be used to make inference predictions on live data during production</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=46b3cecb-0a10-4b11-a1c2-cee85bfb8126">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=46b3cecb-0a10-4b11-a1c2-cee85bfb8126">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9423,6 +9423,138 @@ Wall time: 156 ms
 
 <span class="c1"># Train best model</span>
 <span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_all_scaled</span><span class="p">,</span> <span class="n">y_all</span><span class="p">)</span>
+
+<span class="c1"># Predictions</span>
+<span class="n">y_prob_all</span> <span class="o">=</span> <span class="n">model_best</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_all_scaled</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">y_pred_all</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_prob_all</span> <span class="o">&gt;=</span> <span class="n">best_decision_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c8ad4faa-ca22-44a8-a166-69cad0903a03">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Export-Project-Deliverables-to-Private-R2-Bucket">Export Project Deliverables to Private R2 Bucket<a class="anchor-link" href="#Export-Project-Deliverables-to-Private-R2-Bucket">¶</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9d898fa-2996-4ca9-99c3-ad8475895553">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Get the current timestamp in the format <code>YYmmdd_HHMMSS</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bd0a588e-4137-4403-8baa-690169829920">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">curr_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4de09aa6-9ff7-4af9-816a-a84a71a2bb3a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Data-Files-with-Churn-Predictions">Data Files with Churn Predictions<a class="anchor-link" href="#Data-Files-with-Churn-Predictions">¶</a></h3>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63825616-aa2f-4153-b91b-d352365d9a9a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The following will be appended to the validation split (<code>df_val</code>) and test split (<code>df_test</code>)</p>
+<ol>
+<li>ML model predictions (in the <code>y_pred</code> column)</li>
+<li>ML model prediction probabilities (in the <code>y_pred_proba</code> column)</li>
+<li>name of best model (in the <code>model_name</code> column)</li>
+<li>best decision threshold ( in the <code>best_decision_threshold</code> column)</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=084a033e-5f4a-4e61-ac86-39f1a8aa7b59">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Validation-Split">Validation Split<a class="anchor-link" href="#Validation-Split">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f563e03-2b16-4a1b-b20c-291cc135cac1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Append to the validation split (<code>df_val</code>)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=76eb3ff0-cf97-4be2-ad1e-928b70435223">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">df_val_pred</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_val</span>
+    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="c1"># 4.best model name</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">best_model_name</span><span class="p">,</span>
+        <span class="c1"># 1. ML model predictions</span>
+        <span class="n">y_pred_proba</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_prob_val</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_val_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 2. ML model prediction probabilities</span>
+        <span class="n">y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_pred_val</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_val_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'int16[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 3. best decision threshold</span>
+        <span class="n">best_decision_threshold</span><span class="o">=</span><span class="n">best_decision_threshold</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"model_name"</span><span class="p">:</span> <span class="s1">'category'</span><span class="p">,</span>
+            <span class="s1">'best_decision_threshold'</span><span class="p">:</span> <span class="s1">'float64[pyarrow]'</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s1">'category'</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)})</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_val_pred</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of validation split predictions"</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">'display.max_columns'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">df_val_pred</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">df_val_pred</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">memory_usage</span><span class="o">=</span><span class="s1">'deep'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -9432,8 +9564,1080 @@ Wall time: 156 ms
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Got 1,427 rows of validation split predictions
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>clientnum</th>
+<th>is_churned</th>
+<th>customer_age</th>
+<th>gender</th>
+<th>dependent_count</th>
+<th>education_level</th>
+<th>marital_status</th>
+<th>income_category</th>
+<th>card_category</th>
+<th>months_on_book</th>
+<th>num_products</th>
+<th>months_inactive_12_mon</th>
+<th>contacts_count_12_mon</th>
+<th>credit_limit</th>
+<th>total_revolv_bal</th>
+<th>avg_open_to_buy</th>
+<th>total_amt_chng_q4_q1</th>
+<th>total_trans_amt</th>
+<th>total_trans_ct</th>
+<th>total_ct_chng_q4_q1</th>
+<th>avg_utilization_ratio</th>
+<th>model_name</th>
+<th>y_pred_proba</th>
+<th>y_pred</th>
+<th>best_decision_threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>816086508</td>
+<td>0</td>
+<td>47</td>
+<td>F</td>
+<td>2</td>
+<td>Unknown</td>
+<td>Married</td>
+<td>Less than $40K</td>
+<td>Blue</td>
+<td>42</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+<td>1438.3</td>
+<td>0.0</td>
+<td>1438.3</td>
+<td>0.677</td>
+<td>4624.0</td>
+<td>73</td>
+<td>0.587</td>
+<td>0.0</td>
+<td>LogisticRegression</td>
+<td>0.565682</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>1</th>
+<td>715749858</td>
+<td>0</td>
+<td>30</td>
+<td>M</td>
+<td>1</td>
+<td>Unknown</td>
+<td>Married</td>
+<td>$40K - $60K</td>
+<td>Blue</td>
+<td>18</td>
+<td>5</td>
+<td>1</td>
+<td>3</td>
+<td>4726.0</td>
+<td>1380.0</td>
+<td>3346.0</td>
+<td>0.622</td>
+<td>1723.0</td>
+<td>31</td>
+<td>0.55</td>
+<td>0.292</td>
+<td>LogisticRegression</td>
+<td>0.56938</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>2</th>
+<td>795991758</td>
+<td>0</td>
+<td>47</td>
+<td>F</td>
+<td>3</td>
+<td>Unknown</td>
+<td>Married</td>
+<td>$40K - $60K</td>
+<td>Blue</td>
+<td>41</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>7553.0</td>
+<td>660.0</td>
+<td>6893.0</td>
+<td>0.549</td>
+<td>4079.0</td>
+<td>67</td>
+<td>0.457</td>
+<td>0.087</td>
+<td>LogisticRegression</td>
+<td>0.273788</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>3</th>
+<td>771594783</td>
+<td>1</td>
+<td>56</td>
+<td>F</td>
+<td>1</td>
+<td>College</td>
+<td>Married</td>
+<td>Unknown</td>
+<td>Blue</td>
+<td>44</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+<td>1438.3</td>
+<td>0.0</td>
+<td>1438.3</td>
+<td>0.859</td>
+<td>2264.0</td>
+<td>37</td>
+<td>0.423</td>
+<td>0.0</td>
+<td>LogisticRegression</td>
+<td>0.989876</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>4</th>
+<td>771502383</td>
+<td>0</td>
+<td>54</td>
+<td>F</td>
+<td>1</td>
+<td>High School</td>
+<td>Married</td>
+<td>Less than $40K</td>
+<td>Blue</td>
+<td>42</td>
+<td>3</td>
+<td>5</td>
+<td>4</td>
+<td>2474.0</td>
+<td>1539.0</td>
+<td>935.0</td>
+<td>0.649</td>
+<td>4884.0</td>
+<td>80</td>
+<td>0.509</td>
+<td>0.622</td>
+<td>LogisticRegression</td>
+<td>0.311991</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 1427 entries, 0 to 1426
+Data columns (total 25 columns):
+ #   Column                   Non-Null Count  Dtype          
+---  ------                   --------------  -----          
+ 0   clientnum                1427 non-null   int32[pyarrow] 
+ 1   is_churned               1427 non-null   int8[pyarrow]  
+ 2   customer_age             1427 non-null   int8[pyarrow]  
+ 3   gender                   1427 non-null   category       
+ 4   dependent_count          1427 non-null   int8[pyarrow]  
+ 5   education_level          1427 non-null   category       
+ 6   marital_status           1427 non-null   category       
+ 7   income_category          1427 non-null   category       
+ 8   card_category            1427 non-null   category       
+ 9   months_on_book           1427 non-null   int16[pyarrow] 
+ 10  num_products             1427 non-null   int16[pyarrow] 
+ 11  months_inactive_12_mon   1427 non-null   int16[pyarrow] 
+ 12  contacts_count_12_mon    1427 non-null   int16[pyarrow] 
+ 13  credit_limit             1427 non-null   double[pyarrow]
+ 14  total_revolv_bal         1427 non-null   double[pyarrow]
+ 15  avg_open_to_buy          1427 non-null   double[pyarrow]
+ 16  total_amt_chng_q4_q1     1427 non-null   double[pyarrow]
+ 17  total_trans_amt          1427 non-null   double[pyarrow]
+ 18  total_trans_ct           1427 non-null   int16[pyarrow] 
+ 19  total_ct_chng_q4_q1      1427 non-null   double[pyarrow]
+ 20  avg_utilization_ratio    1427 non-null   double[pyarrow]
+ 21  model_name               1427 non-null   category       
+ 22  y_pred_proba             1427 non-null   double[pyarrow]
+ 23  y_pred                   1427 non-null   int16[pyarrow] 
+ 24  best_decision_threshold  1427 non-null   double[pyarrow]
+dtypes: category(6), double[pyarrow](9), int16[pyarrow](6), int32[pyarrow](1), int8[pyarrow](3)
+memory usage: 138.1 KB
+CPU times: user 277 ms, sys: 1.99 ms, total: 279 ms
+Wall time: 28.2 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c0e4dd3e-b916-4af1-90dd-c79f03676581">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, export to a file in the R2 bucket with the following file name format <code>validation_predictions__logisticregression__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c3e7c6bd-b3d1-4c19-b3f3-0f7644d3d3b2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">df_val_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"validation_predictions__</span><span class="si">{</span><span class="n">best_model_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key validation_predictions__logisticregression__20251009_234501.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 1,427 rows to key: validation_predictions__logisticregression__20251009_234501.parquet.gzip
+CPU times: user 522 ms, sys: 2.14 ms, total: 524 ms
+Wall time: 286 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=06e74f2f-a29b-48df-a4dd-e8c92ec3b070">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Test-Split">Test Split<a class="anchor-link" href="#Test-Split">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c04e8be5-4484-4549-be50-f8b109ad5a09">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Append to the test split (<code>df_test</code>)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97da3a69-94de-40f6-91d3-5d7dc018b11f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">df_test_pred</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_test</span>
+    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="c1"># 4.best model name</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">best_model_name</span><span class="p">,</span>
+        <span class="c1"># 1. ML model predictions</span>
+        <span class="n">y_pred_proba</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_prob_test</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_test_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 2. ML model prediction probabilities</span>
+        <span class="n">y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_test_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'int16[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 3. best decision threshold</span>
+        <span class="n">best_decision_threshold</span><span class="o">=</span><span class="n">best_decision_threshold</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"model_name"</span><span class="p">:</span> <span class="s1">'category'</span><span class="p">,</span>
+            <span class="s1">'best_decision_threshold'</span><span class="p">:</span> <span class="s1">'float64[pyarrow]'</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s1">'category'</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)})</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test_pred</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of test split predictions"</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">'display.max_columns'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">df_test_pred</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">df_test_pred</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">memory_usage</span><span class="o">=</span><span class="s1">'deep'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Got 1,718 rows of test split predictions
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>clientnum</th>
+<th>is_churned</th>
+<th>customer_age</th>
+<th>gender</th>
+<th>dependent_count</th>
+<th>education_level</th>
+<th>marital_status</th>
+<th>income_category</th>
+<th>card_category</th>
+<th>months_on_book</th>
+<th>num_products</th>
+<th>months_inactive_12_mon</th>
+<th>contacts_count_12_mon</th>
+<th>credit_limit</th>
+<th>total_revolv_bal</th>
+<th>avg_open_to_buy</th>
+<th>total_amt_chng_q4_q1</th>
+<th>total_trans_amt</th>
+<th>total_trans_ct</th>
+<th>total_ct_chng_q4_q1</th>
+<th>avg_utilization_ratio</th>
+<th>model_name</th>
+<th>y_pred_proba</th>
+<th>y_pred</th>
+<th>best_decision_threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>721418133</td>
+<td>0</td>
+<td>45</td>
+<td>F</td>
+<td>3</td>
+<td>Graduate</td>
+<td>Single</td>
+<td>Less than $40K</td>
+<td>Blue</td>
+<td>33</td>
+<td>6</td>
+<td>2</td>
+<td>3</td>
+<td>2016.0</td>
+<td>972.0</td>
+<td>1044.0</td>
+<td>0.685</td>
+<td>4535.0</td>
+<td>82</td>
+<td>0.745</td>
+<td>0.482</td>
+<td>LogisticRegression</td>
+<td>0.028622</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>1</th>
+<td>719513733</td>
+<td>0</td>
+<td>48</td>
+<td>M</td>
+<td>3</td>
+<td>Doctorate</td>
+<td>Married</td>
+<td>$80K - $120K</td>
+<td>Blue</td>
+<td>41</td>
+<td>3</td>
+<td>3</td>
+<td>4</td>
+<td>8739.0</td>
+<td>0.0</td>
+<td>8739.0</td>
+<td>0.715</td>
+<td>4276.0</td>
+<td>69</td>
+<td>0.769</td>
+<td>0.0</td>
+<td>LogisticRegression</td>
+<td>0.495681</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>2</th>
+<td>721043058</td>
+<td>0</td>
+<td>58</td>
+<td>M</td>
+<td>4</td>
+<td>Unknown</td>
+<td>Married</td>
+<td>$60K - $80K</td>
+<td>Blue</td>
+<td>44</td>
+<td>5</td>
+<td>1</td>
+<td>3</td>
+<td>12010.0</td>
+<td>2149.0</td>
+<td>9861.0</td>
+<td>0.801</td>
+<td>1700.0</td>
+<td>35</td>
+<td>1.5</td>
+<td>0.179</td>
+<td>LogisticRegression</td>
+<td>0.042856</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>3</th>
+<td>718435158</td>
+<td>0</td>
+<td>50</td>
+<td>M</td>
+<td>3</td>
+<td>High School</td>
+<td>Married</td>
+<td>$120K +</td>
+<td>Blue</td>
+<td>40</td>
+<td>5</td>
+<td>1</td>
+<td>4</td>
+<td>34516.0</td>
+<td>0.0</td>
+<td>34516.0</td>
+<td>0.986</td>
+<td>1930.0</td>
+<td>36</td>
+<td>0.44</td>
+<td>0.0</td>
+<td>LogisticRegression</td>
+<td>0.82207</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>4</th>
+<td>711336033</td>
+<td>0</td>
+<td>26</td>
+<td>F</td>
+<td>0</td>
+<td>Unknown</td>
+<td>Single</td>
+<td>Unknown</td>
+<td>Blue</td>
+<td>36</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+<td>7595.0</td>
+<td>1032.0</td>
+<td>6563.0</td>
+<td>1.035</td>
+<td>4080.0</td>
+<td>72</td>
+<td>0.8</td>
+<td>0.136</td>
+<td>LogisticRegression</td>
+<td>0.151568</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 1718 entries, 0 to 1717
+Data columns (total 25 columns):
+ #   Column                   Non-Null Count  Dtype          
+---  ------                   --------------  -----          
+ 0   clientnum                1718 non-null   int32[pyarrow] 
+ 1   is_churned               1718 non-null   int8[pyarrow]  
+ 2   customer_age             1718 non-null   int8[pyarrow]  
+ 3   gender                   1718 non-null   category       
+ 4   dependent_count          1718 non-null   int8[pyarrow]  
+ 5   education_level          1718 non-null   category       
+ 6   marital_status           1718 non-null   category       
+ 7   income_category          1718 non-null   category       
+ 8   card_category            1718 non-null   category       
+ 9   months_on_book           1718 non-null   int16[pyarrow] 
+ 10  num_products             1718 non-null   int16[pyarrow] 
+ 11  months_inactive_12_mon   1718 non-null   int16[pyarrow] 
+ 12  contacts_count_12_mon    1718 non-null   int16[pyarrow] 
+ 13  credit_limit             1718 non-null   double[pyarrow]
+ 14  total_revolv_bal         1718 non-null   double[pyarrow]
+ 15  avg_open_to_buy          1718 non-null   double[pyarrow]
+ 16  total_amt_chng_q4_q1     1718 non-null   double[pyarrow]
+ 17  total_trans_amt          1718 non-null   double[pyarrow]
+ 18  total_trans_ct           1718 non-null   int16[pyarrow] 
+ 19  total_ct_chng_q4_q1      1718 non-null   double[pyarrow]
+ 20  avg_utilization_ratio    1718 non-null   double[pyarrow]
+ 21  model_name               1718 non-null   category       
+ 22  y_pred_proba             1718 non-null   double[pyarrow]
+ 23  y_pred                   1718 non-null   int16[pyarrow] 
+ 24  best_decision_threshold  1718 non-null   double[pyarrow]
+dtypes: category(6), double[pyarrow](9), int16[pyarrow](6), int32[pyarrow](1), int8[pyarrow](3)
+memory usage: 166.0 KB
+CPU times: user 41.4 ms, sys: 1.01 ms, total: 42.4 ms
+Wall time: 40.2 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fff8f634-c2fc-4e17-826e-f35c659df587">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, export to a file in the R2 bucket with the following file name format <code>test_predictions__logisticregression__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6f7e2585-6b7b-40d4-9ff6-8618eb92352b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">df_test_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"test_predictions__</span><span class="si">{</span><span class="n">best_model_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key test_predictions__logisticregression__20251009_234501.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 1,718 rows to key: test_predictions__logisticregression__20251009_234501.parquet.gzip
+CPU times: user 14.5 ms, sys: 1.94 ms, total: 16.4 ms
+Wall time: 291 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ec77487a-9a8b-4281-97c3-17f53b408e34">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="All-Available-Data">All Available Data<a class="anchor-link" href="#All-Available-Data">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c53bc6f9-b778-4d98-9dc3-ba4b46f36a79">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Append to all available data</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=778860b2-1ebc-4454-b26e-a5f7ebdf059d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">df_all_pred</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_train</span><span class="p">,</span> <span class="n">df_val</span><span class="p">,</span> <span class="n">df_test</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="c1"># 4.best model name</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">best_model_name</span><span class="p">,</span>
+        <span class="c1"># 1. ML model predictions</span>
+        <span class="n">y_pred_proba</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_prob_all</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_all_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 2. ML model prediction probabilities</span>
+        <span class="n">y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">y_pred_all</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_all_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'int16[pyarrow]'</span>
+        <span class="p">),</span>
+        <span class="c1"># 3. best decision threshold</span>
+        <span class="n">best_decision_threshold</span><span class="o">=</span><span class="n">best_decision_threshold</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"model_name"</span><span class="p">:</span> <span class="s1">'category'</span><span class="p">,</span>
+            <span class="s1">'best_decision_threshold'</span><span class="p">:</span> <span class="s1">'float64[pyarrow]'</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s1">'category'</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)})</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_all_pred</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of predictions on all available data"</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">'display.max_columns'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">df_all_pred</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">df_all_pred</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">memory_usage</span><span class="o">=</span><span class="s1">'deep'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Got 10,127 rows of predictions on all available data
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>clientnum</th>
+<th>is_churned</th>
+<th>customer_age</th>
+<th>gender</th>
+<th>dependent_count</th>
+<th>education_level</th>
+<th>marital_status</th>
+<th>income_category</th>
+<th>card_category</th>
+<th>months_on_book</th>
+<th>num_products</th>
+<th>months_inactive_12_mon</th>
+<th>contacts_count_12_mon</th>
+<th>credit_limit</th>
+<th>total_revolv_bal</th>
+<th>avg_open_to_buy</th>
+<th>total_amt_chng_q4_q1</th>
+<th>total_trans_amt</th>
+<th>total_trans_ct</th>
+<th>total_ct_chng_q4_q1</th>
+<th>avg_utilization_ratio</th>
+<th>model_name</th>
+<th>y_pred_proba</th>
+<th>y_pred</th>
+<th>best_decision_threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>710115108</td>
+<td>0</td>
+<td>45</td>
+<td>F</td>
+<td>2</td>
+<td>Graduate</td>
+<td>Unknown</td>
+<td>$40K - $60K</td>
+<td>Blue</td>
+<td>37</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>5562.0</td>
+<td>1556.0</td>
+<td>4006.0</td>
+<td>0.751</td>
+<td>4568.0</td>
+<td>76</td>
+<td>0.767</td>
+<td>0.28</td>
+<td>LogisticRegression</td>
+<td>0.041328</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>1</th>
+<td>713668158</td>
+<td>1</td>
+<td>31</td>
+<td>F</td>
+<td>1</td>
+<td>Uneducated</td>
+<td>Single</td>
+<td>Unknown</td>
+<td>Blue</td>
+<td>36</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>21067.0</td>
+<td>0.0</td>
+<td>21067.0</td>
+<td>0.995</td>
+<td>9212.0</td>
+<td>71</td>
+<td>0.821</td>
+<td>0.0</td>
+<td>LogisticRegression</td>
+<td>0.939816</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>2</th>
+<td>710180958</td>
+<td>0</td>
+<td>43</td>
+<td>M</td>
+<td>3</td>
+<td>High School</td>
+<td>Single</td>
+<td>$40K - $60K</td>
+<td>Blue</td>
+<td>33</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>3040.0</td>
+<td>2517.0</td>
+<td>523.0</td>
+<td>0.493</td>
+<td>1598.0</td>
+<td>31</td>
+<td>0.476</td>
+<td>0.828</td>
+<td>LogisticRegression</td>
+<td>0.681567</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>3</th>
+<td>711204483</td>
+<td>1</td>
+<td>56</td>
+<td>M</td>
+<td>4</td>
+<td>High School</td>
+<td>Married</td>
+<td>$60K - $80K</td>
+<td>Blue</td>
+<td>46</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>2340.0</td>
+<td>1930.0</td>
+<td>410.0</td>
+<td>0.987</td>
+<td>781.0</td>
+<td>15</td>
+<td>0.364</td>
+<td>0.825</td>
+<td>LogisticRegression</td>
+<td>0.969446</td>
+<td>1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<th>4</th>
+<td>712797258</td>
+<td>0</td>
+<td>43</td>
+<td>M</td>
+<td>3</td>
+<td>Graduate</td>
+<td>Married</td>
+<td>$120K +</td>
+<td>Blue</td>
+<td>33</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>34516.0</td>
+<td>2129.0</td>
+<td>32387.0</td>
+<td>0.587</td>
+<td>1463.0</td>
+<td>38</td>
+<td>0.583</td>
+<td>0.062</td>
+<td>LogisticRegression</td>
+<td>0.417719</td>
+<td>0</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Index: 10127 entries, 0 to 1717
+Data columns (total 25 columns):
+ #   Column                   Non-Null Count  Dtype          
+---  ------                   --------------  -----          
+ 0   clientnum                10127 non-null  int32[pyarrow] 
+ 1   is_churned               10127 non-null  int8[pyarrow]  
+ 2   customer_age             10127 non-null  int8[pyarrow]  
+ 3   gender                   10127 non-null  category       
+ 4   dependent_count          10127 non-null  int8[pyarrow]  
+ 5   education_level          10127 non-null  category       
+ 6   marital_status           10127 non-null  category       
+ 7   income_category          10127 non-null  category       
+ 8   card_category            10127 non-null  category       
+ 9   months_on_book           10127 non-null  int16[pyarrow] 
+ 10  num_products             10127 non-null  int16[pyarrow] 
+ 11  months_inactive_12_mon   10127 non-null  int16[pyarrow] 
+ 12  contacts_count_12_mon    10127 non-null  int16[pyarrow] 
+ 13  credit_limit             10127 non-null  double[pyarrow]
+ 14  total_revolv_bal         10127 non-null  double[pyarrow]
+ 15  avg_open_to_buy          10127 non-null  double[pyarrow]
+ 16  total_amt_chng_q4_q1     10127 non-null  double[pyarrow]
+ 17  total_trans_amt          10127 non-null  double[pyarrow]
+ 18  total_trans_ct           10127 non-null  int16[pyarrow] 
+ 19  total_ct_chng_q4_q1      10127 non-null  double[pyarrow]
+ 20  avg_utilization_ratio    10127 non-null  double[pyarrow]
+ 21  model_name               10127 non-null  category       
+ 22  y_pred_proba             10127 non-null  double[pyarrow]
+ 23  y_pred                   10127 non-null  int16[pyarrow] 
+ 24  best_decision_threshold  10127 non-null  double[pyarrow]
+dtypes: category(6), double[pyarrow](9), int16[pyarrow](6), int32[pyarrow](1), int8[pyarrow](3)
+memory usage: 1.0 MB
+CPU times: user 37.1 ms, sys: 1.08 ms, total: 38.2 ms
+Wall time: 35.7 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c230e410-4bd8-4010-b744-70dbd1cfff40">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, export to a file in the R2 bucket with the following file name format <code>all_predictions__logisticregression__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7a772c79-8635-47d0-9e37-db6d6f93caa7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">df_all_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"all_predictions__</span><span class="si">{</span><span class="n">best_model_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key all_predictions__logisticregression__20251009_234501.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 10,127 rows to key: all_predictions__logisticregression__20251009_234501.parquet.gzip
+CPU times: user 68.2 ms, sys: 7.92 ms, total: 76.1 ms
+Wall time: 310 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed9e2aac-b5d0-42bb-96b6-b9682f71d603">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Best-Trained-ML-Model-Object">Best Trained ML Model Object<a class="anchor-link" href="#Best-Trained-ML-Model-Object">¶</a></h3>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7795b4a9-d02c-4f0a-af9d-41d01cbd5efd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Trained-on-Combined-Training-and-Validataion-Data-(Train+Validation)">Trained on Combined Training and Validataion Data (Train+Validation)<a class="anchor-link" href="#Trained-on-Combined-Training-and-Validataion-Data-(Train+Validation)">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f1ff35e-89ad-4360-9a0b-bf6f49c30ace">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Train the best model on the combined training and validation data (<code>X_train_val_scaled</code> and <code>y_train_val</code>)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1b6ce490-1991-42d9-b54f-d2844aa8aa51">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_val_scaled</span><span class="p">,</span> <span class="n">y_train_val</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>CPU times: user 74.5 ms, sys: 0 ns, total: 74.5 ms
+Wall time: 19.9 ms
+</pre>
+</div>
+</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[21]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style>#sk-container-id-1 {
   /* Definition of color scheme common for light and dark mode */
@@ -10060,488 +11264,40 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c8ad4faa-ca22-44a8-a166-69cad0903a03">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b17fa773-9ac2-46bf-a0ec-0806aa340e00">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Export-Project-Deliverables-to-Private-R2-Bucket">Export Project Deliverables to Private R2 Bucket<a class="anchor-link" href="#Export-Project-Deliverables-to-Private-R2-Bucket">¶</a></h2>
+<p>Export to <code>.joblib</code> file in R2 bucket</p>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9d898fa-2996-4ca9-99c3-ad8475895553">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Get the current timestamp in the format <code>YYmmdd_HHMMSS</code></p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bd0a588e-4137-4403-8baa-690169829920">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9b694c43-eec8-4b75-a915-cef159c044cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">curr_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S'</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4de09aa6-9ff7-4af9-816a-a84a71a2bb3a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Data-Files-with-Churn-Predictions">Data Files with Churn Predictions<a class="anchor-link" href="#Data-Files-with-Churn-Predictions">¶</a></h3>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63825616-aa2f-4153-b91b-d352365d9a9a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The following will be appended to the validation split (<code>df_val</code>) and test split (<code>df_test</code>)</p>
-<ol>
-<li>ML model predictions (in the <code>y_pred</code> column)</li>
-<li>ML model prediction probabilities (in the <code>y_pred_proba</code> column)</li>
-<li>name of best model (in the <code>model_name</code> column)</li>
-<li>best decision threshold ( in the <code>best_decision_threshold</code> column)</li>
-</ol>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=084a033e-5f4a-4e61-ac86-39f1a8aa7b59">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Validation-Split">Validation Split<a class="anchor-link" href="#Validation-Split">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f563e03-2b16-4a1b-b20c-291cc135cac1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Append to the validation split (<code>df_val</code>)</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=76eb3ff0-cf97-4be2-ad1e-928b70435223">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">df_val_pred</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df_val</span>
-    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-        <span class="c1"># 4.best model name</span>
-        <span class="n">model_name</span><span class="o">=</span><span class="n">best_model_name</span><span class="p">,</span>
-        <span class="c1"># 1. ML model predictions</span>
-        <span class="n">y_pred_proba</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-            <span class="n">y_prob_val</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_val_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64[pyarrow]'</span>
-        <span class="p">),</span>
-        <span class="c1"># 2. ML model prediction probabilities</span>
-        <span class="n">y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-            <span class="n">y_pred_val</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_val_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'int16[pyarrow]'</span>
-        <span class="p">),</span>
-        <span class="c1"># 3. best decision threshold</span>
-        <span class="n">best_decision_threshold</span><span class="o">=</span><span class="n">best_decision_threshold</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s2">"model_name"</span><span class="p">:</span> <span class="s1">'category'</span><span class="p">,</span>
-            <span class="s1">'best_decision_threshold'</span><span class="p">:</span> <span class="s1">'float64[pyarrow]'</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-    <span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s1">'category'</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)})</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_val_pred</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of validation split predictions"</span><span class="p">)</span>
-<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">'display.max_columns'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">df_val_pred</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-<span class="n">df_val_pred</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">memory_usage</span><span class="o">=</span><span class="s1">'deep'</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Got 1,427 rows of validation split predictions
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+    <span class="c1"># Dump the object to the in-memory file</span>
+    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">model_best</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
+    <span class="c1"># Seek to the beginning of the file before uploading</span>
+    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>clientnum</th>
-<th>is_churned</th>
-<th>customer_age</th>
-<th>gender</th>
-<th>dependent_count</th>
-<th>education_level</th>
-<th>marital_status</th>
-<th>income_category</th>
-<th>card_category</th>
-<th>months_on_book</th>
-<th>num_products</th>
-<th>months_inactive_12_mon</th>
-<th>contacts_count_12_mon</th>
-<th>credit_limit</th>
-<th>total_revolv_bal</th>
-<th>avg_open_to_buy</th>
-<th>total_amt_chng_q4_q1</th>
-<th>total_trans_amt</th>
-<th>total_trans_ct</th>
-<th>total_ct_chng_q4_q1</th>
-<th>avg_utilization_ratio</th>
-<th>model_name</th>
-<th>y_pred_proba</th>
-<th>y_pred</th>
-<th>best_decision_threshold</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>816086508</td>
-<td>0</td>
-<td>47</td>
-<td>F</td>
-<td>2</td>
-<td>Unknown</td>
-<td>Married</td>
-<td>Less than $40K</td>
-<td>Blue</td>
-<td>42</td>
-<td>1</td>
-<td>3</td>
-<td>3</td>
-<td>1438.3</td>
-<td>0.0</td>
-<td>1438.3</td>
-<td>0.677</td>
-<td>4624.0</td>
-<td>73</td>
-<td>0.587</td>
-<td>0.0</td>
-<td>LogisticRegression</td>
-<td>0.565682</td>
-<td>1</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>1</th>
-<td>715749858</td>
-<td>0</td>
-<td>30</td>
-<td>M</td>
-<td>1</td>
-<td>Unknown</td>
-<td>Married</td>
-<td>$40K - $60K</td>
-<td>Blue</td>
-<td>18</td>
-<td>5</td>
-<td>1</td>
-<td>3</td>
-<td>4726.0</td>
-<td>1380.0</td>
-<td>3346.0</td>
-<td>0.622</td>
-<td>1723.0</td>
-<td>31</td>
-<td>0.55</td>
-<td>0.292</td>
-<td>LogisticRegression</td>
-<td>0.56938</td>
-<td>1</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>2</th>
-<td>795991758</td>
-<td>0</td>
-<td>47</td>
-<td>F</td>
-<td>3</td>
-<td>Unknown</td>
-<td>Married</td>
-<td>$40K - $60K</td>
-<td>Blue</td>
-<td>41</td>
-<td>5</td>
-<td>3</td>
-<td>3</td>
-<td>7553.0</td>
-<td>660.0</td>
-<td>6893.0</td>
-<td>0.549</td>
-<td>4079.0</td>
-<td>67</td>
-<td>0.457</td>
-<td>0.087</td>
-<td>LogisticRegression</td>
-<td>0.273788</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>3</th>
-<td>771594783</td>
-<td>1</td>
-<td>56</td>
-<td>F</td>
-<td>1</td>
-<td>College</td>
-<td>Married</td>
-<td>Unknown</td>
-<td>Blue</td>
-<td>44</td>
-<td>2</td>
-<td>4</td>
-<td>4</td>
-<td>1438.3</td>
-<td>0.0</td>
-<td>1438.3</td>
-<td>0.859</td>
-<td>2264.0</td>
-<td>37</td>
-<td>0.423</td>
-<td>0.0</td>
-<td>LogisticRegression</td>
-<td>0.989876</td>
-<td>1</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>4</th>
-<td>771502383</td>
-<td>0</td>
-<td>54</td>
-<td>F</td>
-<td>1</td>
-<td>High School</td>
-<td>Married</td>
-<td>Less than $40K</td>
-<td>Blue</td>
-<td>42</td>
-<td>3</td>
-<td>5</td>
-<td>4</td>
-<td>2474.0</td>
-<td>1539.0</td>
-<td>935.0</td>
-<td>0.649</td>
-<td>4884.0</td>
-<td>80</td>
-<td>0.509</td>
-<td>0.622</td>
-<td>LogisticRegression</td>
-<td>0.311991</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
-RangeIndex: 1427 entries, 0 to 1426
-Data columns (total 25 columns):
- #   Column                   Non-Null Count  Dtype          
----  ------                   --------------  -----          
- 0   clientnum                1427 non-null   int32[pyarrow] 
- 1   is_churned               1427 non-null   int8[pyarrow]  
- 2   customer_age             1427 non-null   int8[pyarrow]  
- 3   gender                   1427 non-null   category       
- 4   dependent_count          1427 non-null   int8[pyarrow]  
- 5   education_level          1427 non-null   category       
- 6   marital_status           1427 non-null   category       
- 7   income_category          1427 non-null   category       
- 8   card_category            1427 non-null   category       
- 9   months_on_book           1427 non-null   int16[pyarrow] 
- 10  num_products             1427 non-null   int16[pyarrow] 
- 11  months_inactive_12_mon   1427 non-null   int16[pyarrow] 
- 12  contacts_count_12_mon    1427 non-null   int16[pyarrow] 
- 13  credit_limit             1427 non-null   double[pyarrow]
- 14  total_revolv_bal         1427 non-null   double[pyarrow]
- 15  avg_open_to_buy          1427 non-null   double[pyarrow]
- 16  total_amt_chng_q4_q1     1427 non-null   double[pyarrow]
- 17  total_trans_amt          1427 non-null   double[pyarrow]
- 18  total_trans_ct           1427 non-null   int16[pyarrow] 
- 19  total_ct_chng_q4_q1      1427 non-null   double[pyarrow]
- 20  avg_utilization_ratio    1427 non-null   double[pyarrow]
- 21  model_name               1427 non-null   category       
- 22  y_pred_proba             1427 non-null   double[pyarrow]
- 23  y_pred                   1427 non-null   int16[pyarrow] 
- 24  best_decision_threshold  1427 non-null   double[pyarrow]
-dtypes: category(6), double[pyarrow](9), int16[pyarrow](6), int32[pyarrow](1), int8[pyarrow](3)
-memory usage: 138.1 KB
-CPU times: user 336 ms, sys: 3 ms, total: 339 ms
-Wall time: 33.9 ms
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c0e4dd3e-b916-4af1-90dd-c79f03676581">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Next, export to a file in the R2 bucket with the following file name format <code>validation_predictions__logisticregression__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c3e7c6bd-b3d1-4c19-b3f3-0f7644d3d3b2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">export_df_to_r2</span><span class="p">(</span>
-    <span class="n">df_val_pred</span><span class="p">,</span>
-    <span class="n">bucket_name</span><span class="p">,</span>
-    <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"validation_predictions__</span><span class="si">{</span><span class="n">best_model_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
-        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
-    <span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Key validation_predictions__logisticregression__20251007_111315.parquet.gzip does not exist in bucket cc-churn-splits
-Exported 1,427 rows to key: validation_predictions__logisticregression__20251007_111315.parquet.gzip
-CPU times: user 454 ms, sys: 2.34 ms, total: 456 ms
-Wall time: 453 ms
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=06e74f2f-a29b-48df-a4dd-e8c92ec3b070">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Test-Split">Test Split<a class="anchor-link" href="#Test-Split">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c04e8be5-4484-4549-be50-f8b109ad5a09">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Append to the test split (<code>df_test</code>)</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97da3a69-94de-40f6-91d3-5d7dc018b11f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">df_test_pred</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df_test</span>
-    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-        <span class="c1"># 4.best model name</span>
-        <span class="n">model_name</span><span class="o">=</span><span class="n">best_model_name</span><span class="p">,</span>
-        <span class="c1"># 1. ML model predictions</span>
-        <span class="n">y_pred_proba</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-            <span class="n">y_prob_test</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_test_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float64[pyarrow]'</span>
+    <span class="c1"># Upload the in-memory file to our team's R2 bucket</span>
+    <span class="n">s3_client</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span>
+        <span class="n">Body</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+        <span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+        <span class="n">Key</span><span class="o">=</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"best_model__</span><span class="si">{</span><span class="n">best_model_name</span><span class="si">}</span><span class="s2">__train_val__</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.joblib"</span>
         <span class="p">),</span>
-        <span class="c1"># 2. ML model prediction probabilities</span>
-        <span class="n">y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-            <span class="n">y_pred_test</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X_test_clean</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'int16[pyarrow]'</span>
-        <span class="p">),</span>
-        <span class="c1"># 3. best decision threshold</span>
-        <span class="n">best_decision_threshold</span><span class="o">=</span><span class="n">best_decision_threshold</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s2">"model_name"</span><span class="p">:</span> <span class="s1">'category'</span><span class="p">,</span>
-            <span class="s1">'best_decision_threshold'</span><span class="p">:</span> <span class="s1">'float64[pyarrow]'</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-    <span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="s1">'category'</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)})</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test_pred</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of test split predictions"</span><span class="p">)</span>
-<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s1">'display.max_columns'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">df_test_pred</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-<span class="n">df_test_pred</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">memory_usage</span><span class="o">=</span><span class="s1">'deep'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -10554,274 +11310,45 @@ Wall time: 453 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Got 1,718 rows of test split predictions
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>clientnum</th>
-<th>is_churned</th>
-<th>customer_age</th>
-<th>gender</th>
-<th>dependent_count</th>
-<th>education_level</th>
-<th>marital_status</th>
-<th>income_category</th>
-<th>card_category</th>
-<th>months_on_book</th>
-<th>num_products</th>
-<th>months_inactive_12_mon</th>
-<th>contacts_count_12_mon</th>
-<th>credit_limit</th>
-<th>total_revolv_bal</th>
-<th>avg_open_to_buy</th>
-<th>total_amt_chng_q4_q1</th>
-<th>total_trans_amt</th>
-<th>total_trans_ct</th>
-<th>total_ct_chng_q4_q1</th>
-<th>avg_utilization_ratio</th>
-<th>model_name</th>
-<th>y_pred_proba</th>
-<th>y_pred</th>
-<th>best_decision_threshold</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>721418133</td>
-<td>0</td>
-<td>45</td>
-<td>F</td>
-<td>3</td>
-<td>Graduate</td>
-<td>Single</td>
-<td>Less than $40K</td>
-<td>Blue</td>
-<td>33</td>
-<td>6</td>
-<td>2</td>
-<td>3</td>
-<td>2016.0</td>
-<td>972.0</td>
-<td>1044.0</td>
-<td>0.685</td>
-<td>4535.0</td>
-<td>82</td>
-<td>0.745</td>
-<td>0.482</td>
-<td>LogisticRegression</td>
-<td>0.028622</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>1</th>
-<td>719513733</td>
-<td>0</td>
-<td>48</td>
-<td>M</td>
-<td>3</td>
-<td>Doctorate</td>
-<td>Married</td>
-<td>$80K - $120K</td>
-<td>Blue</td>
-<td>41</td>
-<td>3</td>
-<td>3</td>
-<td>4</td>
-<td>8739.0</td>
-<td>0.0</td>
-<td>8739.0</td>
-<td>0.715</td>
-<td>4276.0</td>
-<td>69</td>
-<td>0.769</td>
-<td>0.0</td>
-<td>LogisticRegression</td>
-<td>0.495681</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>2</th>
-<td>721043058</td>
-<td>0</td>
-<td>58</td>
-<td>M</td>
-<td>4</td>
-<td>Unknown</td>
-<td>Married</td>
-<td>$60K - $80K</td>
-<td>Blue</td>
-<td>44</td>
-<td>5</td>
-<td>1</td>
-<td>3</td>
-<td>12010.0</td>
-<td>2149.0</td>
-<td>9861.0</td>
-<td>0.801</td>
-<td>1700.0</td>
-<td>35</td>
-<td>1.5</td>
-<td>0.179</td>
-<td>LogisticRegression</td>
-<td>0.042856</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>3</th>
-<td>718435158</td>
-<td>0</td>
-<td>50</td>
-<td>M</td>
-<td>3</td>
-<td>High School</td>
-<td>Married</td>
-<td>$120K +</td>
-<td>Blue</td>
-<td>40</td>
-<td>5</td>
-<td>1</td>
-<td>4</td>
-<td>34516.0</td>
-<td>0.0</td>
-<td>34516.0</td>
-<td>0.986</td>
-<td>1930.0</td>
-<td>36</td>
-<td>0.44</td>
-<td>0.0</td>
-<td>LogisticRegression</td>
-<td>0.82207</td>
-<td>1</td>
-<td>0.5</td>
-</tr>
-<tr>
-<th>4</th>
-<td>711336033</td>
-<td>0</td>
-<td>26</td>
-<td>F</td>
-<td>0</td>
-<td>Unknown</td>
-<td>Single</td>
-<td>Unknown</td>
-<td>Blue</td>
-<td>36</td>
-<td>3</td>
-<td>3</td>
-<td>2</td>
-<td>7595.0</td>
-<td>1032.0</td>
-<td>6563.0</td>
-<td>1.035</td>
-<td>4080.0</td>
-<td>72</td>
-<td>0.8</td>
-<td>0.136</td>
-<td>LogisticRegression</td>
-<td>0.151568</td>
-<td>0</td>
-<td>0.5</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
-RangeIndex: 1718 entries, 0 to 1717
-Data columns (total 25 columns):
- #   Column                   Non-Null Count  Dtype          
----  ------                   --------------  -----          
- 0   clientnum                1718 non-null   int32[pyarrow] 
- 1   is_churned               1718 non-null   int8[pyarrow]  
- 2   customer_age             1718 non-null   int8[pyarrow]  
- 3   gender                   1718 non-null   category       
- 4   dependent_count          1718 non-null   int8[pyarrow]  
- 5   education_level          1718 non-null   category       
- 6   marital_status           1718 non-null   category       
- 7   income_category          1718 non-null   category       
- 8   card_category            1718 non-null   category       
- 9   months_on_book           1718 non-null   int16[pyarrow] 
- 10  num_products             1718 non-null   int16[pyarrow] 
- 11  months_inactive_12_mon   1718 non-null   int16[pyarrow] 
- 12  contacts_count_12_mon    1718 non-null   int16[pyarrow] 
- 13  credit_limit             1718 non-null   double[pyarrow]
- 14  total_revolv_bal         1718 non-null   double[pyarrow]
- 15  avg_open_to_buy          1718 non-null   double[pyarrow]
- 16  total_amt_chng_q4_q1     1718 non-null   double[pyarrow]
- 17  total_trans_amt          1718 non-null   double[pyarrow]
- 18  total_trans_ct           1718 non-null   int16[pyarrow] 
- 19  total_ct_chng_q4_q1      1718 non-null   double[pyarrow]
- 20  avg_utilization_ratio    1718 non-null   double[pyarrow]
- 21  model_name               1718 non-null   category       
- 22  y_pred_proba             1718 non-null   double[pyarrow]
- 23  y_pred                   1718 non-null   int16[pyarrow] 
- 24  best_decision_threshold  1718 non-null   double[pyarrow]
-dtypes: category(6), double[pyarrow](9), int16[pyarrow](6), int32[pyarrow](1), int8[pyarrow](3)
-memory usage: 166.0 KB
-CPU times: user 39.6 ms, sys: 1.1 ms, total: 40.7 ms
-Wall time: 38.2 ms
+<pre>CPU times: user 864 ms, sys: 1.94 ms, total: 866 ms
+Wall time: 184 ms
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fff8f634-c2fc-4e17-826e-f35c659df587">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=077079ca-185b-46cf-b2e9-ab720742e405">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Next, export to a file in the R2 bucket with the following file name format <code>test_predictions__logisticregression__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
+<h4 id="Trained-on-All-Available-Data-(Train+Validation+Test)">Trained on All Available Data (Train+Validation+Test)<a class="anchor-link" href="#Trained-on-All-Available-Data-(Train+Validation+Test)">¶</a></h4>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6f7e2585-6b7b-40d4-9ff6-8618eb92352b">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79c14769-8f65-4c19-9a90-572612ff131a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Train the best model on all available data (<code>X_all_scaled</code> and <code>y_all</code>)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4c10f026-2fd0-483c-b239-b858354960a6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">export_df_to_r2</span><span class="p">(</span>
-    <span class="n">df_test_pred</span><span class="p">,</span>
-    <span class="n">bucket_name</span><span class="p">,</span>
-    <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"test_predictions__</span><span class="si">{</span><span class="n">best_model_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
-        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
-    <span class="p">),</span>
-<span class="p">)</span>
+<span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_all_scaled</span><span class="p">,</span> <span class="n">y_all</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -10834,77 +11361,13 @@ Wall time: 38.2 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Key test_predictions__logisticregression__20251007_111315.parquet.gzip does not exist in bucket cc-churn-splits
-Exported 1,718 rows to key: test_predictions__logisticregression__20251007_111315.parquet.gzip
-CPU times: user 34.6 ms, sys: 1.05 ms, total: 35.6 ms
-Wall time: 618 ms
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed9e2aac-b5d0-42bb-96b6-b9682f71d603">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Best-Trained-ML-Model-Object">Best Trained ML Model Object<a class="anchor-link" href="#Best-Trained-ML-Model-Object">¶</a></h3>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7795b4a9-d02c-4f0a-af9d-41d01cbd5efd">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Trained-on-Combined-Training-and-Validataion-Data-(Train+Validation)">Trained on Combined Training and Validataion Data (Train+Validation)<a class="anchor-link" href="#Trained-on-Combined-Training-and-Validataion-Data-(Train+Validation)">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f1ff35e-89ad-4360-9a0b-bf6f49c30ace">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Train the best model on the combined training and validation data (<code>X_train_val_scaled</code> and <code>y_train_val</code>)</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1b6ce490-1991-42d9-b54f-d2844aa8aa51">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_val_scaled</span><span class="p">,</span> <span class="n">y_train_val</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 66.3 ms, sys: 0 ns, total: 66.3 ms
-Wall time: 15.2 ms
+<pre>CPU times: user 80.4 ms, sys: 1.82 ms, total: 82.2 ms
+Wall time: 19.2 ms
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[31]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style>#sk-container-id-2 {
   /* Definition of color scheme common for light and dark mode */
@@ -11531,736 +11994,6 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b17fa773-9ac2-46bf-a0ec-0806aa340e00">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Export to <code>.joblib</code> file in R2 bucket</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9b694c43-eec8-4b75-a915-cef159c044cd">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-    <span class="c1"># Dump the object to the in-memory file</span>
-    <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">model_best</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
-
-    <span class="c1"># Seek to the beginning of the file before uploading</span>
-    <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="c1"># Upload the in-memory file to our team's R2 bucket</span>
-    <span class="n">s3_client</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span>
-        <span class="n">Body</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
-        <span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
-        <span class="n">Key</span><span class="o">=</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"best_model__</span><span class="si">{</span><span class="n">best_model_name</span><span class="si">}</span><span class="s2">__train_val__</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.joblib"</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 855 ms, sys: 4.84 ms, total: 860 ms
-Wall time: 238 ms
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=077079ca-185b-46cf-b2e9-ab720742e405">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Trained-on-All-Available-Data-(Train+Validation+Test)">Trained on All Available Data (Train+Validation+Test)<a class="anchor-link" href="#Trained-on-All-Available-Data-(Train+Validation+Test)">¶</a></h4>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79c14769-8f65-4c19-9a90-572612ff131a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Train the best model on all available data (<code>X_all_scaled</code> and <code>y_all</code>)</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4c10f026-2fd0-483c-b239-b858354960a6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">model_best</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_all_scaled</span><span class="p">,</span> <span class="n">y_all</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 88.1 ms, sys: 1.89 ms, total: 90 ms
-Wall time: 20.6 ms
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<style>#sk-container-id-3 {
-  /* Definition of color scheme common for light and dark mode */
-  --sklearn-color-text: #000;
-  --sklearn-color-text-muted: #666;
-  --sklearn-color-line: gray;
-  /* Definition of color scheme for unfitted estimators */
-  --sklearn-color-unfitted-level-0: #fff5e6;
-  --sklearn-color-unfitted-level-1: #f6e4d2;
-  --sklearn-color-unfitted-level-2: #ffe0b3;
-  --sklearn-color-unfitted-level-3: chocolate;
-  /* Definition of color scheme for fitted estimators */
-  --sklearn-color-fitted-level-0: #f0f8ff;
-  --sklearn-color-fitted-level-1: #d4ebff;
-  --sklearn-color-fitted-level-2: #b3dbfd;
-  --sklearn-color-fitted-level-3: cornflowerblue;
-
-  /* Specific color for light theme */
-  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-  --sklearn-color-icon: #696969;
-
-  @media (prefers-color-scheme: dark) {
-    /* Redefinition of color scheme for dark theme */
-    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-    --sklearn-color-icon: #878787;
-  }
-}
-
-#sk-container-id-3 {
-  color: var(--sklearn-color-text);
-}
-
-#sk-container-id-3 pre {
-  padding: 0;
-}
-
-#sk-container-id-3 input.sk-hidden--visually {
-  border: 0;
-  clip: rect(1px 1px 1px 1px);
-  clip: rect(1px, 1px, 1px, 1px);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
-
-#sk-container-id-3 div.sk-dashed-wrapped {
-  border: 1px dashed var(--sklearn-color-line);
-  margin: 0 0.4em 0.5em 0.4em;
-  box-sizing: border-box;
-  padding-bottom: 0.4em;
-  background-color: var(--sklearn-color-background);
-}
-
-#sk-container-id-3 div.sk-container {
-  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
-     but bootstrap.min.css set `[hidden] { display: none !important; }`
-     so we also need the `!important` here to be able to override the
-     default hidden behavior on the sphinx rendered scikit-learn.org.
-     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
-  display: inline-block !important;
-  position: relative;
-}
-
-#sk-container-id-3 div.sk-text-repr-fallback {
-  display: none;
-}
-
-div.sk-parallel-item,
-div.sk-serial,
-div.sk-item {
-  /* draw centered vertical line to link estimators */
-  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
-  background-size: 2px 100%;
-  background-repeat: no-repeat;
-  background-position: center center;
-}
-
-/* Parallel-specific style estimator block */
-
-#sk-container-id-3 div.sk-parallel-item::after {
-  content: "";
-  width: 100%;
-  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
-  flex-grow: 1;
-}
-
-#sk-container-id-3 div.sk-parallel {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  background-color: var(--sklearn-color-background);
-  position: relative;
-}
-
-#sk-container-id-3 div.sk-parallel-item {
-  display: flex;
-  flex-direction: column;
-}
-
-#sk-container-id-3 div.sk-parallel-item:first-child::after {
-  align-self: flex-end;
-  width: 50%;
-}
-
-#sk-container-id-3 div.sk-parallel-item:last-child::after {
-  align-self: flex-start;
-  width: 50%;
-}
-
-#sk-container-id-3 div.sk-parallel-item:only-child::after {
-  width: 0;
-}
-
-/* Serial-specific style estimator block */
-
-#sk-container-id-3 div.sk-serial {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: var(--sklearn-color-background);
-  padding-right: 1em;
-  padding-left: 1em;
-}
-
-
-/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
-clickable and can be expanded/collapsed.
-- Pipeline and ColumnTransformer use this feature and define the default style
-- Estimators will overwrite some part of the style using the `sk-estimator` class
-*/
-
-/* Pipeline and ColumnTransformer style (default) */
-
-#sk-container-id-3 div.sk-toggleable {
-  /* Default theme specific background. It is overwritten whether we have a
-  specific estimator or a Pipeline/ColumnTransformer */
-  background-color: var(--sklearn-color-background);
-}
-
-/* Toggleable label */
-#sk-container-id-3 label.sk-toggleable__label {
-  cursor: pointer;
-  display: flex;
-  width: 100%;
-  margin-bottom: 0;
-  padding: 0.5em;
-  box-sizing: border-box;
-  text-align: center;
-  align-items: start;
-  justify-content: space-between;
-  gap: 0.5em;
-}
-
-#sk-container-id-3 label.sk-toggleable__label .caption {
-  font-size: 0.6rem;
-  font-weight: lighter;
-  color: var(--sklearn-color-text-muted);
-}
-
-#sk-container-id-3 label.sk-toggleable__label-arrow:before {
-  /* Arrow on the left of the label */
-  content: "▸";
-  float: left;
-  margin-right: 0.25em;
-  color: var(--sklearn-color-icon);
-}
-
-#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {
-  color: var(--sklearn-color-text);
-}
-
-/* Toggleable content - dropdown */
-
-#sk-container-id-3 div.sk-toggleable__content {
-  display: none;
-  text-align: left;
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-0);
-}
-
-#sk-container-id-3 div.sk-toggleable__content.fitted {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-0);
-}
-
-#sk-container-id-3 div.sk-toggleable__content pre {
-  margin: 0.2em;
-  border-radius: 0.25em;
-  color: var(--sklearn-color-text);
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-0);
-}
-
-#sk-container-id-3 div.sk-toggleable__content.fitted pre {
-  /* unfitted */
-  background-color: var(--sklearn-color-fitted-level-0);
-}
-
-#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {
-  /* Expand drop-down */
-  display: block;
-  width: 100%;
-  overflow: visible;
-}
-
-#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
-  content: "▾";
-}
-
-/* Pipeline/ColumnTransformer-specific style */
-
-#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
-  color: var(--sklearn-color-text);
-  background-color: var(--sklearn-color-unfitted-level-2);
-}
-
-#sk-container-id-3 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
-  background-color: var(--sklearn-color-fitted-level-2);
-}
-
-/* Estimator-specific style */
-
-/* Colorize estimator box */
-#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-2);
-}
-
-#sk-container-id-3 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-2);
-}
-
-#sk-container-id-3 div.sk-label label.sk-toggleable__label,
-#sk-container-id-3 div.sk-label label {
-  /* The background is the default theme color */
-  color: var(--sklearn-color-text-on-default-background);
-}
-
-/* On hover, darken the color of the background */
-#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {
-  color: var(--sklearn-color-text);
-  background-color: var(--sklearn-color-unfitted-level-2);
-}
-
-/* Label box, darken color on hover, fitted */
-#sk-container-id-3 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
-  color: var(--sklearn-color-text);
-  background-color: var(--sklearn-color-fitted-level-2);
-}
-
-/* Estimator label */
-
-#sk-container-id-3 div.sk-label label {
-  font-family: monospace;
-  font-weight: bold;
-  display: inline-block;
-  line-height: 1.2em;
-}
-
-#sk-container-id-3 div.sk-label-container {
-  text-align: center;
-}
-
-/* Estimator-specific */
-#sk-container-id-3 div.sk-estimator {
-  font-family: monospace;
-  border: 1px dotted var(--sklearn-color-border-box);
-  border-radius: 0.25em;
-  box-sizing: border-box;
-  margin-bottom: 0.5em;
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-0);
-}
-
-#sk-container-id-3 div.sk-estimator.fitted {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-0);
-}
-
-/* on hover */
-#sk-container-id-3 div.sk-estimator:hover {
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-2);
-}
-
-#sk-container-id-3 div.sk-estimator.fitted:hover {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-2);
-}
-
-/* Specification for estimator info (e.g. "i" and "?") */
-
-/* Common style for "i" and "?" */
-
-.sk-estimator-doc-link,
-a:link.sk-estimator-doc-link,
-a:visited.sk-estimator-doc-link {
-  float: right;
-  font-size: smaller;
-  line-height: 1em;
-  font-family: monospace;
-  background-color: var(--sklearn-color-background);
-  border-radius: 1em;
-  height: 1em;
-  width: 1em;
-  text-decoration: none !important;
-  margin-left: 0.5em;
-  text-align: center;
-  /* unfitted */
-  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-  color: var(--sklearn-color-unfitted-level-1);
-}
-
-.sk-estimator-doc-link.fitted,
-a:link.sk-estimator-doc-link.fitted,
-a:visited.sk-estimator-doc-link.fitted {
-  /* fitted */
-  border: var(--sklearn-color-fitted-level-1) 1pt solid;
-  color: var(--sklearn-color-fitted-level-1);
-}
-
-/* On hover */
-div.sk-estimator:hover .sk-estimator-doc-link:hover,
-.sk-estimator-doc-link:hover,
-div.sk-label-container:hover .sk-estimator-doc-link:hover,
-.sk-estimator-doc-link:hover {
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-3);
-  color: var(--sklearn-color-background);
-  text-decoration: none;
-}
-
-div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
-.sk-estimator-doc-link.fitted:hover,
-div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
-.sk-estimator-doc-link.fitted:hover {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-3);
-  color: var(--sklearn-color-background);
-  text-decoration: none;
-}
-
-/* Span, style for the box shown on hovering the info icon */
-.sk-estimator-doc-link span {
-  display: none;
-  z-index: 9999;
-  position: relative;
-  font-weight: normal;
-  right: .2ex;
-  padding: .5ex;
-  margin: .5ex;
-  width: min-content;
-  min-width: 20ex;
-  max-width: 50ex;
-  color: var(--sklearn-color-text);
-  box-shadow: 2pt 2pt 4pt #999;
-  /* unfitted */
-  background: var(--sklearn-color-unfitted-level-0);
-  border: .5pt solid var(--sklearn-color-unfitted-level-3);
-}
-
-.sk-estimator-doc-link.fitted span {
-  /* fitted */
-  background: var(--sklearn-color-fitted-level-0);
-  border: var(--sklearn-color-fitted-level-3);
-}
-
-.sk-estimator-doc-link:hover span {
-  display: block;
-}
-
-/* "?"-specific style due to the `<a>` HTML tag */
-
-#sk-container-id-3 a.estimator_doc_link {
-  float: right;
-  font-size: 1rem;
-  line-height: 1em;
-  font-family: monospace;
-  background-color: var(--sklearn-color-background);
-  border-radius: 1rem;
-  height: 1rem;
-  width: 1rem;
-  text-decoration: none;
-  /* unfitted */
-  color: var(--sklearn-color-unfitted-level-1);
-  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-}
-
-#sk-container-id-3 a.estimator_doc_link.fitted {
-  /* fitted */
-  border: var(--sklearn-color-fitted-level-1) 1pt solid;
-  color: var(--sklearn-color-fitted-level-1);
-}
-
-/* On hover */
-#sk-container-id-3 a.estimator_doc_link:hover {
-  /* unfitted */
-  background-color: var(--sklearn-color-unfitted-level-3);
-  color: var(--sklearn-color-background);
-  text-decoration: none;
-}
-
-#sk-container-id-3 a.estimator_doc_link.fitted:hover {
-  /* fitted */
-  background-color: var(--sklearn-color-fitted-level-3);
-}
-
-.estimator-table summary {
-    padding: .5rem;
-    font-family: monospace;
-    cursor: pointer;
-}
-
-.estimator-table details[open] {
-    padding-left: 0.1rem;
-    padding-right: 0.1rem;
-    padding-bottom: 0.3rem;
-}
-
-.estimator-table .parameters-table {
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
-
-.estimator-table .parameters-table tr:nth-child(odd) {
-    background-color: #fff;
-}
-
-.estimator-table .parameters-table tr:nth-child(even) {
-    background-color: #f6f6f6;
-}
-
-.estimator-table .parameters-table tr:hover {
-    background-color: #e0e0e0;
-}
-
-.estimator-table table td {
-    border: 1px solid rgba(106, 105, 104, 0.232);
-}
-
-.user-set td {
-    color:rgb(255, 94, 0);
-    text-align: left;
-}
-
-.user-set td.value pre {
-    color:rgb(255, 94, 0) !important;
-    background-color: transparent !important;
-}
-
-.default td {
-    color: black;
-    text-align: left;
-}
-
-.user-set td i,
-.default td i {
-    color: black;
-}
-
-.copy-paste-icon {
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
-    background-repeat: no-repeat;
-    background-size: 14px 14px;
-    background-position: 0;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
-}
-</style><body><div class="sk-top-container" id="sk-container-id-3"><div class="sk-text-repr-fallback"><pre>LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br/>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input checked="" class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox"/><label class="sk-toggleable__label fitted sk-toggleable__label-arrow" for="sk-estimator-id-3"><div><div>LogisticRegression</div></div><div><a class="sk-estimator-doc-link fitted" href="https://scikit-learn.org/1.7/modules/generated/sklearn.linear_model.LogisticRegression.html" rel="noreferrer" target="_blank">?<span>Documentation for LogisticRegression</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
-<div class="estimator-table">
-<details>
-<summary>Parameters</summary>
-<table class="parameters-table">
-<tbody>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('penalty',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">penalty </td>
-<td class="value">'l2'</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('dual',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">dual </td>
-<td class="value">False</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('tol',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">tol </td>
-<td class="value">0.0001</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('C',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">C </td>
-<td class="value">1.0</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('fit_intercept',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">fit_intercept </td>
-<td class="value">True</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('intercept_scaling',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">intercept_scaling </td>
-<td class="value">1</td>
-</tr>
-<tr class="user-set">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('class_weight',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">class_weight </td>
-<td class="value">'balanced'</td>
-</tr>
-<tr class="user-set">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('random_state',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">random_state </td>
-<td class="value">42</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('solver',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">solver </td>
-<td class="value">'lbfgs'</td>
-</tr>
-<tr class="user-set">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('max_iter',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">max_iter </td>
-<td class="value">1000</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('multi_class',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">multi_class </td>
-<td class="value">'deprecated'</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('verbose',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">verbose </td>
-<td class="value">0</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('warm_start',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">warm_start </td>
-<td class="value">False</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('n_jobs',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">n_jobs </td>
-<td class="value">None</td>
-</tr>
-<tr class="default">
-<td><i class="copy-paste-icon" onclick="copyToClipboard('l1_ratio',
-                          this.parentElement.nextElementSibling)"></i></td>
-<td class="param">l1_ratio </td>
-<td class="value">None</td>
-</tr>
-</tbody>
-</table>
-</details>
-</div>
-</div></div></div></div></div><script>function copyToClipboard(text, element) {
-    // Get the parameter prefix from the closest toggleable content
-    const toggleableContent = element.closest('.sk-toggleable__content');
-    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
-    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
-
-    const originalStyle = element.style;
-    const computedStyle = window.getComputedStyle(element);
-    const originalWidth = computedStyle.width;
-    const originalHTML = element.innerHTML.replace('Copied!', '');
-
-    navigator.clipboard.writeText(fullParamName)
-        .then(() => {
-            element.style.width = originalWidth;
-            element.style.color = 'green';
-            element.innerHTML = "Copied!";
-
-            setTimeout(() => {
-                element.innerHTML = originalHTML;
-                element.style = originalStyle;
-            }, 2000);
-        })
-        .catch(err => {
-            console.error('Failed to copy:', err);
-            element.style.color = 'red';
-            element.innerHTML = "Failed!";
-            setTimeout(() => {
-                element.innerHTML = originalHTML;
-                element.style = originalStyle;
-            }, 2000);
-        });
-    return false;
-}
-
-document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
-    const toggleableContent = element.closest('.sk-toggleable__content');
-    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
-    const paramName = element.parentElement.nextElementSibling.textContent.trim();
-    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
-
-    element.setAttribute('title', fullParamName);
-});
-</script></body>
-</div>
-</div>
-</div>
-</div>
-</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3f48393-10f3-40ec-aef9-f59301db24ff">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -12276,7 +12009,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
@@ -12307,8 +12040,8 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 861 ms, sys: 1.06 ms, total: 862 ms
-Wall time: 233 ms
+<pre>CPU times: user 855 ms, sys: 201 μs, total: 855 ms
+Wall time: 168 ms
 </pre>
 </div>
 </div>

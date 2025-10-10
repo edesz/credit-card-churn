@@ -1,8 +1,16 @@
 # Project Scope
 
+## Title
+
+Reducing customer churn among bank's credit card customers.
+
 ## Background
 
-The manager of the credit card division at McMaster Bank is worried by more and more customers leaving the bank's credit card services. The manager has provided a random (representative) sample of customer data and asked this team to use this data to predict customer churn for every customer in this dataset. With this prediction, the management team in the credit card division can go to the at-risk customers to provide them better services and reverse their decision to churn.
+McMaster Bank is a Full-Service Financial Institution. It provides a range of financial services on premises to its customers, including issuane of credit cards. The manager of the credit card division at the bank is worried by more and more customers leaving the bank's credit card services. The manager has provided a random (but representative) sample of customer data and asked developers on the data team to use this data to predict customer churn. With this prediction, the management team in the credit card division can go to the at-risk customers to provide them better services and reverse their decision to churn.
+
+## Data
+
+
 
 ## Problem Understanding
 
