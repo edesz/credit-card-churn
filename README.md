@@ -47,7 +47,7 @@ Below is the [shared repository workflow that can be followed](https://uoftcoder
    ```bash
    git fetch upstream
    git checkout main
-   git merge upstream/master
+   git merge upstream/main
    ```
 5. Make changes
    - add your notebook
