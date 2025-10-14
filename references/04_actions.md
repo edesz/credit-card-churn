@@ -8,7 +8,7 @@ This section will discuss actions to be taken to address the goal (problem of re
 
 ### Identification of the Action
 
-The intervention, or action, is to contact (target) customers at risk of churn during a **certain period in the future** in order to get them to reverse their decision before the end of **that period**, thereby improving customer loyalty.
+The intervention, or action, is to proactively contact (target) customers at risk of churn during a **certain period in the future** in order to get them to reverse their decision before the end of **that period**, thereby improving customer loyalty.
 
 (optional) Characterizing at-risk customers allows the client to know how to target them. This will allow the client to target data-driven interventions at the at-risk customers by implementing proactive strategies to retain them.
 
@@ -26,9 +26,7 @@ Existing credit card customers.
 
 ### Frequency of Executing Action
 
-Multiple times during a **certain period in the future**.
-
-The exact number of times is not known but it is at the discretion of the client and it will be more than one.
+At-risk clients will be contacted one or more times during a **certain period in the future**. The exact number of times is not known but it is at the discretion of the client.
 
 ### Channels Ueed to Execute Action
 
@@ -40,7 +38,7 @@ All channels available to the bank will be deployed
 
 ### Resource or Capital Constraints
 
-At most the top 200 customers can be contacted (targeted) during a **certain period in the future** due to budgeting constraints.
+(optional) If churn is to be predicted in approximately 1,500 random but representative customers then the top 200 customers can be contacted (targeted) due to budgeting constraints.
 
 ### Ethical Issues Associated With Action
 

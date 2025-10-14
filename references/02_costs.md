@@ -6,7 +6,7 @@ One common way to calculate the impact (cost) of customer churn is to calculate 
 
 ## Replacement Cost or Customer Acquisition Cost (CaC)
 
-The replacement cost related to customer churn refers to the Customer Acquisition Cost (CAC), which is the total expenses incurred by the client to acquire a new credit card customer to replace one that has churned. This cost includes marketing and sales expenses, such as advertising, salaries for sales and marketing teams, the cost of tools and services needed to attract and onboard a new customer, etc. For credit card providers, this is approximately [167 USD per customer](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/). Here, we will assume CaC is $200 CAD per customer (`cac = 200`).
+The replacement cost related to customer churn refers to the Customer Acquisition Cost (CAC), which is the total expenses incurred by the client to acquire a new credit card customer to replace one that has churned. This cost includes marketing and sales expenses, such as advertising, salaries for sales and marketing teams, the cost of tools and services needed to attract and onboard a new customer, etc. For credit card providers, this is approximately [167 USD per customer](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/). Here, we will assume CaC is $200 USD per customer (`cac = 200`).
 
 ## Customer Lifetime Value (CLV)
 
@@ -20,7 +20,7 @@ CLV per customer is the average lifetime value retained if churned customers wer
    - banks typically earn a fee of 1-3% of transaction volume, so we'll assume 2% (`r = 0.02`) and the interchange revenue is calculated as *Interchange Revenue* = `Total_Trans_Amt` X `r`
 2. Interest income from revolving balance
    - captured by `Total_Revolving_Bal`
-   - if a customer carries a balance then the bank earns interest of [approximately 15-20% in Canada](https://www.consolidatedcreditcanada.ca/credit-card-debt/what-is-apr/) (we'll assume 18%, `apr = 0.18`), so this revenue from interest is calculated as *Interest Revenue* = `Total_Revolving_Bal` X `apr`
+   - if a customer carries a balance then the bank earns interest of approximately [15-20% in Canada](https://www.consolidatedcreditcanada.ca/credit-card-debt/what-is-apr/) and [20-30% in the US](https://www.lendingtree.com/credit-cards/study/average-credit-card-interest-rate-in-america/) (we'll assume 18%, `apr = 0.18`), so this revenue from interest is calculated as *Interest Revenue* = `Total_Revolving_Bal` X `apr`
 3. Fees from Credit Card Exposure
    - this refers to a scenario in which a credit card customer receives a higher discount as their tenure (how long they've held the credit card) increases, through a multiplier on [rewards points earned per total spent](https://marionthemap.com/credit-card-points-category-multipliers/)
    - approximated by `Credit_Limit` and `Avg_Utilization_Ratio`

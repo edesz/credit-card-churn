@@ -61,7 +61,7 @@ Across the industry, customer credit card behavior is seasonal, with the followi
 3. back-to-school surge in late summer
 4. general increase in spending during warmer months
 
-These patterns are relevant in Canada, where the client's institution (McMaster Bank) is located.
+These patterns are relevant in North America (Canada or the US), where the client's bank (McMaster Bank) is located.
 
 ### Frequency of Subsequent Data Collection or Updates
 

@@ -18,22 +18,22 @@ Identify at-risk cutomers.
 
 We need to answer the key question: *Which customers should we prioritize for proactive interventions?* This means we want to identify the customers who are at risk of churning in the future.
 
-Because we want to intervene before a customer churns, we would predict the likelihood (probability) of churn for every customer. We would then use these predictions to rank customers based on the risk (probability) of future churn and prioritize them for intervention. So, this would be a Machine Learning (ML) prediction task.
+Because we want to intervene before a customer churns, we would predict the likelihood (probability) of churn for every customer. We would use these predictions to rank customers based on the risk (probability) of future churn and prioritize them for intervention. So, this would be a Machine Learning (ML) prediction task.
 
 These customers would then be characterized to understand their attributes.
 
 In this way, the **Actions** from above can be better informed using data science and would ultimately increase revenue by allowing targeted interventions rather than broad, less effective strategies.
 
-The client will be starting with a one-time iteration of this ML-assisted intervention, by contacting the at-risk customers identified from the sample data. Since the customers in the sample data have already churned, this would be a retrospective intervention.
+The client will be starting with a one-time iteration of this ML-assisted intervention, by contacting the at-risk customers identified from the sample data. Since the customers in the sample data have already churned, this would be a retrospective intervention. Future iterations will be proactive.
 
 ### Validation Method
 
 We assume the data has been prepared to support predicting future churn
 
-1. Compute the customer attributes using a ~12-16 month time window for each customer
+1. Compute the customer attributes using a trailing ~12-16 month time window for each customer
 2. Determine the target (outcome or label) using a **certain period in the future** subsequent to the customer attributes extraction time window. If the cutomer churned during this target time window, then the `Attrition_Flag` (`"Attrited_Customer"`) is set to 1, else it is set to 0 (`"Existing_Customer"`).
 
-A trained ML model would be validated by splitting the data into training data and test data, using an 80:20 random split. The choice of ML model and [classification, or decision, threshold](https://scikit-learn.org/stable/auto_examples/model_selection/plot_tuned_decision_threshold.html#post-hoc-tuning-the-cut-off-point-of-decision-function) would be determined using the training data and the best model and threshold would be evaluated using the test data. Due to the imbalance of the data, the default decision threshold of 0.5 is unlikely to be the optimal choice. For this reason, decision threshold tuning is important.
+A trained ML model would be validated by splitting the data into training data and test data, using an 80:20 random split. The choice of ML model and [classification, or decision, threshold](https://scikit-learn.org/stable/auto_examples/model_selection/plot_tuned_decision_threshold.html#post-hoc-tuning-the-cut-off-point-of-decision-function) would be determined using the training data and the best model and threshold would be evaluated using the test data.
 
 ### Validation Methodology and Metrics
 
@@ -61,7 +61,7 @@ There are two possible choices for primary scoring metric that the development t
 
 #### Constraints During Imbalanced ML Model Training
 
-When ML models are trained on imbalanced data, they are biased towards the majority class (no churn). Unfortunately, this leads to large errors for the minority class (churn) and, as discussed above, this is of more interest here. The default classification decision threshold is set to 0.5 and is not optimal for imbalanced data such as churn. So, [this decision threshold needs to be tuned for imbalanced classification problems](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00160).
+When ML models are trained on imbalanced data, they are biased towards the majority class (no churn). Unfortunately, this leads to large errors for the minority class (churn) and, as discussed above, this is of more interest here. The default classification decision threshold is set to 0.5 and is not optimal for imbalanced data such as churn. So, [this decision threshold needs to be tuned for imbalanced classification problems](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00160). For this reason, decision threshold tuning is important and will be performed on the training data. The best threshold will be used during evaluation on the test data.
 
 #### Final Choice of Machine Learning Metrics
 

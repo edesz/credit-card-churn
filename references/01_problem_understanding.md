@@ -19,7 +19,7 @@ As per [Canadian banking laws](https://www.globallegalinsights.com/practice-area
 
 So, Canadian banks do not release specific credit card churn rates, making a precise number unavailable. We will compare this churn rate to that at banks in the US.
 
-In the US, the overall churn rate at financial institutions is ~19% ([1](https://customergauge.com/blog/average-churn-rate-by-industry), [2](https://thefinancialbrand.com/news/bank-onboarding/the-churn-challenge-four-big-ideas-for-banks-and-credit-unions-looking-to-drive-down-attrition-182528)). At US banks, a [credit card churn rate of 25% is at the start of the high range (20%-30%)](https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking). Considering this to be a reasonable first-order estimate of churn at banks in in Canada, a churn rate of 16% and trending up at McMaster Bank is a concern.
+In the US, the overall churn rate at financial institutions is ~19% ([1](https://customergauge.com/blog/average-churn-rate-by-industry), [2](https://thefinancialbrand.com/news/bank-onboarding/the-churn-challenge-four-big-ideas-for-banks-and-credit-unions-looking-to-drive-down-attrition-182528)). At US banks, a [credit card churn rate of 25% is at the start of the high range (20%-30%)](https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking). So, a churn rate of 16% and trending up at the bank is a concern.
 
 ### Client
 
@@ -32,7 +32,7 @@ Using the assumed estimated revenue and costs defined in `02_costs.md`, the impa
 1. 508 dollars of CLV (CLV) per customer
 2. 10% of overall CLV
 
-In the US, the average CLV per credit card customer across all financial services is ~$808 USD (~$1,100 CAD). Considering that US banks are bigger than in Canada and credit card limits are relatively higher in the US ([1](https://www.finlywealth.com/blog/credit-cards/what-credit-card-limit-should-i-have), [2](https://www.bankrate.com/credit-cards/news/what-is-the-average-credit-limit-for-americans), [3](https://www.chase.com/personal/credit-cards/education/basics/reducing-credit-limit)), this CLV is a reasonable estimate for CLV at McMaster Bank in Canada.
+In the US, the average CLV per credit card customer across all financial services is ~$808 USD. So, this is a reasonable estimate for CLV.
 
 When the cost to acquire a new customer is taken into account (CaC, assumed to be $200 per customer) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.
 
