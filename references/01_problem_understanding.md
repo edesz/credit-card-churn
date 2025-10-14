@@ -34,7 +34,7 @@ Using the assumed estimated revenue and costs defined in `02_costs.md`, the impa
 
 In the US, the average CLV per credit card customer across all financial services is ~$808 USD. So, this is a reasonable estimate for CLV.
 
-When the cost to acquire a new customer is taken into account (CaC, assumed to be $200 per customer) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.
+When the cost to acquire a new customer is taken into account (CaC), assumed to be $200 per customer ([1](https://www.reviewtrackers.com/blog/bank-customer-retention), [2](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/)) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.
 
 If customer churn continues at the same rate, then this cost will be incurred each year. If churn grows, as has been observed, then this annual cost will also grow.
 
