@@ -76,7 +76,7 @@ def plot_roi_curves(
 
 
 def plot_class_imbalance_proba_distribution(
-    df_clasS_imbalance,
+    df_class_imbalance,
     df_probabilities,
     ptitle1,
     title1_xloc,
@@ -95,7 +95,7 @@ def plot_class_imbalance_proba_distribution(
     )
 
     # class imbalance in true labels
-    ax1 = df_clasS_imbalance.plot.bar(
+    ax1 = df_class_imbalance.plot.bar(
         grid=False,
         color={"True": "darkgreen", "Predicted": "Red"},
         zorder=2,
