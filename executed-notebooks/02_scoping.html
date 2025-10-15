@@ -7682,12 +7682,12 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=306435a0-2e44-4e57-bcf5-0c63ccc8a971">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=306435a0-2e44-4e57-bcf5-0c63ccc8a971">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
@@ -7695,150 +7695,17 @@ a.anchor-link {
 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">list_objects_v2</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Contents'</span><span class="p">,</span> <span class="p">[]):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">'/'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span> <span class="ow">and</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'.parquet.gzip'</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="ow">not</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="s1">'/'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span>
+        <span class="ow">and</span> <span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">'_data.parquet.gzip'</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="s1">'Key'</span><span class="p">])</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">'Body'</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s2">"is_churned"</span><span class="p">:</span> <span class="s1">'bool[pyarrow]'</span><span class="p">})</span>
 <span class="n">df</span>
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 119 ms, sys: 15.7 ms, total: 135 ms
-Wall time: 570 ms
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>clientnum</th>
-<th>card_category</th>
-<th>total_revolv_bal</th>
-<th>total_trans_amt</th>
-<th>is_churned</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>708223383</td>
-<td>Blue</td>
-<td>979.0</td>
-<td>2736.0</td>
-<td>True</td>
-</tr>
-<tr>
-<th>1</th>
-<td>715052583</td>
-<td>Silver</td>
-<td>879.0</td>
-<td>14375.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>2</th>
-<td>719910333</td>
-<td>Blue</td>
-<td>1190.0</td>
-<td>3595.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>3</th>
-<td>785328408</td>
-<td>Blue</td>
-<td>1180.0</td>
-<td>2013.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>4</th>
-<td>716321583</td>
-<td>Blue</td>
-<td>1173.0</td>
-<td>3441.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>...</th>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr>
-<th>10122</th>
-<td>804840033</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>1960.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>10123</th>
-<td>786566733</td>
-<td>Blue</td>
-<td>1190.0</td>
-<td>3764.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>10124</th>
-<td>711326583</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>4274.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>10125</th>
-<td>718538958</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>4564.0</td>
-<td>False</td>
-</tr>
-<tr>
-<th>10126</th>
-<td>714051033</td>
-<td>Blue</td>
-<td>1699.0</td>
-<td>1967.0</td>
-<td>False</td>
-</tr>
-</tbody>
-</table>
-<p>10127 rows × 5 columns</p>
-</div>
 </div>
 </div>
 </div>
@@ -7865,12 +7732,12 @@ Wall time: 570 ms
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7c0b2328-5c91-479a-a448-7f5c3281be7e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7c0b2328-5c91-479a-a448-7f5c3281be7e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
@@ -7888,215 +7755,6 @@ Wall time: 570 ms
 <span class="p">)</span>
 <span class="n">df</span>
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 6.22 ms, sys: 28 μs, total: 6.24 ms
-Wall time: 5.4 ms
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>clientnum</th>
-<th>card_category</th>
-<th>total_revolv_bal</th>
-<th>total_trans_amt</th>
-<th>is_churned</th>
-<th>interchange_rev</th>
-<th>interest_rev</th>
-<th>fee_rev</th>
-<th>annual_rev</th>
-<th>clv</th>
-<th>intervention_cost</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>708223383</td>
-<td>Blue</td>
-<td>979.0</td>
-<td>2736.0</td>
-<td>True</td>
-<td>54.72</td>
-<td>176.22</td>
-<td>0</td>
-<td>230.94</td>
-<td>625.8474</td>
-<td>50</td>
-</tr>
-<tr>
-<th>1</th>
-<td>715052583</td>
-<td>Silver</td>
-<td>879.0</td>
-<td>14375.0</td>
-<td>False</td>
-<td>287.5</td>
-<td>158.22</td>
-<td>50</td>
-<td>495.72</td>
-<td>1343.4012</td>
-<td>50</td>
-</tr>
-<tr>
-<th>2</th>
-<td>719910333</td>
-<td>Blue</td>
-<td>1190.0</td>
-<td>3595.0</td>
-<td>False</td>
-<td>71.9</td>
-<td>214.2</td>
-<td>0</td>
-<td>286.1</td>
-<td>775.331</td>
-<td>50</td>
-</tr>
-<tr>
-<th>3</th>
-<td>785328408</td>
-<td>Blue</td>
-<td>1180.0</td>
-<td>2013.0</td>
-<td>False</td>
-<td>40.26</td>
-<td>212.4</td>
-<td>0</td>
-<td>252.66</td>
-<td>684.7086</td>
-<td>50</td>
-</tr>
-<tr>
-<th>4</th>
-<td>716321583</td>
-<td>Blue</td>
-<td>1173.0</td>
-<td>3441.0</td>
-<td>False</td>
-<td>68.82</td>
-<td>211.14</td>
-<td>0</td>
-<td>279.96</td>
-<td>758.6916</td>
-<td>50</td>
-</tr>
-<tr>
-<th>...</th>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr>
-<th>10122</th>
-<td>804840033</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>1960.0</td>
-<td>False</td>
-<td>39.2</td>
-<td>0.0</td>
-<td>0</td>
-<td>39.2</td>
-<td>106.232</td>
-<td>50</td>
-</tr>
-<tr>
-<th>10123</th>
-<td>786566733</td>
-<td>Blue</td>
-<td>1190.0</td>
-<td>3764.0</td>
-<td>False</td>
-<td>75.28</td>
-<td>214.2</td>
-<td>0</td>
-<td>289.48</td>
-<td>784.4908</td>
-<td>50</td>
-</tr>
-<tr>
-<th>10124</th>
-<td>711326583</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>4274.0</td>
-<td>False</td>
-<td>85.48</td>
-<td>0.0</td>
-<td>0</td>
-<td>85.48</td>
-<td>231.6508</td>
-<td>50</td>
-</tr>
-<tr>
-<th>10125</th>
-<td>718538958</td>
-<td>Blue</td>
-<td>0.0</td>
-<td>4564.0</td>
-<td>False</td>
-<td>91.28</td>
-<td>0.0</td>
-<td>0</td>
-<td>91.28</td>
-<td>247.3688</td>
-<td>50</td>
-</tr>
-<tr>
-<th>10126</th>
-<td>714051033</td>
-<td>Blue</td>
-<td>1699.0</td>
-<td>1967.0</td>
-<td>False</td>
-<td>39.34</td>
-<td>305.82</td>
-<td>0</td>
-<td>345.16</td>
-<td>935.3836</td>
-<td>50</td>
-</tr>
-</tbody>
-</table>
-<p>10127 rows × 11 columns</p>
-</div>
 </div>
 </div>
 </div>
@@ -8182,23 +7840,27 @@ Wall time: 5.4 ms
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><strong>Observaitons</strong></p>
 <ol>
-<li>Credit card churn is observed in 16% of customers.</li>
+<li>Credit card churn is observed in 16% of customers. This is<ul>
+<li><strong>just below</strong> the <a href="https://billingplatform.com/blog/average-churn-rate-by-industry">industry average churn rate for the financial sector of 19%</a></li>
+<li>below the <a href="https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking">standard for high credit card churn of 25-30%</a></li>
+</ul>
+</li>
 </ol>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3eaeaf55-776b-4c93-9681-2c183db39413">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6a15c4da-cd66-43ce-a9e6-cb5efbf77497">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>One common way to calculate the customer churn impact is to calculate the lost Customer Lifetime Value (CLV) per churned customer and add the replacement cost (CAC). The average CAC for a credit card customer is approximately <a href="https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/">167</a> USD or ~200 CAD. The total impact of churn is estimated below for sample of data provided by McMaster Bank</p>
+<p>The total number of customers and total Customer Lifetime Value (CLV) are shown below for churned and existing customers</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f0f7bea8-9ed6-4765-a718-4d3af2b83777">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aead09e4-3327-4c95-80ee-3befe8e0f984">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8206,7 +7868,8 @@ Wall time: 5.4 ms
 <div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="p">(</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">df_attrition_stats</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">df</span>
     <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'is_churned'</span><span class="p">)</span>
     <span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">'clv'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'sum'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">]})</span>
@@ -8218,7 +7881,98 @@ Wall time: 5.4 ms
         <span class="p">),</span>
         <span class="n">clv_per_customer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">'clv_total'</span><span class="p">]</span><span class="o">/</span><span class="n">df</span><span class="p">[</span><span class="s1">'num_customers'</span><span class="p">],</span>
     <span class="p">)</span>
-    <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"is_churned == True"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">df_attrition_stats</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>CPU times: user 6.42 ms, sys: 40 μs, total: 6.46 ms
+Wall time: 5.54 ms
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>is_churned</th>
+<th>clv_total</th>
+<th>num_customers</th>
+<th>clf_fraction</th>
+<th>clv_per_customer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>False</td>
+<td>7452624.118</td>
+<td>8500</td>
+<td>90.01784</td>
+<td>876.779308</td>
+</tr>
+<tr>
+<th>1</th>
+<td>True</td>
+<td>826428.2668</td>
+<td>1627</td>
+<td>9.98216</td>
+<td>507.946077</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3eaeaf55-776b-4c93-9681-2c183db39413">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>One common way to calculate the customer churn impact is to calculate the lost CLV per churned customer and add the replacement cost (CAC). The average CAC for a credit card customer is approximately <a href="https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/">167</a> USD or ~200 CAD. The total impact of churn is estimated below for sample of data provided by McMaster Bank</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f0f7bea8-9ed6-4765-a718-4d3af2b83777">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="p">(</span>
+    <span class="n">df_attrition_stats</span>
     <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
         <span class="n">impact_per_customer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">'clv_per_customer'</span><span class="p">]</span><span class="o">+</span><span class="n">replacement_cost</span><span class="p">,</span>
@@ -8237,7 +7991,7 @@ Wall time: 5.4 ms
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8269,6 +8023,16 @@ Wall time: 5.4 ms
 <tbody>
 <tr>
 <th>0</th>
+<td>False</td>
+<td>7452624.118</td>
+<td>8500</td>
+<td>90.01784</td>
+<td>876.779308</td>
+<td>1076.779308</td>
+<td>9152624.118</td>
+</tr>
+<tr>
+<th>1</th>
 <td>True</td>
 <td>826428.2668</td>
 <td>1627</td>
@@ -8294,6 +8058,93 @@ Wall time: 5.4 ms
 <p><strong>Observations</strong></p>
 <ol>
 <li>Approximately 10% of customer lifetime value is lost due to the 16% churn rate over the past 12 months in the random sample of customer data. The impact to the client (i.e. to the bank's credit card division) is a loss of approximately 508 dollars of customer lifetime value (per customer). When the cost to acquire a new customer is taken into account this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2b4838b-c76a-4823-a728-21ca895709aa">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The CLV of retained customers is shown below</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c25c9fd2-35e8-4eaf-9db7-769234a44b7d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">df_attrition_stats</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"is_churned == False"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>is_churned</th>
+<th>clv_total</th>
+<th>num_customers</th>
+<th>clf_fraction</th>
+<th>clv_per_customer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>False</td>
+<td>7452624.118</td>
+<td>8500</td>
+<td>90.01784</td>
+<td>876.779308</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5340fbe3-8048-4890-b306-23f069729ebc">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Observations</strong></p>
+<ol>
+<li>The CLV is <strong>just above</strong> the <a href="https://focus-digital.co/average-customer-lifetime-value-for-financial-services/">industry standard for credit card customers of $808</a>.</li>
 </ol>
 </div>
 </div>
