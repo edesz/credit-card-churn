@@ -1,130 +1,71 @@
-# Credit Card Churn Prediction
+# credit-card-churn
 
-Machine learning system for predicting credit card customer churn with business cost analysis.
+Welcome to **credit-card-churn**!
 
-## Overview
+## Description
 
-This project implements an advanced ML pipeline to identify customers at risk of churning, enabling proactive intervention strategies. The solution includes tree-based models, business cost optimization, and comprehensive evaluation frameworks for imbalanced classification.
+Use ML to identify customers at risk of churning for proactive targeting.
 
-See the project scope in `references/01_proposal.md`.
+See the project scope [here](https://github.com/edesz/credit-card-churn/blob/main/references/01_proposal.md).
 
-## Project Structure
+## Analysis
 
-```
-credit-card-churn/
-├── src/                          # Source code
-│   ├── models/                   # ML models
-│   ├── business/                 # Business cost analysis
-│   ├── evaluation/               # Model evaluation
-│   └── utils/                    # Data processing
-├── notebooks/                    # Jupyter notebooks
-│   └── 04_advanced_modeling.ipynb
-├── scripts/                      # Utility scripts
-├── docs/                         # Documentation
-├── data/                         # Data storage
-├── references/                   # Project documentation
-└── requirements.txt              # Dependencies
-```
+1. Split Raw Data (`01_split_data.ipynb`)
+   - create train, validation and test splits
+   - team member: I. S.
+2. Perform Quantitative Analysis for Project Scoping (`02_scoping.ipynb`)
+   - estimate quantitative impact of credit card churn
+   - team member: E. D.
+3. EDA (`03_eda.ipynb`)
+   - exploratory data analysis
+   - team member: I. S.
+4. Machine Learning
+   - starter notebook (`04_model_development_logisticregression.ipynb`)
+     - team member: I. S.
+   - advanced notebook (`05_*.ipynb`)
+     - team member: I. Y.
+5. Business Metrics (`06_*.ipynb`)
+   - calculating business metrics and identifying customers to target using ML predictions
+     - team member: E. D.
 
-## Installation
+## Contributing (for project collaborators)
 
-### Prerequisites
-- Python 3.10+
-- Virtual environment (recommended)
+Below is the [shared repository workflow that can be followed](https://uoftcoders.github.io/studyGroup/lessons/git/collaboration/lesson/) to commit analysis code to Github
 
-### Setup
-```bash
-# Clone repository
-git clone https://github.com/edesz/credit-card-churn.git
-cd credit-card-churn
+1. [Create a fork of the project's repository in your personal account](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#forking-a-repository) ([video](https://youtu.be/a_FLqX3vGR4?si=VRZRA6w4F4SLRMev&t=189))
+   - creating a fork is necessary since collaborators do not have push access to main (upstream) repo
+2. [Clone your forked repo repo locally](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-a-pull-request) ([video](https://youtu.be/a_FLqX3vGR4?si=3Xanq8QLjp4khNfN&t=243))
+   ```bash
+   # clone the repository (if not already done)
+   git clone https://github.com/edesz/credit-card-churn
+   ```
+3. Connect to original repository into your local cloned repo ([video](https://youtu.be/a_FLqX3vGR4?si=Wy59AZvvOGe6UpU1&t=272))
+   ```bash
+   git remote add upstream https://github.com/edesz/credit-card-churn.git
+   ```
+4. Pull latest changes (recommended before making changes) ([video](https://youtu.be/a_FLqX3vGR4?si=AtzQaRX_p1wyjayE&t=372))
+   ```bash
+   git fetch upstream
+   git checkout main
+   git merge upstream/main
+   ```
+5. Make changes
+   - add your notebook
+6. [Push changes to your branch](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-and-pushing-changes) ([video](https://youtu.be/a_FLqX3vGR4?si=5MG4CdrBxEDmoNF5&t=478))
+   ```
+   # verify your changes are being tracked by git
+   git status
+   # make changes and stage changes
+   git add .
+   # commit changes
+   git commit -m "added advanced ml workflow notebook"
+   # push changes to repository on Github
+   git push
+   ```
+7. [Create pull request](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-a-pull-request) ([video](https://youtu.be/a_FLqX3vGR4?si=SuRP9MSCJbBTMu5J&t=492))
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+This example is for adding an advanced ML notebook (named `05_advanced_ml_development.ipynb`). For updating any other notebook, follow a similar workflow.
 
-# Install dependencies
-pip install -r requirements.txt
+## 📦 Project Structure
 
-# Configure R2 access
-cp docs/env_template.txt .env
-# Edit .env with your credentials
-```
-
-## Usage
-
-### Run the ML Pipeline
-```bash
-jupyter lab notebooks/04_advanced_modeling.ipynb
-```
-
-The notebook includes:
-- Data loading from R2 or synthetic data
-- Preprocessing and feature engineering
-- Model training (XGBoost, LightGBM, Random Forest)
-- Business cost analysis
-- Model interpretability
-
-### Test R2 Connection
-```bash
-python scripts/test_r2_connection.py
-```
-
-### Run Demo
-```bash
-python scripts/demo_pipeline.py
-```
-
-## Key Features
-
-### Advanced Models
-- XGBoost with SMOTE sampling
-- LightGBM with class weights
-- Random Forest ensemble
-- F2-score optimization (prioritizes recall)
-
-### Business Analysis
-- Customer Lifetime Value (CLV) calculation
-- Cost-benefit analysis
-- ROI optimization
-- Threshold tuning for profit maximization
-
-### Evaluation
-- Custom metrics for imbalanced data
-- Stratified cross-validation
-- Statistical significance testing
-- SHAP interpretability
-
-## Model Performance
-
-Tested on 6,982 real customer records:
-
-| Metric | Value |
-|--------|-------|
-| F2 Score | 0.912 |
-| Recall | 92.0% |
-| Precision | 88.0% |
-| AUC | 0.994 |
-
-## Business Impact
-
-| Metric | Value |
-|--------|-------|
-| Average CLV | $805 |
-| Net Benefit | $29,328 |
-| ROI | 251% |
-
-## Documentation
-
-- **Project Proposal**: `references/01_proposal.md`
-- **R2 Setup Guide**: `docs/R2_SETUP_GUIDE.md`
-- **Environment Template**: `docs/env_template.txt`
-
-## Team
-
-- Inderpreet: Data Engineering & EDA
-- Elstan: Data Infrastructure & Validation
-- Ilkham: Machine Learning & Business Analysis
-
-## License
-
-MIT License - see LICENSE file for details.
+To be done.
