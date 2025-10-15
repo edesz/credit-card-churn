@@ -1,3 +1,3 @@
 # 0. Title
 
-Reducing customer churn among bank's credit card customers.
+Determine Credit Card Customers at Risk of Churning.

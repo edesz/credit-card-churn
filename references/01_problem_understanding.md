@@ -32,11 +32,19 @@ Using the assumed estimated revenue and costs defined in `02_costs.md`, the impa
 1. 508 dollars of CLV (CLV) per customer
 2. 10% of overall CLV
 
-In the US, the average CLV per credit card customer across all financial services is ~$808 USD. So, this is a reasonable estimate for CLV.
-
 When the cost to acquire a new customer is taken into account (CaC), assumed to be $200 per customer ([1](https://www.reviewtrackers.com/blog/bank-customer-retention), [2](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/)) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.
 
 If customer churn continues at the same rate, then this cost will be incurred each year. If churn grows, as has been observed, then this annual cost will also grow.
+
+There are two metrics for which the bank is in danger of exceeding industry standards
+
+1. In the US, the average CLV per credit card customer across all financial services is ~$808 USD. The CLV of remaining (non-churned) customers is $877, which is just above this value.
+2. The industry standard for churn rate in the financial sector is ~19%. The standard for high churn starts at ~25%. The current churn rate at McMaster Bank is ~16%, which is again just below this threshold.
+
+The client's observation that more and more customers are churning suggests churn rate is growing which would cause both metrics to exceed industry standards. When this happens, it has the following consequence
+
+1. revenue loss compared to competitors
+2. increased CaC relative to its peers
 
 ### Benefits of Solving this Problem
 
