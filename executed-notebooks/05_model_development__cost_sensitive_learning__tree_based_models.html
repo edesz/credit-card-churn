@@ -7517,7 +7517,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Tree-Based-Model-Cost-Based-Learning">Tree-Based Model Cost-Based Learning<a class="anchor-link" href="#Tree-Based-Model-Cost-Based-Learning">¶</a></h1>
+<h1 id="Tree-Based-Model-Cost-Sensitive-Learning">Tree-Based Model Cost-Sensitive Learning<a class="anchor-link" href="#Tree-Based-Model-Cost-Sensitive-Learning">¶</a></h1>
 </div>
 </div>
 </div>
@@ -7530,13 +7530,12 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">StringIO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">botocore.exceptions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ticker</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -7594,6 +7593,7 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cc_churn.visualization</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">vzu</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">r2.io_utils</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">r2io</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cc_churn.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_model</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cc_churn.scoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_scorers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cc_churn.tuning</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune_threshold_cv</span>
@@ -7726,52 +7726,6 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eb86d050-2327-4e4f-bc5e-030cb7e77736">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Read parquet file from private R2 bucket."""</span>
-    <span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">r2_key</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
-        <span class="n">BytesIO</span><span class="p">(</span><span class="n">s3_object</span><span class="p">[</span><span class="s1">'Body'</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span> <span class="n">dtype_backend</span><span class="o">=</span><span class="s1">'pyarrow'</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">export_df_to_r2</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Export DataFrame to file in private R2 bucket, if not present."""</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">s3_client</span><span class="o">.</span><span class="n">head_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">r2_key</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Key </span><span class="si">{</span><span class="n">r2_key</span><span class="si">}</span><span class="s2"> already exists in bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">botocore</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">[</span><span class="s2">"Error"</span><span class="p">][</span><span class="s2">"Code"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"404"</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Key </span><span class="si">{</span><span class="n">r2_key</span><span class="si">}</span><span class="s2"> does not exist in bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="n">buffer</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
-                <span class="n">buffer</span><span class="p">,</span>
-                <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">engine</span><span class="o">=</span><span class="s1">'pyarrow'</span><span class="p">,</span>
-                <span class="n">compression</span><span class="o">=</span><span class="s1">'gzip'</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">s3_client</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span>
-                <span class="n">Bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">r2_key</span><span class="p">,</span> <span class="n">Body</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-            <span class="p">)</span>
-            <span class="k">assert</span> <span class="n">response</span><span class="p">[</span><span class="s1">'ResponseMetadata'</span><span class="p">][</span><span class="s1">'HTTPStatusCode'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">200</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Exported </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows to key: </span><span class="si">{</span><span class="n">r2_key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">[</span><span class="s2">"Error"</span><span class="p">][</span><span class="s2">"Code"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"403"</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Access denied to bucket </span><span class="si">{</span><span class="n">bucket_name</span><span class="si">}</span><span class="s2"> or key </span><span class="si">{</span><span class="n">r2_key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"An unexpected error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e81219fe-914c-4225-aa53-1bc4d13099cb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -7815,7 +7769,7 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
 <span class="n">df_train</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_train</span><span class="p">)</span>
+    <span class="n">r2io</span><span class="o">.</span><span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">s3_client</span><span class="p">,</span> <span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_train</span><span class="p">)</span>
     <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_train</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of training data"</span><span class="p">)</span>
@@ -7858,7 +7812,7 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
 <span class="n">df_val</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_val</span><span class="p">)</span>
+    <span class="n">r2io</span><span class="o">.</span><span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">s3_client</span><span class="p">,</span> <span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_val</span><span class="p">)</span>
     <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_val</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of validation data"</span><span class="p">)</span>
@@ -7919,7 +7873,7 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
 <span class="n">df_test</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_test</span><span class="p">)</span>
+    <span class="n">r2io</span><span class="o">.</span><span class="n">pandas_read_parquet_r2</span><span class="p">(</span><span class="n">s3_client</span><span class="p">,</span> <span class="n">bucket_name</span><span class="p">,</span> <span class="n">r2_key_test</span><span class="p">)</span>
     <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtypes_categoricals</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_test</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows of test data"</span><span class="p">)</span>
@@ -8196,8 +8150,8 @@ a.anchor-link {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 6.63 ms, sys: 0 ns, total: 6.63 ms
-Wall time: 6.33 ms
+<pre>CPU times: user 7.11 ms, sys: 972 μs, total: 8.08 ms
+Wall time: 7.64 ms
 </pre>
 </div>
 </div>
@@ -8628,14 +8582,14 @@ Wall time: 6.33 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>(LogisticRegression_imbalanced) Start: 2025-10-14 15:16:46...done at 2025-10-14 15:16:48 (1.92 s).
-(LogisticRegression) Start: 2025-10-14 15:16:48...done at 2025-10-14 15:16:50 (1.77 s).
-(HistGradientBoostingClassifier) Start: 2025-10-14 15:16:50...done at 2025-10-14 15:16:52 (2.09 s).
-(RandomForestClassifier) Start: 2025-10-14 15:16:52...done at 2025-10-14 15:16:56 (4.49 s).
-(XGBClassifier) Start: 2025-10-14 15:16:56...done at 2025-10-14 15:16:57 (0.95 s).
-(Ensemble__VotingClassifier) Start: 2025-10-14 15:16:57...done at 2025-10-14 15:17:03 (5.55 s).
-CPU times: user 1.65 s, sys: 21.9 ms, total: 1.67 s
-Wall time: 16.8 s
+<pre>(LogisticRegression_imbalanced) Start: 2025-10-14 20:59:05...done at 2025-10-14 20:59:07 (1.91 s).
+(LogisticRegression) Start: 2025-10-14 20:59:07...done at 2025-10-14 20:59:09 (1.72 s).
+(HistGradientBoostingClassifier) Start: 2025-10-14 20:59:09...done at 2025-10-14 20:59:11 (2.17 s).
+(RandomForestClassifier) Start: 2025-10-14 20:59:11...done at 2025-10-14 20:59:16 (4.79 s).
+(XGBClassifier) Start: 2025-10-14 20:59:16...done at 2025-10-14 20:59:17 (1.03 s).
+(Ensemble__VotingClassifier) Start: 2025-10-14 20:59:17...done at 2025-10-14 20:59:22 (5.64 s).
+CPU times: user 1.9 s, sys: 39 ms, total: 1.94 s
+Wall time: 17.3 s
 </pre>
 </div>
 </div>
@@ -8701,8 +8655,8 @@ Wall time: 16.8 s
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 6.43 ms, sys: 74 μs, total: 6.5 ms
-Wall time: 14.1 ms
+<pre>CPU times: user 5.34 ms, sys: 71 μs, total: 5.41 ms
+Wall time: 13.3 ms
 </pre>
 </div>
 </div>
@@ -8846,148 +8800,148 @@ Wall time: 14.1 ms
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[24]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_def98_row0_col0, #T_def98_row0_col4, #T_def98_row0_col6, #T_def98_row0_col8, #T_def98_row0_col10, #T_def98_row1_col0, #T_def98_row1_col4, #T_def98_row1_col6, #T_def98_row1_col8, #T_def98_row1_col10, #T_def98_row2_col0, #T_def98_row2_col4, #T_def98_row2_col6, #T_def98_row2_col8, #T_def98_row2_col10, #T_def98_row3_col0, #T_def98_row3_col4, #T_def98_row3_col6, #T_def98_row3_col8, #T_def98_row3_col10, #T_def98_row4_col0, #T_def98_row4_col4, #T_def98_row4_col6, #T_def98_row4_col8, #T_def98_row4_col10, #T_def98_row5_col0, #T_def98_row5_col4, #T_def98_row5_col6, #T_def98_row5_col8, #T_def98_row5_col10 {
+#T_ef8b9_row0_col0, #T_ef8b9_row0_col4, #T_ef8b9_row0_col6, #T_ef8b9_row0_col8, #T_ef8b9_row0_col10, #T_ef8b9_row1_col0, #T_ef8b9_row1_col4, #T_ef8b9_row1_col6, #T_ef8b9_row1_col8, #T_ef8b9_row1_col10, #T_ef8b9_row2_col0, #T_ef8b9_row2_col4, #T_ef8b9_row2_col6, #T_ef8b9_row2_col8, #T_ef8b9_row2_col10, #T_ef8b9_row3_col0, #T_ef8b9_row3_col4, #T_ef8b9_row3_col6, #T_ef8b9_row3_col8, #T_ef8b9_row3_col10, #T_ef8b9_row4_col0, #T_ef8b9_row4_col4, #T_ef8b9_row4_col6, #T_ef8b9_row4_col8, #T_ef8b9_row4_col10, #T_ef8b9_row5_col0, #T_ef8b9_row5_col4, #T_ef8b9_row5_col6, #T_ef8b9_row5_col8, #T_ef8b9_row5_col10 {
   background-color: yellow;
   color: black;
 }
-#T_def98_row0_col5, #T_def98_row0_col7, #T_def98_row0_col9, #T_def98_row0_col11, #T_def98_row1_col5, #T_def98_row1_col7, #T_def98_row1_col9, #T_def98_row1_col11, #T_def98_row2_col5, #T_def98_row2_col7, #T_def98_row2_col9, #T_def98_row2_col11, #T_def98_row3_col5, #T_def98_row3_col7, #T_def98_row3_col9, #T_def98_row3_col11, #T_def98_row4_col5, #T_def98_row4_col7, #T_def98_row4_col9, #T_def98_row4_col11, #T_def98_row5_col5, #T_def98_row5_col7, #T_def98_row5_col9, #T_def98_row5_col11 {
+#T_ef8b9_row0_col5, #T_ef8b9_row0_col7, #T_ef8b9_row0_col9, #T_ef8b9_row0_col11, #T_ef8b9_row1_col5, #T_ef8b9_row1_col7, #T_ef8b9_row1_col9, #T_ef8b9_row1_col11, #T_ef8b9_row2_col5, #T_ef8b9_row2_col7, #T_ef8b9_row2_col9, #T_ef8b9_row2_col11, #T_ef8b9_row3_col5, #T_ef8b9_row3_col7, #T_ef8b9_row3_col9, #T_ef8b9_row3_col11, #T_ef8b9_row4_col5, #T_ef8b9_row4_col7, #T_ef8b9_row4_col9, #T_ef8b9_row4_col11, #T_ef8b9_row5_col5, #T_ef8b9_row5_col7, #T_ef8b9_row5_col9, #T_ef8b9_row5_col11 {
   background-color: teal;
   color: white;
 }
-#T_def98_row0_col14, #T_def98_row1_col14, #T_def98_row2_col14, #T_def98_row3_col14, #T_def98_row4_col14, #T_def98_row5_col14 {
+#T_ef8b9_row0_col14, #T_ef8b9_row1_col14, #T_ef8b9_row2_col14, #T_ef8b9_row3_col14, #T_ef8b9_row4_col14, #T_ef8b9_row5_col14 {
   background-color: darkred;
   color: white;
 }
 </style>
-<table id="T_def98">
+<table id="T_ef8b9">
 <thead>
 <tr>
 <th class="blank level0"> </th>
-<th class="col_heading level0 col0" id="T_def98_level0_col0">model</th>
-<th class="col_heading level0 col1" id="T_def98_level0_col1">threshold</th>
-<th class="col_heading level0 col2" id="T_def98_level0_col2">train_time</th>
-<th class="col_heading level0 col3" id="T_def98_level0_col3">score_time</th>
-<th class="col_heading level0 col4" id="T_def98_level0_col4">test_prauc</th>
-<th class="col_heading level0 col5" id="T_def98_level0_col5">train_prauc</th>
-<th class="col_heading level0 col6" id="T_def98_level0_col6">test_f2</th>
-<th class="col_heading level0 col7" id="T_def98_level0_col7">train_f2</th>
-<th class="col_heading level0 col8" id="T_def98_level0_col8">test_recall</th>
-<th class="col_heading level0 col9" id="T_def98_level0_col9">train_recall</th>
-<th class="col_heading level0 col10" id="T_def98_level0_col10">test_rocauc</th>
-<th class="col_heading level0 col11" id="T_def98_level0_col11">train_rocauc</th>
-<th class="col_heading level0 col12" id="T_def98_level0_col12">pct_diff</th>
-<th class="col_heading level0 col13" id="T_def98_level0_col13">is_overfit</th>
-<th class="col_heading level0 col14" id="T_def98_level0_col14">is_overfit_significant</th>
+<th class="col_heading level0 col0" id="T_ef8b9_level0_col0">model</th>
+<th class="col_heading level0 col1" id="T_ef8b9_level0_col1">threshold</th>
+<th class="col_heading level0 col2" id="T_ef8b9_level0_col2">train_time</th>
+<th class="col_heading level0 col3" id="T_ef8b9_level0_col3">score_time</th>
+<th class="col_heading level0 col4" id="T_ef8b9_level0_col4">test_prauc</th>
+<th class="col_heading level0 col5" id="T_ef8b9_level0_col5">train_prauc</th>
+<th class="col_heading level0 col6" id="T_ef8b9_level0_col6">test_f2</th>
+<th class="col_heading level0 col7" id="T_ef8b9_level0_col7">train_f2</th>
+<th class="col_heading level0 col8" id="T_ef8b9_level0_col8">test_recall</th>
+<th class="col_heading level0 col9" id="T_ef8b9_level0_col9">train_recall</th>
+<th class="col_heading level0 col10" id="T_ef8b9_level0_col10">test_rocauc</th>
+<th class="col_heading level0 col11" id="T_ef8b9_level0_col11">train_rocauc</th>
+<th class="col_heading level0 col12" id="T_ef8b9_level0_col12">pct_diff</th>
+<th class="col_heading level0 col13" id="T_ef8b9_level0_col13">is_overfit</th>
+<th class="col_heading level0 col14" id="T_ef8b9_level0_col14">is_overfit_significant</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_def98_level0_row0">0</th>
-<td class="data row0 col0" id="T_def98_row0_col0">HistGradientBoostingClassifier</td>
-<td class="data row0 col1" id="T_def98_row0_col1">0.754410</td>
-<td class="data row0 col2" id="T_def98_row0_col2">0.959054</td>
-<td class="data row0 col3" id="T_def98_row0_col3">0.025208</td>
-<td class="data row0 col4" id="T_def98_row0_col4">0.636820</td>
-<td class="data row0 col5" id="T_def98_row0_col5">0.686566</td>
-<td class="data row0 col6" id="T_def98_row0_col6">0.742475</td>
-<td class="data row0 col7" id="T_def98_row0_col7">0.783551</td>
-<td class="data row0 col8" id="T_def98_row0_col8">0.726733</td>
-<td class="data row0 col9" id="T_def98_row0_col9">0.770545</td>
-<td class="data row0 col10" id="T_def98_row0_col10">0.847537</td>
-<td class="data row0 col11" id="T_def98_row0_col11">0.871481</td>
-<td class="data row0 col12" id="T_def98_row0_col12">7.245619</td>
-<td class="data row0 col13" id="T_def98_row0_col13">True</td>
-<td class="data row0 col14" id="T_def98_row0_col14">True</td>
+<th class="row_heading level0 row0" id="T_ef8b9_level0_row0">0</th>
+<td class="data row0 col0" id="T_ef8b9_row0_col0">HistGradientBoostingClassifier</td>
+<td class="data row0 col1" id="T_ef8b9_row0_col1">0.754410</td>
+<td class="data row0 col2" id="T_ef8b9_row0_col2">0.980083</td>
+<td class="data row0 col3" id="T_ef8b9_row0_col3">0.025654</td>
+<td class="data row0 col4" id="T_ef8b9_row0_col4">0.636820</td>
+<td class="data row0 col5" id="T_ef8b9_row0_col5">0.686566</td>
+<td class="data row0 col6" id="T_ef8b9_row0_col6">0.742475</td>
+<td class="data row0 col7" id="T_ef8b9_row0_col7">0.783551</td>
+<td class="data row0 col8" id="T_ef8b9_row0_col8">0.726733</td>
+<td class="data row0 col9" id="T_ef8b9_row0_col9">0.770545</td>
+<td class="data row0 col10" id="T_ef8b9_row0_col10">0.847537</td>
+<td class="data row0 col11" id="T_ef8b9_row0_col11">0.871481</td>
+<td class="data row0 col12" id="T_ef8b9_row0_col12">7.245619</td>
+<td class="data row0 col13" id="T_ef8b9_row0_col13">True</td>
+<td class="data row0 col14" id="T_ef8b9_row0_col14">True</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_def98_level0_row1">1</th>
-<td class="data row1 col0" id="T_def98_row1_col0">Ensemble__VotingClassifier</td>
-<td class="data row1 col1" id="T_def98_row1_col1">0.665158</td>
-<td class="data row1 col2" id="T_def98_row1_col2">5.128225</td>
-<td class="data row1 col3" id="T_def98_row1_col3">0.087478</td>
-<td class="data row1 col4" id="T_def98_row1_col4">0.601252</td>
-<td class="data row1 col5" id="T_def98_row1_col5">0.642142</td>
-<td class="data row1 col6" id="T_def98_row1_col6">0.737400</td>
-<td class="data row1 col7" id="T_def98_row1_col7">0.768425</td>
-<td class="data row1 col8" id="T_def98_row1_col8">0.731683</td>
-<td class="data row1 col9" id="T_def98_row1_col9">0.763119</td>
-<td class="data row1 col10" id="T_def98_row1_col10">0.843946</td>
-<td class="data row1 col11" id="T_def98_row1_col11">0.862270</td>
-<td class="data row1 col12" id="T_def98_row1_col12">6.367789</td>
-<td class="data row1 col13" id="T_def98_row1_col13">True</td>
-<td class="data row1 col14" id="T_def98_row1_col14">True</td>
+<th class="row_heading level0 row1" id="T_ef8b9_level0_row1">1</th>
+<td class="data row1 col0" id="T_ef8b9_row1_col0">Ensemble__VotingClassifier</td>
+<td class="data row1 col1" id="T_ef8b9_row1_col1">0.665158</td>
+<td class="data row1 col2" id="T_ef8b9_row1_col2">5.221357</td>
+<td class="data row1 col3" id="T_ef8b9_row1_col3">0.082282</td>
+<td class="data row1 col4" id="T_ef8b9_row1_col4">0.601252</td>
+<td class="data row1 col5" id="T_ef8b9_row1_col5">0.642142</td>
+<td class="data row1 col6" id="T_ef8b9_row1_col6">0.737400</td>
+<td class="data row1 col7" id="T_ef8b9_row1_col7">0.768425</td>
+<td class="data row1 col8" id="T_ef8b9_row1_col8">0.731683</td>
+<td class="data row1 col9" id="T_ef8b9_row1_col9">0.763119</td>
+<td class="data row1 col10" id="T_ef8b9_row1_col10">0.843946</td>
+<td class="data row1 col11" id="T_ef8b9_row1_col11">0.862270</td>
+<td class="data row1 col12" id="T_ef8b9_row1_col12">6.367789</td>
+<td class="data row1 col13" id="T_ef8b9_row1_col13">True</td>
+<td class="data row1 col14" id="T_ef8b9_row1_col14">True</td>
 </tr>
 <tr>
-<th class="row_heading level0 row2" id="T_def98_level0_row2">2</th>
-<td class="data row2 col0" id="T_def98_row2_col0">XGBClassifier</td>
-<td class="data row2 col1" id="T_def98_row2_col1">0.728473</td>
-<td class="data row2 col2" id="T_def98_row2_col2">0.837158</td>
-<td class="data row2 col3" id="T_def98_row2_col3">0.022606</td>
-<td class="data row2 col4" id="T_def98_row2_col4">0.599207</td>
-<td class="data row2 col5" id="T_def98_row2_col5">0.660790</td>
-<td class="data row2 col6" id="T_def98_row2_col6">0.737019</td>
-<td class="data row2 col7" id="T_def98_row2_col7">0.787948</td>
-<td class="data row2 col8" id="T_def98_row2_col8">0.731683</td>
-<td class="data row2 col9" id="T_def98_row2_col9">0.785891</td>
-<td class="data row2 col10" id="T_def98_row2_col10">0.843661</td>
-<td class="data row2 col11" id="T_def98_row2_col11">0.873751</td>
-<td class="data row2 col12" id="T_def98_row2_col12">9.319655</td>
-<td class="data row2 col13" id="T_def98_row2_col13">True</td>
-<td class="data row2 col14" id="T_def98_row2_col14">True</td>
+<th class="row_heading level0 row2" id="T_ef8b9_level0_row2">2</th>
+<td class="data row2 col0" id="T_ef8b9_row2_col0">XGBClassifier</td>
+<td class="data row2 col1" id="T_ef8b9_row2_col1">0.728473</td>
+<td class="data row2 col2" id="T_ef8b9_row2_col2">0.892836</td>
+<td class="data row2 col3" id="T_ef8b9_row2_col3">0.025842</td>
+<td class="data row2 col4" id="T_ef8b9_row2_col4">0.599207</td>
+<td class="data row2 col5" id="T_ef8b9_row2_col5">0.660790</td>
+<td class="data row2 col6" id="T_ef8b9_row2_col6">0.737019</td>
+<td class="data row2 col7" id="T_ef8b9_row2_col7">0.787948</td>
+<td class="data row2 col8" id="T_ef8b9_row2_col8">0.731683</td>
+<td class="data row2 col9" id="T_ef8b9_row2_col9">0.785891</td>
+<td class="data row2 col10" id="T_ef8b9_row2_col10">0.843661</td>
+<td class="data row2 col11" id="T_ef8b9_row2_col11">0.873751</td>
+<td class="data row2 col12" id="T_ef8b9_row2_col12">9.319655</td>
+<td class="data row2 col13" id="T_ef8b9_row2_col13">True</td>
+<td class="data row2 col14" id="T_ef8b9_row2_col14">True</td>
 </tr>
 <tr>
-<th class="row_heading level0 row3" id="T_def98_level0_row3">3</th>
-<td class="data row3 col0" id="T_def98_row3_col0">RandomForestClassifier</td>
-<td class="data row3 col1" id="T_def98_row3_col1">0.643604</td>
-<td class="data row3 col2" id="T_def98_row3_col2">4.203809</td>
-<td class="data row3 col3" id="T_def98_row3_col3">0.076358</td>
-<td class="data row3 col4" id="T_def98_row3_col4">0.530342</td>
-<td class="data row3 col5" id="T_def98_row3_col5">0.557128</td>
-<td class="data row3 col6" id="T_def98_row3_col6">0.631444</td>
-<td class="data row3 col7" id="T_def98_row3_col7">0.653761</td>
-<td class="data row3 col8" id="T_def98_row3_col8">0.604950</td>
-<td class="data row3 col9" id="T_def98_row3_col9">0.626733</td>
-<td class="data row3 col10" id="T_def98_row3_col10">0.785129</td>
-<td class="data row3 col11" id="T_def98_row3_col11">0.797608</td>
-<td class="data row3 col12" id="T_def98_row3_col12">4.807813</td>
-<td class="data row3 col13" id="T_def98_row3_col13">True</td>
-<td class="data row3 col14" id="T_def98_row3_col14">False</td>
+<th class="row_heading level0 row3" id="T_ef8b9_level0_row3">3</th>
+<td class="data row3 col0" id="T_ef8b9_row3_col0">RandomForestClassifier</td>
+<td class="data row3 col1" id="T_ef8b9_row3_col1">0.643604</td>
+<td class="data row3 col2" id="T_ef8b9_row3_col2">4.495731</td>
+<td class="data row3 col3" id="T_ef8b9_row3_col3">0.071062</td>
+<td class="data row3 col4" id="T_ef8b9_row3_col4">0.530342</td>
+<td class="data row3 col5" id="T_ef8b9_row3_col5">0.557128</td>
+<td class="data row3 col6" id="T_ef8b9_row3_col6">0.631444</td>
+<td class="data row3 col7" id="T_ef8b9_row3_col7">0.653761</td>
+<td class="data row3 col8" id="T_ef8b9_row3_col8">0.604950</td>
+<td class="data row3 col9" id="T_ef8b9_row3_col9">0.626733</td>
+<td class="data row3 col10" id="T_ef8b9_row3_col10">0.785129</td>
+<td class="data row3 col11" id="T_ef8b9_row3_col11">0.797608</td>
+<td class="data row3 col12" id="T_ef8b9_row3_col12">4.807813</td>
+<td class="data row3 col13" id="T_ef8b9_row3_col13">True</td>
+<td class="data row3 col14" id="T_ef8b9_row3_col14">False</td>
 </tr>
 <tr>
-<th class="row_heading level0 row4" id="T_def98_level0_row4">4</th>
-<td class="data row4 col0" id="T_def98_row4_col0">LogisticRegression_imbalanced</td>
-<td class="data row4 col1" id="T_def98_row4_col1">0.332606</td>
-<td class="data row4 col2" id="T_def98_row4_col2">0.608115</td>
-<td class="data row4 col3" id="T_def98_row4_col3">0.020708</td>
-<td class="data row4 col4" id="T_def98_row4_col4">0.462527</td>
-<td class="data row4 col5" id="T_def98_row4_col5">0.474420</td>
-<td class="data row4 col6" id="T_def98_row4_col6">0.634018</td>
-<td class="data row4 col7" id="T_def98_row4_col7">0.646993</td>
-<td class="data row4 col8" id="T_def98_row4_col8">0.633663</td>
-<td class="data row4 col9" id="T_def98_row4_col9">0.647525</td>
-<td class="data row4 col10" id="T_def98_row4_col10">0.782140</td>
-<td class="data row4 col11" id="T_def98_row4_col11">0.789639</td>
-<td class="data row4 col12" id="T_def98_row4_col12">2.506701</td>
-<td class="data row4 col13" id="T_def98_row4_col13">True</td>
-<td class="data row4 col14" id="T_def98_row4_col14">False</td>
+<th class="row_heading level0 row4" id="T_ef8b9_level0_row4">4</th>
+<td class="data row4 col0" id="T_ef8b9_row4_col0">LogisticRegression_imbalanced</td>
+<td class="data row4 col1" id="T_ef8b9_row4_col1">0.332606</td>
+<td class="data row4 col2" id="T_ef8b9_row4_col2">0.621192</td>
+<td class="data row4 col3" id="T_ef8b9_row4_col3">0.020803</td>
+<td class="data row4 col4" id="T_ef8b9_row4_col4">0.462527</td>
+<td class="data row4 col5" id="T_ef8b9_row4_col5">0.474420</td>
+<td class="data row4 col6" id="T_ef8b9_row4_col6">0.634018</td>
+<td class="data row4 col7" id="T_ef8b9_row4_col7">0.646993</td>
+<td class="data row4 col8" id="T_ef8b9_row4_col8">0.633663</td>
+<td class="data row4 col9" id="T_ef8b9_row4_col9">0.647525</td>
+<td class="data row4 col10" id="T_ef8b9_row4_col10">0.782140</td>
+<td class="data row4 col11" id="T_ef8b9_row4_col11">0.789639</td>
+<td class="data row4 col12" id="T_ef8b9_row4_col12">2.506701</td>
+<td class="data row4 col13" id="T_ef8b9_row4_col13">True</td>
+<td class="data row4 col14" id="T_ef8b9_row4_col14">False</td>
 </tr>
 <tr>
-<th class="row_heading level0 row5" id="T_def98_level0_row5">5</th>
-<td class="data row5 col0" id="T_def98_row5_col0">LogisticRegression</td>
-<td class="data row5 col1" id="T_def98_row5_col1">0.721596</td>
-<td class="data row5 col2" id="T_def98_row5_col2">0.618770</td>
-<td class="data row5 col3" id="T_def98_row5_col3">0.020606</td>
-<td class="data row5 col4" id="T_def98_row5_col4">0.457164</td>
-<td class="data row5 col5" id="T_def98_row5_col5">0.467764</td>
-<td class="data row5 col6" id="T_def98_row5_col6">0.628436</td>
-<td class="data row5 col7" id="T_def98_row5_col7">0.637220</td>
-<td class="data row5 col8" id="T_def98_row5_col8">0.627723</td>
-<td class="data row5 col9" id="T_def98_row5_col9">0.635891</td>
-<td class="data row5 col10" id="T_def98_row5_col10">0.778885</td>
-<td class="data row5 col11" id="T_def98_row5_col11">0.784178</td>
-<td class="data row5 col12" id="T_def98_row5_col12">2.265949</td>
-<td class="data row5 col13" id="T_def98_row5_col13">True</td>
-<td class="data row5 col14" id="T_def98_row5_col14">False</td>
+<th class="row_heading level0 row5" id="T_ef8b9_level0_row5">5</th>
+<td class="data row5 col0" id="T_ef8b9_row5_col0">LogisticRegression</td>
+<td class="data row5 col1" id="T_ef8b9_row5_col1">0.721596</td>
+<td class="data row5 col2" id="T_ef8b9_row5_col2">0.616889</td>
+<td class="data row5 col3" id="T_ef8b9_row5_col3">0.020484</td>
+<td class="data row5 col4" id="T_ef8b9_row5_col4">0.457164</td>
+<td class="data row5 col5" id="T_ef8b9_row5_col5">0.467764</td>
+<td class="data row5 col6" id="T_ef8b9_row5_col6">0.628436</td>
+<td class="data row5 col7" id="T_ef8b9_row5_col7">0.637220</td>
+<td class="data row5 col8" id="T_ef8b9_row5_col8">0.627723</td>
+<td class="data row5 col9" id="T_ef8b9_row5_col9">0.635891</td>
+<td class="data row5 col10" id="T_ef8b9_row5_col10">0.778885</td>
+<td class="data row5 col11" id="T_ef8b9_row5_col11">0.784178</td>
+<td class="data row5 col12" id="T_ef8b9_row5_col12">2.265949</td>
+<td class="data row5 col13" id="T_ef8b9_row5_col13">True</td>
+<td class="data row5 col14" id="T_ef8b9_row5_col14">False</td>
 </tr>
 </tbody>
 </table>
@@ -9319,8 +9273,8 @@ Wall time: 14.1 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 280 ms, sys: 25.7 ms, total: 306 ms
-Wall time: 152 ms
+<pre>CPU times: user 267 ms, sys: 23 ms, total: 290 ms
+Wall time: 148 ms
 </pre>
 </div>
 </div>
@@ -9328,61 +9282,61 @@ Wall time: 152 ms
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[28]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_dfe4a_row0_col0, #T_dfe4a_row0_col2, #T_dfe4a_row0_col4, #T_dfe4a_row1_col0, #T_dfe4a_row1_col2, #T_dfe4a_row1_col4 {
+#T_a2057_row0_col0, #T_a2057_row0_col2, #T_a2057_row0_col4, #T_a2057_row1_col0, #T_a2057_row1_col2, #T_a2057_row1_col4 {
   background-color: yellow;
   color: black;
 }
-#T_dfe4a_row0_col3, #T_dfe4a_row0_col5, #T_dfe4a_row1_col3, #T_dfe4a_row1_col5 {
+#T_a2057_row0_col3, #T_a2057_row0_col5, #T_a2057_row1_col3, #T_a2057_row1_col5 {
   background-color: teal;
   color: white;
 }
-#T_dfe4a_row0_col8, #T_dfe4a_row1_col8 {
+#T_a2057_row0_col8, #T_a2057_row1_col8 {
   background-color: darkred;
   color: white;
 }
 </style>
-<table id="T_dfe4a">
+<table id="T_a2057">
 <thead>
 <tr>
 <th class="blank level0"> </th>
-<th class="col_heading level0 col0" id="T_dfe4a_level0_col0">model</th>
-<th class="col_heading level0 col1" id="T_dfe4a_level0_col1">threshold</th>
-<th class="col_heading level0 col2" id="T_dfe4a_level0_col2">test_f2</th>
-<th class="col_heading level0 col3" id="T_dfe4a_level0_col3">train_f2</th>
-<th class="col_heading level0 col4" id="T_dfe4a_level0_col4">test_recall</th>
-<th class="col_heading level0 col5" id="T_dfe4a_level0_col5">train_recall</th>
-<th class="col_heading level0 col6" id="T_dfe4a_level0_col6">pct_diff</th>
-<th class="col_heading level0 col7" id="T_dfe4a_level0_col7">is_overfit</th>
-<th class="col_heading level0 col8" id="T_dfe4a_level0_col8">is_overfit_significant</th>
-<th class="col_heading level0 col9" id="T_dfe4a_level0_col9">split</th>
+<th class="col_heading level0 col0" id="T_a2057_level0_col0">model</th>
+<th class="col_heading level0 col1" id="T_a2057_level0_col1">threshold</th>
+<th class="col_heading level0 col2" id="T_a2057_level0_col2">test_f2</th>
+<th class="col_heading level0 col3" id="T_a2057_level0_col3">train_f2</th>
+<th class="col_heading level0 col4" id="T_a2057_level0_col4">test_recall</th>
+<th class="col_heading level0 col5" id="T_a2057_level0_col5">train_recall</th>
+<th class="col_heading level0 col6" id="T_a2057_level0_col6">pct_diff</th>
+<th class="col_heading level0 col7" id="T_a2057_level0_col7">is_overfit</th>
+<th class="col_heading level0 col8" id="T_a2057_level0_col8">is_overfit_significant</th>
+<th class="col_heading level0 col9" id="T_a2057_level0_col9">split</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_dfe4a_level0_row0">0</th>
-<td class="data row0 col0" id="T_dfe4a_row0_col0">HistGradientBoostingClassifier</td>
-<td class="data row0 col1" id="T_dfe4a_row0_col1">0.754410</td>
-<td class="data row0 col2" id="T_dfe4a_row0_col2">0.742475</td>
-<td class="data row0 col3" id="T_dfe4a_row0_col3">0.783551</td>
-<td class="data row0 col4" id="T_dfe4a_row0_col4">0.726733</td>
-<td class="data row0 col5" id="T_dfe4a_row0_col5">0.770545</td>
-<td class="data row0 col6" id="T_dfe4a_row0_col6">7.245619</td>
-<td class="data row0 col7" id="T_dfe4a_row0_col7">True</td>
-<td class="data row0 col8" id="T_dfe4a_row0_col8">True</td>
-<td class="data row0 col9" id="T_dfe4a_row0_col9">validation</td>
+<th class="row_heading level0 row0" id="T_a2057_level0_row0">0</th>
+<td class="data row0 col0" id="T_a2057_row0_col0">HistGradientBoostingClassifier</td>
+<td class="data row0 col1" id="T_a2057_row0_col1">0.754410</td>
+<td class="data row0 col2" id="T_a2057_row0_col2">0.742475</td>
+<td class="data row0 col3" id="T_a2057_row0_col3">0.783551</td>
+<td class="data row0 col4" id="T_a2057_row0_col4">0.726733</td>
+<td class="data row0 col5" id="T_a2057_row0_col5">0.770545</td>
+<td class="data row0 col6" id="T_a2057_row0_col6">7.245619</td>
+<td class="data row0 col7" id="T_a2057_row0_col7">True</td>
+<td class="data row0 col8" id="T_a2057_row0_col8">True</td>
+<td class="data row0 col9" id="T_a2057_row0_col9">validation</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_dfe4a_level0_row1">1</th>
-<td class="data row1 col0" id="T_dfe4a_row1_col0">HistGradientBoostingClassifier</td>
-<td class="data row1 col1" id="T_dfe4a_row1_col1">0.754410</td>
-<td class="data row1 col2" id="T_dfe4a_row1_col2">0.735995</td>
-<td class="data row1 col3" id="T_dfe4a_row1_col3">0.788099</td>
-<td class="data row1 col4" id="T_dfe4a_row1_col4">0.715942</td>
-<td class="data row1 col5" id="T_dfe4a_row1_col5">0.776911</td>
-<td class="data row1 col6" id="T_dfe4a_row1_col6">6.611368</td>
-<td class="data row1 col7" id="T_dfe4a_row1_col7">True</td>
-<td class="data row1 col8" id="T_dfe4a_row1_col8">True</td>
-<td class="data row1 col9" id="T_dfe4a_row1_col9">test</td>
+<th class="row_heading level0 row1" id="T_a2057_level0_row1">1</th>
+<td class="data row1 col0" id="T_a2057_row1_col0">HistGradientBoostingClassifier</td>
+<td class="data row1 col1" id="T_a2057_row1_col1">0.754410</td>
+<td class="data row1 col2" id="T_a2057_row1_col2">0.735995</td>
+<td class="data row1 col3" id="T_a2057_row1_col3">0.788099</td>
+<td class="data row1 col4" id="T_a2057_row1_col4">0.715942</td>
+<td class="data row1 col5" id="T_a2057_row1_col5">0.776911</td>
+<td class="data row1 col6" id="T_a2057_row1_col6">6.611368</td>
+<td class="data row1 col7" id="T_a2057_row1_col7">True</td>
+<td class="data row1 col8" id="T_a2057_row1_col8">True</td>
+<td class="data row1 col9" id="T_a2057_row1_col9">test</td>
 </tr>
 </tbody>
 </table>
@@ -9472,8 +9426,8 @@ Wall time: 152 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 2.76 ms, sys: 949 μs, total: 3.71 ms
-Wall time: 3.37 ms
+<pre>CPU times: user 4.76 ms, sys: 0 ns, total: 4.76 ms
+Wall time: 4.44 ms
 </pre>
 </div>
 </div>
@@ -9588,8 +9542,8 @@ Wall time: 3.37 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 2.14 ms, sys: 966 μs, total: 3.11 ms
-Wall time: 2.78 ms
+<pre>CPU times: user 3.8 ms, sys: 0 ns, total: 3.8 ms
+Wall time: 3.46 ms
 </pre>
 </div>
 </div>
@@ -9700,8 +9654,8 @@ Wall time: 2.78 ms
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>CPU times: user 57.4 ms, sys: 1.96 ms, total: 59.4 ms
-Wall time: 58.4 ms
+<pre>CPU times: user 59 ms, sys: 1.01 ms, total: 60 ms
+Wall time: 59 ms
 </pre>
 </div>
 </div>
@@ -9905,7 +9859,7 @@ Wall time: 58.4 ms
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=af57343c-b9dc-415a-bb09-a9f1f46f8e18">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=af57343c-b9dc-415a-bb09-a9f1f46f8e18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9914,15 +9868,32 @@ Wall time: 58.4 ms
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="n">export_df_to_r2</span><span class="p">(</span>
-    <span class="n">df_val_pred</span><span class="p">,</span>
-    <span class="n">bucket_name</span><span class="p">,</span>
-    <span class="p">(</span>
+<span class="n">r2io</span><span class="o">.</span><span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">s3_client</span><span class="o">=</span><span class="n">s3_client</span><span class="p">,</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df_val_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+    <span class="n">r2_key</span><span class="o">=</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"validation_predictions__</span><span class="si">{</span><span class="n">best_estimator</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
     <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key validation_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 1,693 rows to key: validation_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip
+CPU times: user 37.6 ms, sys: 71 μs, total: 37.7 ms
+Wall time: 369 ms
+</pre>
 </div>
 </div>
 </div>
@@ -9989,7 +9960,7 @@ Wall time: 58.4 ms
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eb9eb94f-9866-4dde-8ee3-c0dfffb71425">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=eb9eb94f-9866-4dde-8ee3-c0dfffb71425">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9997,16 +9968,33 @@ Wall time: 58.4 ms
 <div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># %%time</span>
-<span class="c1"># export_df_to_r2(</span>
-<span class="c1">#     df_test_pred,</span>
-<span class="c1">#     bucket_name,</span>
-<span class="c1">#     (</span>
-<span class="c1">#         f"test_predictions__{best_estimator.lower()}__"</span>
-<span class="c1">#         f"{curr_timestamp}.parquet.gzip"</span>
-<span class="c1">#     ),</span>
-<span class="c1"># )</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">r2io</span><span class="o">.</span><span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">s3_client</span><span class="o">=</span><span class="n">s3_client</span><span class="p">,</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df_test_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+    <span class="n">r2_key</span><span class="o">=</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"test_predictions__</span><span class="si">{</span><span class="n">best_estimator</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
+    <span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key test_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 2,149 rows to key: test_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip
+CPU times: user 36.4 ms, sys: 964 μs, total: 37.4 ms
+Wall time: 313 ms
+</pre>
 </div>
 </div>
 </div>
@@ -10063,6 +10051,56 @@ Wall time: 58.4 ms
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd2506d2-0fca-422d-a8fb-201d2296d23c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Next, export to a file in the R2 bucket with the following file name format <code>all_predictions__&lt;best-model-name&gt;__&lt;current-timestamp-YYmmdd_HHMMSS&gt;.parquet.gzip</code></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0bb0b201-1dbd-456a-bb15-f5bd4d5b3d47">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">r2io</span><span class="o">.</span><span class="n">export_df_to_r2</span><span class="p">(</span>
+    <span class="n">s3_client</span><span class="o">=</span><span class="n">s3_client</span><span class="p">,</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df_all_pred</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+    <span class="n">r2_key</span><span class="o">=</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"all_predictions__</span><span class="si">{</span><span class="n">best_estimator</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">__"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.parquet.gzip"</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key all_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip does not exist in bucket cc-churn-splits
+Exported 10,127 rows to key: all_predictions__histgradientboostingclassifier__20251014_205923.parquet.gzip
+CPU times: user 65.8 ms, sys: 7.89 ms, total: 73.7 ms
+Wall time: 446 ms
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a09678b-e436-4788-a9df-a65920e8221c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -10089,15 +10127,10 @@ Wall time: 58.4 ms
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">pipe_best</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
-    <span class="p">[</span>
-        <span class="p">(</span><span class="s2">"pre"</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">'clf'</span><span class="p">,</span> <span class="n">models</span><span class="p">[</span><span class="n">best_estimator</span><span class="p">]),</span>
-    <span class="p">]</span>
-<span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">pipe_best</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s2">"pre"</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span> <span class="p">(</span><span class="s1">'clf'</span><span class="p">,</span> <span class="n">models</span><span class="p">[</span><span class="n">best_estimator</span><span class="p">])])</span>
 </pre></div>
 </div>
 </div>
@@ -10151,31 +10184,38 @@ Wall time: 58.4 ms
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=39ee6508-5a46-425d-bd22-1ebca38538a7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=39ee6508-5a46-425d-bd22-1ebca38538a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [41]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># %%time</span>
-<span class="c1"># with tempfile.TemporaryFile() as fp:</span>
-<span class="c1">#     # Dump the object to the in-memory file</span>
-<span class="c1">#     joblib.dump(pipe_best, fp)</span>
-
-<span class="c1">#     # Seek to the beginning of the file before uploading</span>
-<span class="c1">#     fp.seek(0)</span>
-
-<span class="c1">#     # Upload the in-memory file to our team's R2 bucket</span>
-<span class="c1">#     s3_client.put_object(</span>
-<span class="c1">#         Body=fp.read(),</span>
-<span class="c1">#         Bucket=bucket_name,</span>
-<span class="c1">#         Key=(</span>
-<span class="c1">#             f"best_model__{best_estimator}__train_val__{curr_timestamp}.joblib"</span>
-<span class="c1">#         ),</span>
-<span class="c1">#     )</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">r2io</span><span class="o">.</span><span class="n">joblib_dump_to_r2</span><span class="p">(</span>
+    <span class="n">s3_client</span><span class="o">=</span><span class="n">s3_client</span><span class="p">,</span>
+    <span class="n">pipe</span><span class="o">=</span><span class="n">pipe_best</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+    <span class="n">r2_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">"best_model__</span><span class="si">{</span><span class="n">best_estimator</span><span class="si">}</span><span class="s2">__train_val__</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.joblib"</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key best_model__HistGradientBoostingClassifier__train_val__20251014_205923.joblib does not exist in bucket cc-churn-splits
+Saved pipeline to key: best_model__HistGradientBoostingClassifier__train_val__20251014_205923.joblib
+CPU times: user 37.4 ms, sys: 1.01 ms, total: 38.4 ms
+Wall time: 367 ms
+</pre>
 </div>
 </div>
 </div>
@@ -10228,31 +10268,38 @@ Wall time: 58.4 ms
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a808778c-b1db-4a5b-9f47-aeca7c6b35b1">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a808778c-b1db-4a5b-9f47-aeca7c6b35b1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [43]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># %%time</span>
-<span class="c1"># with tempfile.TemporaryFile() as fp:</span>
-<span class="c1">#     # Dump the object to the in-memory file</span>
-<span class="c1">#     joblib.dump(pipe_best, fp)</span>
-
-<span class="c1">#     # Seek to the beginning of the file before uploading</span>
-<span class="c1">#     fp.seek(0)</span>
-
-<span class="c1">#     # Upload the in-memory file to our team's R2 bucket</span>
-<span class="c1">#     s3_client.put_object(</span>
-<span class="c1">#         Body=fp.read(),</span>
-<span class="c1">#         Bucket=bucket_name,</span>
-<span class="c1">#         Key=(</span>
-<span class="c1">#             f"best_model__{best_estimator}__all__{curr_timestamp}.joblib"</span>
-<span class="c1">#         ),</span>
-<span class="c1">#     )</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="n">r2io</span><span class="o">.</span><span class="n">joblib_dump_to_r2</span><span class="p">(</span>
+    <span class="n">s3_client</span><span class="o">=</span><span class="n">s3_client</span><span class="p">,</span>
+    <span class="n">pipe</span><span class="o">=</span><span class="n">pipe_best</span><span class="p">,</span>
+    <span class="n">bucket_name</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span>
+    <span class="n">r2_key</span><span class="o">=</span><span class="sa">f</span><span class="s2">"best_model__</span><span class="si">{</span><span class="n">best_estimator</span><span class="si">}</span><span class="s2">__all__</span><span class="si">{</span><span class="n">curr_timestamp</span><span class="si">}</span><span class="s2">.joblib"</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Key best_model__HistGradientBoostingClassifier__all__20251014_205923.joblib does not exist in bucket cc-churn-splits
+Saved pipeline to key: best_model__HistGradientBoostingClassifier__all__20251014_205923.joblib
+CPU times: user 24 ms, sys: 0 ns, total: 24 ms
+Wall time: 368 ms
+</pre>
 </div>
 </div>
 </div>
@@ -10262,7 +10309,7 @@ Wall time: 58.4 ms
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [45]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># %%time</span>
