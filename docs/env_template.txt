@@ -1,0 +1,19 @@
+# R2 Storage Credentials Template
+# Copy this file to .env and fill in your actual credentials
+
+# Your Cloudflare R2 Account ID (32-character hex string)
+ACCOUNT_ID=your_account_id_here
+
+# Your R2 Access Key ID (from Cloudflare R2 dashboard)
+ACCESS_KEY_ID_USER2=your_access_key_id_here
+
+# Your R2 Secret Access Key (from Cloudflare R2 dashboard)
+SECRET_ACCESS_KEY_USER2=your_secret_access_key_here
+
+# Example format:
+# ACCOUNT_ID=2daf6b1f267e9f9e103b42c2090e356f
+# ACCESS_KEY_ID_USER2=9485fa4ecf642380184fcbd99252412b
+# SECRET_ACCESS_KEY_USER2=bb5986d17cb6c048e8c0c7e184fc6f201a97ad63116106167edeb743c0a440a4
+
+# Note: Keep your .env file secure and never commit it to Git
+# The .gitignore file should already exclude .env files

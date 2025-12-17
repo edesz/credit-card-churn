@@ -19,14 +19,21 @@ See the project scope [here](https://github.com/edesz/credit-card-churn/blob/mai
 3. EDA (`03_eda.ipynb`)
    - exploratory data analysis
    - team member: I. S.
-4. Machine Learning
-   - starter notebook (`04_model_development_logisticregression.ipynb`)
-     - team member: I. S.
-   - advanced notebook (`05_*.ipynb`)
-     - team member: I. Y.
-5. Business Metrics (`06_*.ipynb`)
-   - calculating business metrics and identifying customers to target using ML predictions
+4. Machine Learning - Cost-Sensitive Learning
+   - linear models (`04_model_development__cost_sensitive_learning__linear_models.ipynb`)
      - team member: E. D.
+   - tree-based models (`05_model_development__cost_sensitive_learning__tree_based_models.ipynb`)
+     - team member: E. D.
+5. Business Metrics Analysis
+   - at-risk customers (`06_get_at_risk_and_max_roi_customers_from_business_metrics.ipynb`)
+     - team member: E. D.
+   - all customers ROI (`07_all_customers_get_at_risk_and_max_roi_customers_from_business_metrics.ipynb`)
+     - team member: E. D.
+6. Production ML Pipeline (`08_production_ml_pipeline.ipynb`)
+   - comprehensive ML pipeline with XGBoost, LightGBM, Random Forest
+   - SHAP interpretability, CLV calculator, ROI optimization
+   - production-ready infrastructure (src/models, src/business, src/evaluation, src/utils)
+     - team member: I. Y.
 
 ## Contributing (for project collaborators)
 
