@@ -1,0 +1,20 @@
+# File patterns to exclude from linting and formatting
+exclude = [
+    ".ipynb_checkpoints",
+    ".git",
+    ".pytest_cache",
+    ".eggs",
+]
+
+# General settings
+line-length = 79
+indent-width = 4
+
+target-version = "py312"
+
+[format]
+# ensure Ruff's formatter behaves like Black
+quote-style = "double"
+indent-style = "space"
+# explicitly tell Ruff to follow Black's line-length and rules
+skip-magic-trailing-comma = false
