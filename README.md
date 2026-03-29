@@ -69,8 +69,8 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 
 ```bash
 ├── data
-│   ├── processed                    <- The final, canonical data sets for modeling.
-│   └── raw                          <- The original, immutable data dump.
+│   ├── processed                     <- The final, canonical data sets for modeling.
+│   └── raw                           <- The original, immutable data dump.
 ├── docs
 │   ├── env_template.txt              <- example of .env file contents with credentials.
 │   └── R2_SETUP_GUIDE.md             <- Guide to use Python to connect to team resources on R2 bucket.
