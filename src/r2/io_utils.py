@@ -5,14 +5,41 @@
 
 import tempfile
 from io import BytesIO
+from typing import Any, Dict, List, Optional
 
 import botocore.exceptions
 import joblib
 import pandas as pd
+from boto3 import resource as boto3_resource
+from botocore.config import Config
 
 
-def pandas_read_parquet_r2(s3_client, bucket_name, r2_key, columns=None):
-    """Read parquet file from private R2 bucket."""
+def pandas_read_parquet_r2(
+    s3_client,
+    bucket_name: str,
+    r2_key: str,
+    columns: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    """Reads a parquet file from a private R2 bucket into a DataFrame.
+
+    This function retrieves a parquet object from an R2 (S3-compatible)
+    bucket and loads it into a pandas DataFrame using an in-memory buffer.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        bucket_name: Name of the R2 bucket.
+        r2_key: Object key (path) to the parquet file.
+        columns: Optional list of columns to load.
+
+    Returns:
+        pd.DataFrame: Loaded DataFrame with optional column filtering.
+
+    Raises:
+        botocore.exceptions.ClientError: If object retrieval fails.
+
+    Examples:
+        >>> df = pandas_read_parquet_r2(client, "bucket", "file.parquet")
+    """
     s3_object = s3_client.get_object(Bucket=bucket_name, Key=r2_key)
     df = pd.read_parquet(
         BytesIO(s3_object["Body"].read()),
@@ -23,9 +50,30 @@ def pandas_read_parquet_r2(s3_client, bucket_name, r2_key, columns=None):
 
 
 def pandas_read_filtered_parquets_r2(
-    s3_client, bucket_name, key_prefix, cols_to_load
-):
-    """Read parquet files using partial filename from private R2 bucket."""
+    s3_client, bucket_name: str, key_prefix: str, cols_to_load: List[str]
+) -> pd.DataFrame:
+    """Reads parquet files from R2 bucket using a key prefix filter.
+
+    This function lists objects matching a prefix and loads them into a
+    single concatenated DataFrame.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        bucket_name: Name of the R2 bucket.
+        key_prefix: Prefix used to filter parquet files.
+        cols_to_load: List of columns to load from each file.
+
+    Returns:
+        pd.DataFrame: Concatenated DataFrame from matching parquet files.
+
+    Raises:
+        AssertionError: If the list_objects API call fails.
+
+    Examples:
+        >>> df = pandas_read_filtered_parquets_r2(
+        ...     client, "bucket", "prefix/", ["col1", "col2"]
+        ... )
+    """
     s3_objects = s3_client.list_objects_v2(
         Bucket=bucket_name, Prefix=key_prefix, MaxKeys=1
     )
@@ -42,14 +90,72 @@ def pandas_read_filtered_parquets_r2(
     return df
 
 
-def export_df_to_r2(s3_client, df, bucket_name, r2_key):
-    """Export DataFrame to file in private R2 bucket, if not present."""
+def pandas_read_xlsx_r2(
+    s3_client, bucket_name: str, r2_key: str, dtypes: Dict[str, str]
+) -> pd.DataFrame:
+    """Reads an Excel file from a private R2 bucket into a DataFrame.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        bucket_name: Name of the R2 bucket.
+        r2_key: Object key (path) to the Excel file.
+        dtypes: Dictionary mapping column names to data types.
+
+    Returns:
+        pd.DataFrame: Loaded DataFrame with specified dtypes.
+
+    Raises:
+        botocore.exceptions.ClientError: If object retrieval fails.
+
+    Examples:
+        >>> df = pandas_read_xlsx_r2(
+        ...     client, "bucket", "file.xlsx", {"col": "string"}
+        ... )
+    """
+    s3_object = s3_client.get_object(Bucket=bucket_name, Key=r2_key)
+    df = pd.read_excel(
+        BytesIO(s3_object["Body"].read()),
+        dtype=dtypes,
+        dtype_backend="pyarrow",
+    )
+    return df
+
+
+def export_df_to_r2(
+    s3_client,
+    df: pd.DataFrame,
+    bucket_name: str,
+    r2_key: str,
+    verbose: bool = True,
+) -> None:
+    """Exports a DataFrame to an R2 bucket if the object does not exist.
+
+    The DataFrame is serialized as a compressed parquet file and uploaded
+    only if the key is not already present.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        df: DataFrame to export.
+        bucket_name: Name of the R2 bucket.
+        r2_key: Object key (path) for the parquet file.
+        verbose: Whether to print status messages.
+
+    Returns:
+        None
+
+    Raises:
+        botocore.exceptions.ClientError: For unexpected S3 errors.
+
+    Examples:
+        >>> export_df_to_r2(client, df, "bucket", "data/file.parquet")
+    """
     try:
         s3_client.head_object(Bucket=bucket_name, Key=r2_key)
         print(f"Key {r2_key} already exists in bucket {bucket_name}")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "404":
-            print(f"Key {r2_key} does not exist in bucket {bucket_name}")
+            if verbose:
+                print(f"Key {r2_key} does not exist in bucket {bucket_name}")
             buffer = BytesIO()
             df.to_parquet(
                 buffer, index=False, engine="pyarrow", compression="gzip"
@@ -58,21 +164,47 @@ def export_df_to_r2(s3_client, df, bucket_name, r2_key):
                 Bucket=bucket_name, Key=r2_key, Body=buffer.getvalue()
             )
             assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
-            print(f"Exported {len(df):,} rows to key: {r2_key}")
+            if verbose:
+                print(f"Exported {len(df):,} rows to key: {r2_key}")
         elif e.response["Error"]["Code"] == "403":
-            print(f"Access denied to bucket {bucket_name} or key {r2_key}")
+            if verbose:
+                print(f"Access denied to bucket {bucket_name} or key {r2_key}")
         else:
-            print(f"An unexpected error occurred: {e}")
+            if verbose:
+                print(f"An unexpected error occurred: {e}")
 
 
-def joblib_dump_to_r2(s3_client, pipe, bucket_name, r2_key):
-    """Export trained pipeline to file in private R2 bucket, if not present."""
+def joblib_dump_to_r2(
+    s3_client, pipe: Any, bucket_name: str, r2_key: str, verbose: bool = True
+) -> None:
+    """Serializes and uploads a Python object to an R2 bucket.
+
+    The object (e.g., trained pipeline) is saved using joblib and uploaded
+    only if the target key does not already exist.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        pipe: Python object to serialize (e.g., model pipeline).
+        bucket_name: Name of the R2 bucket.
+        r2_key: Object key (path) for the saved object.
+        verbose: Whether to print status messages.
+
+    Returns:
+        None
+
+    Raises:
+        botocore.exceptions.ClientError: For unexpected S3 errors.
+
+    Examples:
+        >>> joblib_dump_to_r2(client, pipe, "bucket", "model.joblib")
+    """
     try:
         s3_client.head_object(Bucket=bucket_name, Key=r2_key)
         print(f"Key {r2_key} already exists in bucket {bucket_name}")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "404":
-            print(f"Key {r2_key} does not exist in bucket {bucket_name}")
+            if verbose:
+                print(f"Key {r2_key} does not exist in bucket {bucket_name}")
             with tempfile.TemporaryFile() as fp:
                 # Dump the object to the in-memory file
                 joblib.dump(pipe, fp)
@@ -90,8 +222,61 @@ def joblib_dump_to_r2(s3_client, pipe, bucket_name, r2_key):
                 Bucket=bucket_name, Prefix=key_prefix, MaxKeys=1
             )
             assert s3_objects["ResponseMetadata"]["HTTPStatusCode"] == 200
-            print(f"Saved pipeline to key: {r2_key}")
+            if verbose:
+                print(f"Saved pipeline to key: {r2_key}")
         elif e.response["Error"]["Code"] == "403":
-            print(f"Access denied to bucket {bucket_name} or key {r2_key}")
+            if verbose:
+                print(f"Access denied to bucket {bucket_name} or key {r2_key}")
         else:
-            print(f"An unexpected error occurred: {e}")
+            if verbose:
+                print(f"An unexpected error occurred: {e}")
+
+
+def joblib_load_from_r2(s3_client, bucket_name: str, key_prefix: str) -> Any:
+    """Loads a joblib-serialized object from an R2 bucket.
+
+    This function retrieves the latest object matching a prefix and
+    deserializes it using joblib.
+
+    Args:
+        s3_client: Boto3-compatible S3 client.
+        bucket_name: Name of the R2 bucket.
+        key_prefix: Prefix used to locate the object.
+
+    Returns:
+        Any: Deserialized Python object.
+
+    Raises:
+        AssertionError: If object listing fails.
+
+    Examples:
+        >>> model = joblib_load_from_r2(client, "bucket", "model_prefix")
+    """
+    # get list of objects based on key prefix
+    s3_objects = s3_client.list_objects_v2(
+        Bucket=bucket_name, Prefix=key_prefix, MaxKeys=1
+    )
+    assert s3_objects["ResponseMetadata"]["HTTPStatusCode"] == 200
+    # # get last object from list
+    r2_key = list(map(lambda x: x["Key"], s3_objects["Contents"]))[-1]
+
+    # get s3_resource from s3_client
+    credentials = s3_client._request_signer._credentials
+    s3_resource = boto3_resource(
+        "s3",
+        endpoint_url=s3_client.meta.endpoint_url,
+        aws_access_key_id=credentials.access_key,
+        aws_secret_access_key=credentials.secret_key,
+        region_name="auto",
+        config=Config(signature_version="s3v4"),
+    )
+
+    # get bucket object from s3_resource
+    s3_bucket = s3_resource.Bucket(bucket_name)
+
+    # load object from bucket
+    with BytesIO() as data:
+        s3_bucket.download_fileobj(r2_key, data)
+        data.seek(0)
+        object = joblib.load(data)
+    return object

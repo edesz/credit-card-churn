@@ -11,9 +11,11 @@ dependencies = []
 
 [tool.pixi.workspace]
 channels = ["https://prefix.dev/conda-forge"]
-platforms = [
-    "linux-64",
-]
+platforms = ["linux-64"]
+
+# location where the build tool should find custom modules to be tested
+[tool.setuptools.packages.find]
+where = ["src"]
 
 # ============================= Conda dependencies =============================
 
@@ -26,51 +28,78 @@ python-dotenv = "*"
 openpyxl = "*"
 boto3 = "*"
 pandas = "*"
+pandera-pandas = "*"
+pandera-hypotheses = "*"
 matplotlib = "*"
 seaborn = "*"
+altair = "*"
 scikit-learn = "*"
+metaflow = "*"
 xgboost = "*"
-lightgbm = "*"
-imbalanced-learn = "*"
 joblib = "*"
-statsmodels = "*"
 shap = "*"
-evidently = "*"
 
 # ================== Make this project available as a package ==================
 
 [tool.pixi.pypi-dependencies]
 cc-churn = { path = ".", editable = true }
 
-[build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling"]
-
 # ========= Specify non-essential dependencies in features ========
 
 [tool.pixi.feature.notebooks.dependencies]
 # create a notebooks feature for exploration
+ipykernel = "*"
 ipywidgets = "*"
 jupyterlab = "*"
-nbconvert = "*"
 jupysql = "*"
 jupytext = "*"
 jupyter_server_ydoc = "*"
 jupyter_server_fileid = "*"
-panel = "*"
-nbclassic = "*"
 jupyter-ruff = "*"
+nbconvert = "*"
+nbclassic = "*"
+panel = "*"
 toml = "*"
+
+[tool.pixi.feature.ci.dependencies]
+# create a data ci feature
+pytz = "*"
+papermill = "*"
+typer = "*"
+
+[tool.pixi.feature.test.dependencies]
+# create a test feature
+ipykernel = "*"
+moto = "*"
+pytest = "*"
+coverage = "*"
+pytest-html = "*"
 
 # ========= Specify non-essential dependencies in environments ========
 
 [tool.pixi.environments]
 # create environments that use features created above
 default = { solve-group = "default" }
-notebooks = { features = ["notebooks"], solve-group = "default" }
+# notebooks env inherits default feature and notebooks feature to run jlab
+notebooks = { features = ['default', "notebooks"], solve-group = "notebooks" }
+ci = { features = ["default", 'notebooks', "ci"], solve-group = "ci" }
+# test env inherits default feature and unit-test feature to run pytest
+test = { features = ["default", "test"], solve-group = "default" }
 
 # ========================== Define tasks (shortcuts) ==========================
 
 [tool.pixi.feature.notebooks.tasks]
 # run development tasks for the notebooks feature
-jlab = { cmd = "jupyter lab", depends-on = [] }
+jlab = { cmd = "jupyter lab", depends-on = [], description="Launch Jupyterlab", default-environment = "notebooks" }
+
+[tool.pixi.feature.test.tasks]
+# run unit-test tasks
+test = { cmd = """
+    coverage run -m pytest &&
+    coverage report -m &&
+    coverage html && coverage xml
+    """, description="Run unit tests with pytest", default-environment = "test" }
+
+[tool.pixi.feature.ci.tasks]
+# programmatically run all development tasks for the ci feature
+pmill = { cmd = "python3 papermill_runner.py 05", description="Perform ML Validation", depends-on = [] }

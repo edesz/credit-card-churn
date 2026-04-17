@@ -1,22 +1,60 @@
 #!/usr/bin/env python3
 
 
-"""Define helper functions to assign cost to model predictions."""
+"""Define helper functions to assign cost to model predictions using ROI."""
 
+
+from typing import Dict, Tuple
 
 import numpy as np
+import pandas as pd
 
 
 def calc_predicted_savings(
-    df,
-    interchange_rate,
-    apr,
-    card_fees,
-    multiplier,
-    success_rate,
-    intervention_cost,
-):
-    """Calculated predicted savings from CLV and success rate."""
+    df: pd.DataFrame,
+    interchange_rate: float,
+    apr: float,
+    card_fees: Dict[str, float],
+    multiplier: float,
+    success_rate: float,
+    intervention_cost: float,
+) -> pd.DataFrame:
+    """Calculates expected customer-level savings based on predicted churn risk.
+
+    This function derives multiple revenue components (interchange, interest,
+    and fees) to estimate annual revenue and customer lifetime value (CLV).
+    It then computes expected savings by combining predicted churn probability,
+    intervention success rate, and CLV, adjusted for intervention cost.
+
+    Args:
+        df: Input DataFrame containing customer-level features, including
+            `total_trans_amt`, `total_revolv_bal`, `card_category`,
+            and `y_pred_proba`.
+        interchange_rate: Proportion of transaction volume earned as revenue.
+        apr: Annual percentage rate applied to revolving balances.
+        card_fees: Mapping of card category to annual fee.
+        multiplier: Factor used to convert annual revenue into CLV.
+        success_rate: Probability that intervention successfully prevents churn.
+        intervention_cost: Cost incurred per customer intervention.
+
+    Returns:
+        pd.DataFrame: A DataFrame with additional columns:
+            - `interchange_rev`, `interest_rev`, `fee_rev`
+            - `annual_rev`, `clv`
+            - `success_rate`
+            - `expected_savings`
+
+    Examples:
+        >>> df_out = calc_predicted_savings(
+        ...     df,
+        ...     interchange_rate=0.02,
+        ...     apr=0.15,
+        ...     card_fees={"Gold": 100, "Silver": 50},
+        ...     multiplier=3.0,
+        ...     success_rate=0.25,
+        ...     intervention_cost=20.0,
+        ... )
+    """
     return df.assign(
         interchange_rev=lambda df: df["total_trans_amt"] * interchange_rate,
         interest_rev=lambda df: df["total_revolv_bal"] * apr,
@@ -33,33 +71,105 @@ def calc_predicted_savings(
     )
 
 
-def calc_true_savings(y_pred, is_churned, success_rate, clv, intervention_cost):
-    """Calculate net savings relative to true outcome."""
+def calc_true_savings(
+    pred: int,
+    true: int,
+    success_rate: float,
+    clv: float,
+    intervention_cost: float,
+) -> float:
+    """Computes realized savings for a single prediction outcome.
+
+    The function evaluates the net benefit of an intervention based on
+    predicted action and actual churn outcome.
+
+    Args:
+        pred: Binary prediction (1 = intervene, 0 = no intervention).
+        true: Actual churn outcome (1 = churned, 0 = retained).
+        success_rate: Probability that intervention prevents churn.
+        clv: Customer lifetime value.
+        intervention_cost: Cost of applying the intervention.
+
+    Returns:
+        float: Net realized savings for the given case.
+
+    Examples:
+        >>> calc_true_savings(1, 1, 0.3, clv=1000, intervention_cost=50)
+        250.0
+    """
     # intervene, actual churn
-    if y_pred == 1 and is_churned == 1:
+    if pred == 1 and true == 1:
         return success_rate * clv - intervention_cost
-    # intervene, but they’d stay anyway
-    elif y_pred == 1 and is_churned == 0:
+    # intervene, but they would stay anyway
+    elif pred == 1 and true == 0:
         return -intervention_cost
     # no intervention
     else:
-        return 0
+        return 0.0
 
 
 def get_cost(
-    df,
-    pred_proba_cutoff,
-    interchange_rate,
-    apr,
-    card_fees,
-    multiplier,
-    success_rate,
-    intervention_cost,
-):
-    """Calculate error in estimated savings."""
+    df: pd.DataFrame,
+    pred_proba_cutoff: float,
+    interchange_rate: float,
+    apr: float,
+    card_fees: Dict[str, float],
+    multiplier: float,
+    success_rate: float,
+    intervention_cost: float,
+    get_atrisk_only: bool = True,
+) -> Tuple[pd.DataFrame, float, float]:
+    """Evaluates model performance in terms of financial impact and ROI.
+
+    This function filters customers above a prediction probability threshold,
+    computes expected and true savings, and derives cumulative savings and ROI
+    metrics. It also quantifies the cost of model error as the deviation between
+    predicted and actual savings.
+
+    Args:
+        df: Input DataFrame containing predictions and true labels, including
+            `y_pred_proba`, `y_pred`, and `is_churned`.
+        pred_proba_cutoff: Threshold above which customers are selected for
+            intervention.
+        interchange_rate: Proportion of transaction volume earned as revenue.
+        apr: Annual percentage rate applied to revolving balances.
+        card_fees: Mapping of card category to annual fee.
+        multiplier: Factor used to convert annual revenue into CLV.
+        success_rate: Probability that intervention successfully prevents churn.
+        intervention_cost: Cost incurred per customer intervention.
+        get_atrisk_only: Whether to get at risk (True) or all (False) customers.
+
+    Returns:
+        Tuple[pd.DataFrame, float, float]:
+            - DataFrame with detailed cost, savings, and ROI metrics
+            - Total predicted savings (float)
+            - Cost of model error as a percentage (float)
+
+    Raises:
+        KeyError: If required columns are missing from the input DataFrame.
+        ZeroDivisionError: If true total savings is zero when computing model cost.
+
+    Examples:
+        >>> df_costs, pred_total, model_cost = get_cost(
+        ...     df,
+        ...     pred_proba_cutoff=0.6,
+        ...     interchange_rate=0.02,
+        ...     apr=0.15,
+        ...     card_fees={"Gold": 100, "Silver": 50},
+        ...     multiplier=3.0,
+        ...     success_rate=0.25,
+        ...     intervention_cost=20.0,
+        ...     get_atrisk_only=True,
+        ... )
+    """
+    df = (
+        df.query(f"y_pred_proba >= {pred_proba_cutoff}")
+        if get_atrisk_only
+        else df
+    )
     df_costs = (
         calc_predicted_savings(
-            df.query(f"y_pred_proba >= {pred_proba_cutoff}"),
+            df,
             interchange_rate=interchange_rate,
             apr=apr,
             card_fees=card_fees,
@@ -107,5 +217,10 @@ def get_cost(
     pred_total = df_costs["expected_savings"].sum()
     true_total = df_costs["true_savings"].sum()
     # calculate business cost of model (error in predicted savings)
-    cost_of_model = 100 * (true_total - pred_total) / true_total
+    if true_total == 0:
+        raise ZeroDivisionError(
+            "True total savings is zero; cannot compute model cost."
+        )
+    else:
+        cost_of_model = 100 * (true_total - pred_total) / true_total
     return [df_costs, pred_total, cost_of_model]

@@ -3,98 +3,87 @@
 
 """Define helper functions for model evaluation."""
 
+from typing import Dict
+
 import numpy as np
 import pandas as pd
-from sklearn.pipeline import Pipeline
 
 
-def evaluate_model(
-    preprocessor,
-    model,
-    model_name,
-    X_train,
-    y_train,
-    X_test,
-    y_test,
-    scorers,
-    class_weights=None,
-    primary_metric="f2",
-    threshold_overfit=5,
-    threshold_scoring=0.5,
-) -> list[pd.DataFrame]:
-    """."""
-    pipe = Pipeline(
-        steps=[
-            ("preprocessor", preprocessor),
-            ("classifier", model),
-        ]
-    )
+def score_predictions(
+    scorers: Dict[str, object],
+    y_train: pd.Series,
+    y_train_pred: pd.Series,
+    y_test: pd.Series,
+    y_test_pred: pd.Series,
+    model_name: str,
+    primary_metric: str = "f2",
+    threshold_overfit: float = 5,
+) -> pd.DataFrame:
+    """Computes train/test metrics and evaluates overfitting.
 
-    # train on full train split
-    _ = pipe.fit(X_train, y_train.to_numpy().ravel())
+    This function applies a dictionary of scorer objects to predicted
+    labels for both training and test datasets. It returns a DataFrame
+    with metric values and overfitting diagnostics based on a selected
+    primary metric.
 
-    # predict full test split
-    if "Dummy" not in model_name:
-        assert model.class_weight == class_weights
-        y_train_pred_proba = pd.Series(
-            pipe.predict_proba(X_train)[:, 1],
-            index=X_train.index,
-            dtype="float64[pyarrow]",
-        )
-        y_train_pred = pd.Series(
-            (y_train_pred_proba >= threshold_scoring).astype(int),
-            index=X_train.index,
-            dtype="int16[pyarrow]",
-        )
-        y_test_pred_proba = pd.Series(
-            pipe.predict_proba(X_test)[:, 1],
-            index=X_test.index,
-            dtype="float64[pyarrow]",
-        )
-        y_test_pred = pd.Series(
-            (y_test_pred_proba >= threshold_scoring).astype(int),
-            index=X_test.index,
-            dtype="int16[pyarrow]",
-        )
-    else:
-        y_train_pred = pd.Series(
-            pipe.predict(X_train),
-            index=X_train.index,
-            dtype="int16[pyarrow]",
-        )
-        y_train_pred_proba = np.nan
-        y_test_pred = pd.Series(
-            pipe.predict(X_test),
-            index=X_test.index,
-            dtype="int16[pyarrow]",
-        )
-        y_test_pred_proba = np.nan
-    df_test_pred = pd.concat(
-        [
-            X_test.assign(y_pred=y_test_pred, y_pred_proba=y_test_pred_proba),
-            y_test,
-        ],
-        axis=1,
-    )
-    assert len(df_test_pred) == len(X_test)
+    Overfitting is assessed by comparing train and test scores:
+        - Percentage difference between train and test scores.
+        - Boolean flag indicating if train > test.
+        - Boolean flag for significant overfitting based on a threshold.
 
-    # get scores on train and test splits
-    scores_eval = dict(model=model_name)
+    Args:
+        scorers: Dictionary mapping metric names to sklearn scorer
+            objects. Each scorer must expose `_score_func` and `_kwargs`.
+        y_train: True labels for the training dataset.
+        y_train_pred: Predicted labels for the training dataset.
+        y_test: True labels for the test dataset.
+        y_test_pred: Predicted labels for the test dataset.
+        model_name: Name of the model for labeling results.
+        primary_metric: Metric used for overfitting diagnostics.
+        threshold_overfit: Percentage threshold to flag significant
+            overfitting.
+
+    Returns:
+        pd.DataFrame: Single-row DataFrame containing:
+            - train/test scores for each metric
+            - percentage difference for the primary metric
+            - overfitting indicators
+            - model name identifier
+
+    Raises:
+        KeyError: If `primary_metric` is not present in `scorers`.
+        AttributeError: If scorer objects lack required attributes.
+
+    Examples:
+        >>> df_scores = score_predictions(
+        ...     scorers=scorers,
+        ...     y_train=y_train,
+        ...     y_train_pred=y_train_pred,
+        ...     y_test=y_test,
+        ...     y_test_pred=y_test_pred,
+        ...     model_name="logreg",
+        ... )
+    """
+    scores_eval = dict(model_name=model_name)
     scores_eval.update(
         {
-            f"train_{k}": scorers[k]._score_func(y_train, y_train_pred)
-            for k, v in scorers.items()
+            f"train_{k}": scorers[k]._score_func(
+                y_train, y_train_pred, **scorers[k]._kwargs
+            )
+            for k, _ in scorers.items()
         }
     )
     scores_eval.update(
         {
-            f"test_{k}": scorers[k]._score_func(y_test, y_test_pred)
-            for k, v in scorers.items()
+            f"test_{k}": scorers[k]._score_func(
+                y_test, y_test_pred, **scorers[k]._kwargs
+            )
+            for k, _ in scorers.items()
         }
     )
 
     # estimate overfitting
-    df_scores_test = (
+    df_scores = (
         pd.DataFrame.from_records([scores_eval])
         .convert_dtypes(dtype_backend="pyarrow")
         .assign(
@@ -102,7 +91,7 @@ def evaluate_model(
                 (
                     df[f"train_{primary_metric}"] - df[f"test_{primary_metric}"]
                 ).abs()
-                / df[f"train_{primary_metric}"]
+                / df[f"train_{primary_metric}"].replace(0, np.nan)
                 * 100
             ),
             is_overfit=lambda df: (
@@ -112,8 +101,8 @@ def evaluate_model(
             ),
             is_overfit_significant=lambda df: (
                 (
-                    (df["is_overfit"] == True)
-                    & (df["pct_diff"] > threshold_overfit)
+                    df["is_overfit"].fillna(False)
+                    & (df["pct_diff"].fillna(0) > threshold_overfit)
                 ).astype("bool[pyarrow]")
             ),
         )
@@ -127,4 +116,4 @@ def evaluate_model(
             }
         )
     )
-    return [df_scores_test, df_test_pred.assign(model_name=model_name)]
+    return df_scores

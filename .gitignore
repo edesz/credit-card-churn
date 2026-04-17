@@ -25,7 +25,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-pixi.lock
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -83,8 +82,13 @@ target/
 data/raw/*
 data/processed/*
 
+# exclude notebooks with outputs from source control by default
+executed-notebooks/manual/*
+executed-notebooks/scripted/*
+
 # exclude models from source control by default
-models/
+models/*/*
+notebooks/.metaflow/*
 
 # gitkeep files
 !.gitkeep
