@@ -2133,7 +2133,7 @@ packages:
 - pypi: ./
   name: cc-churn
   version: 0.1.0
-  sha256: 64d68d3bf39fa989a91f5207c1923437aa2f294d903fdef281ae9aaa63ecc9b3
+  sha256: 519fff8680bb0647584456481270b952f6c4cd5665367a1462162046ff95d105
   requires_python: '>=3.10'
 - conda: https://prefix.dev/conda-forge/noarch/certifi-2026.2.25-pyhd8ed1ab_0.conda
   sha256: a6b118fd1ed6099dc4fc03f9c492b88882a780fadaef4ed4f93dc70757713656
