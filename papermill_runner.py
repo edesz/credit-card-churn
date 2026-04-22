@@ -134,10 +134,16 @@ def main(
         + experiment_runs_params__5
     )
 
-    nb_list = [
-        {"prefix": "05", "path": str(nb_paths[4]), "params": params}
-        for params in experiment_runs_params__all
-    ]
+    if nb_nums == "05":
+        nb_list = [
+            {"prefix": "05", "path": str(nb_paths[4]), "params": params}
+            for params in experiment_runs_params__all
+        ]
+    elif nb_nums == "13":
+        nb_param_13 = dict(r2_key_raw_data="BankChurners.xlsx")
+        nb_list = [
+            {"prefix": "13", "path": str(nb_paths[12]), "params": nb_param_13}
+        ]
 
     # convert value of params key to json object (without this, pyarrow
     # makes all rows of the params column have the same keys)

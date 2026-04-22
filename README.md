@@ -1,5 +1,9 @@
 # Use ML to Find Credit Card Customers At Risk of Churning
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/edesz/credit-card-churn/.github%2Fworkflows%2Fmain.yml?style=for-the-badge&label=CI)
+ ![Static Badge](https://img.shields.io/badge/License-MIT-brightgreen?style=for-the-badge&link=https%3A%2F%2Fchoosealicense.com%2Flicenses%2Fmit%2F)
+ ![Static Badge](https://img.shields.io/badge/Open%20Source-Yes-yellow?style=for-the-badge&link=https%3A%2F%2Fopensource.com%2F)
+
 ## About
 
 Use ML to identify credit card customers at a bank who are at risk of churning, for retrospective targeting.
@@ -17,7 +21,7 @@ See the project scope [here](https://github.com/edesz/credit-card-churn/blob/mai
 
 ### Installation and Development
 
-1. Create virtual environment for literate programming using Jupyterlab and start server
+1. Create virtual environment for literate programming using Jupyterlab and start the server
    ```bash
    pixi run jlab
    ```
@@ -37,64 +41,85 @@ to see all available tasks
 ```bash
 Tasks that can run on this machine:
 -----------------------------------
-jlab, pmill, test
+dval, jlab, mlval, test
 Task   Description
+dval   Validate customer data with Pandera
 jlab   Launch Jupyterlab
-pmill  Perform ML Validation
-test   Run unit tests with pytest
+mlval  Run ML Validation experiments with Metaflow
+test   Run unit tests with Pytest
 ```
 
 ## Sections
 
-See footnotes for individual team-member contributions to the different sections of this project. Footnotes link to high-level overview of work done in the [Team Member Contributions](#team-member-contributions) section below.
+There are four sections in this project, one for each task from above
+
+1. `jlab` (Analysis, including ML and Data Validation)
+   - scope out the project using *all* provided customer data
+   - split the data into train, validation and test splits
+   - explore the combined train+validation split of the customer data
+   - develop a parameterized ML experiment flow using Metaflow for use during validation, using the combined train+validation split
+   - compare all ML experiments to determine the best one
+   - evaluate the best model+feature's performance on unseen data (test split)
+   - on all available data (combined train+validation+test split)
+      - make inference predictions
+      - estimate business metrics
+      - interpret model predictions
+2. `mlval` (overview of ML Validation)
+   - during validation, ML experiments were run using Metaflow to determine the best combination of ML model, features and feature pre-processing were determined
+3. `dval` (Data Validation)
+   - in preparation for inferernce, the best ML model to predict customer churn was trained on all available data. At the same time, a data model was developed using Pandera in order to validate inference data before making predictions on it.
+4. `test` (Unit Testing)
+   - custom Python modules that were developed during the validation, evaluation and inference phases were tested using the Pytest framework
+
+In the following subsections, we include links to notebooks that implement steps in these four sections. Footnotes link a high-level overview of work done in the [Team Member Contributions](#team-member-contributions) to the different steps in each notebook. We also discuss detils of data validation and unit tests.
 
 ### Analysis
 
-Below are the notebooks for performing data analysis, ML development and estimation of business metrics from ML inference
+Below are the notebooks for performing data analysis, ML development (validation and evaluation), model interpretation and estimation of business metrics from ML inference predictions and finally data validation
 
 1. Preprocess and Split Raw Data
    - create train, validation and test splits
-   - `01_split_data.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/01_split_data.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/01_split_data.ipynb))
+   - `01_split_data.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/01_split_data.ipynb))
 2. Perform Quantitative Analysis for Use in Project Scoping
    - estimate quantitative impact of credit card churn to quantify problem and scope out the entire project
-   - `02_scoping.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/02_scoping.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/02_scoping.ipynb))
+   - `02_scoping.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/02_scoping.ipynb))
 3. EDA
    - perform exploratory data analysis (EDA) on processed data split for combined training and validation data
-   - `03_eda.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/04_eda.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/03_eda.ipynb))
-   - `BankChurners-2.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/BankChurners-2.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/BankChurners-2.ipynb))
-4. EDA for ML
-   - perform EDA for data transformation before performing Machine Learning (ML) development
-   - `04_eda_for_ml.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/04_eda_for_ml.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/04_eda_for_ml.ipynb))
-5. ML Validation - Cost-Sensitive Learning
+     - preliminary versions
+       - `03_eda_v0.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/.rough-work/03_eda_v0.ipynb))
+       - `03_eda_v1.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/03_eda_v1.ipynb))
+     - focus on developing a hypothesis about useful features to predict churn and to inform data transformation of categorical and ordinal data before performing Machine Learning (ML) development
+       - `03_eda_v2.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/03_eda_v2.ipynb))
+4. ML Validation - Cost-Sensitive Learning
    - run ML experiments using linear models and tree-based models with the Metaflow framework
-   - `05_run_validation_experiments.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/05_run_validation_experiments.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/05_run_validation_experiments.ipynb))
-6. Get best combination of ML model, features and feature pre-processing from results of validation experiments
-   - `06_get_best_validation_experiment.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/06_get_best_validation_experiment.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/06_get_best_validation_experiment.ipynb))
-7. ML Evaluation
+   - `04_run_validation_experiments.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/04_run_validation_experiments.ipynb))
+5. Get best combination of ML model, features and feature pre-processing from results of validation experiments
+   - `05_get_best_validation_experiment.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/05_get_best_validation_experiment.ipynb))
+6. ML Evaluation
    - evaluate best ML model performance on unseen (test split) data
-   - `07_evaluate.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/07_evaluate.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/07_evaluate.ipynb))
-8. ML Inference
+   - `06_evaluate.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/06_evaluate.ipynb))
+7. ML Inference
    - perform inference on all available customer data
-   - `08_inference.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/08_inference.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/08_inference.ipynb))
-9. Estimate Business Metrics on inference predictions to determine cohort of predicted to be at risk of canceling credit card services and to be targeted, using
+   - `07_inference.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/07_inference.ipynb))
+8. Estimate Business Metrics on inference predictions to determine cohort of predicted to be at risk of canceling credit card services and to be targeted, using
    - ROI
-     - `09_estimate_cohort_size_using_roi.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/09_estimate_cohort_size_using_roi.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/09_estimate_cohort_size_using_roi.ipynb))
+     - `08_estimate_cohort_size_using_roi.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/08_estimate_cohort_size_using_roi.ipynb))
    - (Net) Savings
-     - `10_estimate_cohort_size_using_savings.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/10_estimate_cohort_size_using_savings.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/10_estimate_cohort_size_using_savings.ipynb))
-10. Inference Customer Profiling
-    - create profiles for customers predicted to be at risk of canceling credit card services
-    - `11_get_at_risk_customer_profiles.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/11_get_at_risk_customer_profiles.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/11_get_at_risk_customer_profiles.ipynb))
-11. Interpret Best Machine Learning Model
+     - `09_estimate_cohort_size_using_savings.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/09_estimate_cohort_size_using_savings.ipynb))
+9. Inference Customer Profiling
+   - create profiles for customers predicted to be at risk of canceling credit card services
+   - `10_get_at_risk_customer_profiles.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/10_get_at_risk_customer_profiles.ipynb))
+10. Interpret Best Machine Learning Model
     - use SHAP to explain best ML model
-    - `12_interpret_model_predictions.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/12_interpret_model_predictions.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/12_interpret_model_predictions.ipynb))
-12. Validate Raw Customer Data
+    - `11_interpret_model_predictions.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/11_interpret_model_predictions.ipynb))
+11. Validate Raw Customer Data
     - use `pandera` to develop data schema to validate raw credit card customer data
-    - `13_validate_data.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/13_validate_data.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/13_validate_data.ipynb))
-13. Production ML Pipeline
+    - `12_validate_data.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/12_validate_data.ipynb))
+12. Production ML Pipeline
     - comprehensive ML pipeline with XGBoost, LightGBM, Random Forest
     - SHAP interpretability, CLV calculator, ROI optimization
-    - production-ready infrastructure (src/models, src/business, src/evaluation, src/utils)
-    - `14_production_ml_pipeline.ipynb`<sup>[3](#myfootnote3)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/14_production_ml_pipeline.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/14_production_ml_pipeline.ipynb))
+    - production-ready infrastructure (`src/models`, `src/business`, `src/evaluation`, `src/utils`)
+    - `13_production_ml_pipeline.ipynb`<sup>[3](#myfootnote3)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/13_production_ml_pipeline.ipynb))
 
 ### Data Validation
 
@@ -105,7 +130,7 @@ Two types of data tests were performed
 1. Example-based Tests
    - a data schema was defined with with specific rules (e.g. column datatypes, constraints, etc.) and used to validate the data
 2. Property-based Tests
-   - statistical checks were defined in directly in the data validation schema and used to validate the relevant columns of the data
+   - statistical checks were defined directly in the data validation schema and used to validate the relevant columns of the data
 
 ### Unit Tests
 
@@ -114,7 +139,7 @@ For custom modules used to perform the analysis, unit tests were implemented<sup
 The following modules in `src` were tested
 
 1. `cc_churn`
-   - all 10 modules
+   - all 11 modules
 2. `r2`
    - 1 of 1 module
 3. `utils`
@@ -183,7 +208,7 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 
 ## License
 
-[MIT License](LICENSE.md) - Copyright 2026 [edesz](https://github.com/edesz)
+[MIT License](LICENSE.md) - Copyright 2025 [edesz](https://github.com/edesz)
 
 ## Questions or Issues?
 
@@ -230,6 +255,7 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │   ├── cc_churn
 │   │   ├── costs_savings.py          <- Implement functions to estimate savings.
 │   │   ├── costs.py                  <- Implement functions to estimate ROI.
+|   |   ├── eda.py                    <- Implement functions to transform data for use in EDA.
 │   │   ├── evaluation.py             <- Implement code to evaluate predictions.
 │   │   ├── explanation.py            <- Implement code to explain best model.
 │   │   ├── mflow_utils.py            <- Implement Metaflow custom helper functions.
@@ -238,7 +264,7 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │   │   ├── transformers.py           <- Source code to define custom scikit-learn transformers.
 │   │   ├── tuning.py                 <- Source code to tune decision threshold.
 │   │   ├── visualization.py          <- Code to make plots with matplotlib.
-│   │   └── visualization.py          <- Code to make plots with altair.
+│   │   └── viz_altair.py             <- Code to make plots with altair.
 │   ├── evaluation
 │   │   ├── __init__.py
 │   │   ├── metrics.py                <- Code to define metrics for pipeline ML notebook.

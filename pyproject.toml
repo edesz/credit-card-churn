@@ -3,7 +3,7 @@
 [project]
 name = "cc-churn"
 version = "0.1.0"
-description = "Use ML to identify customers at risk of churning for proactive targeting."
+description = "Use ML to find customers at risk of churning, for client intervention."
 authors = [{name = "edesz"}]
 requires-python = ">= 3.10"
 # These are the PyPI dependencies, added with: pixi add --pypi PACKAGE_NAME
@@ -21,7 +21,7 @@ where = ["src"]
 
 [tool.pixi.dependencies]
 python = "3.12.10.*"
-# use conda-forge pyarrow in order to get required C dependencies
+# use pyarrow from conda-forge in order to get required C dependencies
 numpy = "*"
 pyarrow = "*"
 python-dotenv = "*"
@@ -61,8 +61,11 @@ nbclassic = "*"
 panel = "*"
 toml = "*"
 
-[tool.pixi.feature.ci.dependencies]
-# create a data ci feature
+[tool.pixi.feature.nbrunner.dependencies]
+# create a notebook runner feature to perform data or ML validation
+ipykernel = "*"
+nbconvert = "*"
+nbformat = "*"
 pytz = "*"
 papermill = "*"
 typer = "*"
@@ -82,7 +85,7 @@ pytest-html = "*"
 default = { solve-group = "default" }
 # notebooks env inherits default feature and notebooks feature to run jlab
 notebooks = { features = ['default', "notebooks"], solve-group = "notebooks" }
-ci = { features = ["default", 'notebooks', "ci"], solve-group = "ci" }
+nbrunner = { features = ["default", "nbrunner"], solve-group = "nbrunner" }
 # test env inherits default feature and unit-test feature to run pytest
 test = { features = ["default", "test"], solve-group = "default" }
 
@@ -90,16 +93,31 @@ test = { features = ["default", "test"], solve-group = "default" }
 
 [tool.pixi.feature.notebooks.tasks]
 # run development tasks for the notebooks feature
-jlab = { cmd = "jupyter lab", depends-on = [], description="Launch Jupyterlab", default-environment = "notebooks" }
+jlab = { cmd = """
+    jupyter lab""", depends-on = [], description="""\
+    Launch Jupyterlab\
+    """, default-environment = "notebooks" }
 
 [tool.pixi.feature.test.tasks]
-# run unit-test tasks
+# run unit-test tasks with Pytest for the test feature
 test = { cmd = """
     coverage run -m pytest &&
     coverage report -m &&
     coverage html && coverage xml
-    """, description="Run unit tests with pytest", default-environment = "test" }
+    """, description="""\
+    Run unit tests with Pytest\
+    """, default-environment = "test" }
 
-[tool.pixi.feature.ci.tasks]
-# programmatically run all development tasks for the ci feature
-pmill = { cmd = "python3 papermill_runner.py 05", description="Perform ML Validation", depends-on = [] }
+[tool.pixi.feature.nbrunner.tasks]
+# programmatically run ML validation experiments for the nbrunner feature
+mlval = { cmd = """
+    python3 papermill_runner.py 05
+    """, description="""\
+    Run ML Validation experiments with Metaflow\
+    """, default-environment = "nbrunner" }
+# programmatically run data validation for the nbrunner feature
+dval = { cmd = """
+    python3 papermill_runner.py 13
+    """, description="""\
+    Validate customer data with Pandera\
+    """, default-environment = "nbrunner" }
