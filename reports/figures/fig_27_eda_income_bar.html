@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "income_category", "type": "nominal"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "income_category", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 275}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "income_category", "type": "nominal"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "income_category", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 275}], "data": {"name": "data-cdba18f1a11ed5fd461b4e514478a819"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "Churn Rates for Two Highest Education Levels Are Similar That are Known", "align": "left", "anchor": "start", "dx": 105, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-cdba18f1a11ed5fd461b4e514478a819": [{"income_category": "$120K +", "Churned": 102, "Did not Churn": 457, "total": 559, "frac_churned": 18.246869409660107, "frac_total": 7.006768613687642}, {"income_category": "$40K - $60K", "Churned": 209, "Did not Churn": 1222, "total": 1431, "frac_churned": 14.605171208944794, "frac_total": 17.936826272248684}, {"income_category": "$60K - $80K", "Churned": 160, "Did not Churn": 954, "total": 1114, "frac_churned": 14.362657091561939, "frac_total": 13.96339934820757}, {"income_category": "$80K - $120K", "Churned": 182, "Did not Churn": 1006, "total": 1188, "frac_churned": 15.31986531986532, "frac_total": 14.890950112810227}, {"income_category": "Less than $40K", "Churned": 483, "Did not Churn": 2329, "total": 2812, "frac_churned": 17.17638691322902, "frac_total": 35.246929054900974}, {"income_category": "Unknown", "Churned": 146, "Did not Churn": 728, "total": 874, "frac_churned": 16.704805491990847, "frac_total": 10.955126598144899}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

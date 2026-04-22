@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "gender", "type": "nominal"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "gender", "scale": {"type": "linear"}, "sort": ["F", "M"], "title": null, "type": "nominal"}}, "height": 50, "width": 375}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "gender", "type": "nominal"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "gender", "scale": {"type": "linear"}, "sort": ["F", "M"], "title": null, "type": "nominal"}}, "height": 50, "width": 375}], "data": {"name": "data-61a5eefb59d23e59d66166c0fdd703ff"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "Churn Rate and Frequencies are Similar Across Both Genders in the Customer Data", "align": "left", "anchor": "start", "dx": 15, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-61a5eefb59d23e59d66166c0fdd703ff": [{"gender": "F", "Churned": 730, "Did not Churn": 3494, "total": 4224, "frac_churned": 17.28219696969697, "frac_total": 52.945600401103036}, {"gender": "M", "Churned": 552, "Did not Churn": 3202, "total": 3754, "frac_churned": 14.704315396909962, "frac_total": 47.054399598896964}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

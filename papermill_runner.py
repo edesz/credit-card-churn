@@ -86,6 +86,17 @@ def main(
 
     nb_paths = sorted(list(nbs_dir.glob("*.ipynb")))
 
+    bus_params = dict(
+        interchange_rate=0.02,
+        apr=0.18,
+        card_fees={"Blue": 0, "Silver": 50, "Gold": 100, "Platinum": 200},
+        tenure_years=3,
+        discount=0.9,
+        success_rate=0.40,
+        intervention_cost=50,
+        replacement_cost=200,
+    )
+
     classifiers = [
         "HistGradientBoostingClassifier",
         "LogisticRegression",
@@ -134,15 +145,64 @@ def main(
         + experiment_runs_params__5
     )
 
-    if nb_nums == "05":
+    if nb_nums == "01":
+        np_param_01 = dict(
+            r2_key_raw_data="BankChurners.xlsx",
+            label="is_churned",
+            n_cv_folds=5,
+            size_val=0.175,
+            r2_key_train="train_data.parquet.gzip",
+            r2_key_val="validation_data.parquet.gzip",
+            r2_key_test="test_data.parquet.gzip",
+        )
         nb_list = [
-            {"prefix": "05", "path": str(nb_paths[4]), "params": params}
+            {"prefix": "01", "path": str(nb_paths[0]), "params": np_param_01}
+        ]
+    elif nb_nums == "02":
+        nb_list = [
+            {"prefix": "02", "path": str(nb_paths[1]), "params": bus_params}
+        ]
+    elif nb_nums == "03":
+        nb_param_03 = dict(
+            r2_key_train="train_data.parquet.gzip",
+            r2_key_val="validation_data.parquet.gzip",
+            label="is_churned",
+            threshold_correlation=0.55,
+        )
+        nb_list = [
+            {"prefix": "02", "path": str(nb_paths[2]), "params": nb_param_03}
+        ]
+    elif nb_nums == "04":
+        nb_list = [
+            {"prefix": "04", "path": str(nb_paths[3]), "params": params}
             for params in experiment_runs_params__all
         ]
-    elif nb_nums == "13":
-        nb_param_13 = dict(r2_key_raw_data="BankChurners.xlsx")
+    elif nb_nums == "08":
         nb_list = [
-            {"prefix": "13", "path": str(nb_paths[12]), "params": nb_param_13}
+            {"prefix": "08", "path": str(nb_paths[7]), "params": bus_params}
+        ]
+    elif nb_nums == "09":
+        nb_list = [
+            {"prefix": "09", "path": str(nb_paths[8]), "params": bus_params}
+        ]
+    elif nb_nums == "10":
+        nb_list = [
+            {"prefix": "10", "path": str(nb_paths[9]), "params": bus_params}
+        ]
+    elif nb_nums == "11":
+        nb_param_11 = dict(
+            r2_key_train="train_data.parquet.gzip",
+            r2_key_val="validation_data.parquet.gzip",
+            r2_key_test="test_data.parquet.gzip",
+            label="is_churned",
+        )
+        nb_list = [
+            {"prefix": "11", "path": str(nb_paths[10]), "params": nb_param_11}
+        ]
+    elif nb_nums == "12":
+        nb_param_12 = dict(r2_key_raw_data="BankChurners.xlsx")
+        nb_list = [
+            {"prefix": "12", "path": str(nb_paths[11]), "params": nb_param_12}
         ]
 
     # convert value of params key to json object (without this, pyarrow

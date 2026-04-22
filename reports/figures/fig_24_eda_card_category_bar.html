@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "card_category", "type": "nominal"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "card_category", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 425}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "card_category", "type": "nominal"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "card_category", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 425}], "data": {"name": "data-8113a8571ed21274e1b32a7d8f07117e"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "Churn Rate is Higher for Two Most Infrequent Card Categories", "align": "left", "anchor": "start", "dx": 65, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-8113a8571ed21274e1b32a7d8f07117e": [{"card_category": "Blue", "Churned": 1193, "Did not Churn": 6238, "total": 7431, "frac_churned": 16.054366841609475, "frac_total": 93.1436450238155}, {"card_category": "Gold", "Churned": 20, "Did not Churn": 73, "total": 93, "frac_churned": 21.50537634408602, "frac_total": 1.1657056906492855}, {"card_category": "Platinum", "Churned": 3, "Did not Churn": 13, "total": 16, "frac_churned": 18.75, "frac_total": 0.2005515166708448}, {"card_category": "Silver", "Churned": 66, "Did not Churn": 372, "total": 438, "frac_churned": 15.068493150684931, "frac_total": 5.490097768864377}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

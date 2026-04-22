@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 17, "labelLimit": 400, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 17, "labelLimit": 400, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "layer": [{"mark": {"type": "bar"}, "encoding": {"color": {"field": "type", "legend": null, "scale": {"domain": ["Client's Bank", "Financial Sector", "Credit Card Churn (High)"], "range": ["darkred", "lightgrey", "grey"]}, "title": null, "type": "nominal"}, "x": {"field": "proportion", "scale": {"type": "linear"}, "sort": null, "title": "Churn Rate (%)", "type": "quantitative"}, "y": {"field": "type", "scale": {"type": "linear"}, "sort": "x", "title": null, "type": "nominal"}}, "title": {"text": "Churn at Client's Bank is Just Below to the Sector Average", "align": "left", "anchor": "start", "dx": 190, "fontSize": 18}}, {"mark": {"type": "text", "align": "right", "baseline": "middle", "dx": -5, "fontSize": 20, "fontWeight": "bold"}, "encoding": {"color": {"condition": {"test": "((datum.proportion < 16.5) || (datum.proportion > 20))", "value": "white"}, "value": "black"}, "text": {"field": "proportion", "format": ".1f", "type": "quantitative"}, "x": {"field": "proportion", "scale": {"type": "linear"}, "sort": null, "title": "Churn Rate (%)", "type": "quantitative"}, "y": {"field": "type", "scale": {"type": "linear"}, "sort": "x", "title": null, "type": "nominal"}}, "title": {"text": "Churn at Client's Bank is Just Below to the Sector Average", "align": "left", "anchor": "start", "dx": 190, "fontSize": 18}}], "data": {"name": "data-773e65b7606487f8b71630ce89754cd1"}, "height": 100, "width": 650, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-773e65b7606487f8b71630ce89754cd1": [{"attrition": "Churn", "proportion": 16.065962279055988, "type": "Client's Bank"}, {"attrition": "Churn", "proportion": 19.0, "type": "Financial Sector"}, {"attrition": "Churn", "proportion": 25.0, "type": "Credit Card Churn (High)"}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

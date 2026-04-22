@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "education_level", "type": "nominal"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "education_level", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 275}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "education_level", "type": "nominal"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "education_level", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 275}], "data": {"name": "data-76462b538e3c0d205f86130dbbb4b283"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "Churn Rate is Similar Regardless of Customers' Education Level", "align": "left", "anchor": "start", "dx": 100, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-76462b538e3c0d205f86130dbbb4b283": [{"education_level": "College", "Churned": 121, "Did not Churn": 679, "total": 800, "frac_churned": 15.125, "frac_total": 10.027575833542242}, {"education_level": "Doctorate", "Churned": 76, "Did not Churn": 279, "total": 355, "frac_churned": 21.408450704225352, "frac_total": 4.449736776134369}, {"education_level": "Graduate", "Churned": 381, "Did not Churn": 2054, "total": 2435, "frac_churned": 15.64681724845996, "frac_total": 30.521433943344196}, {"education_level": "High School", "Churned": 244, "Did not Churn": 1357, "total": 1601, "frac_churned": 15.240474703310431, "frac_total": 20.06768613687641}, {"education_level": "Post-Graduate", "Churned": 80, "Did not Churn": 358, "total": 438, "frac_churned": 18.2648401826484, "frac_total": 5.490097768864377}, {"education_level": "Uneducated", "Churned": 188, "Did not Churn": 984, "total": 1172, "frac_churned": 16.040955631399317, "frac_total": 14.690398596139383}, {"education_level": "Unknown", "Churned": 192, "Did not Churn": 985, "total": 1177, "frac_churned": 16.31265930331351, "frac_total": 14.753070945099022}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

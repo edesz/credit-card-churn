@@ -4,9 +4,7 @@ source =
 omit =
   src/__init__.py
   src/*/__init__.py
-  src/data_models/
 branch = True
-
 
 [html]
 directory = tests/test-logs/htmlcov

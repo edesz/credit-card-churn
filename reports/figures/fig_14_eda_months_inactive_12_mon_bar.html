@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "months_inactive_12_mon", "type": "quantitative"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "months_inactive_12_mon", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 407}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "months_inactive_12_mon", "type": "quantitative"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "months_inactive_12_mon", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 407}], "data": {"name": "data-af15e2c605421fd39b9156356579b5cd"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "Churn Notably Increases for Customers who are Inactive for 3+ Months", "align": "left", "anchor": "start", "dx": 15, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-af15e2c605421fd39b9156356579b5cd": [{"months_inactive_12_mon": 0, "Churned": 10, "Did not Churn": 12, "total": 22, "frac_churned": 45.45454545454545, "frac_total": 0.2757583354224116}, {"months_inactive_12_mon": 1, "Churned": 84, "Did not Churn": 1690, "total": 1774, "frac_churned": 4.735062006764374, "frac_total": 22.236149410879918}, {"months_inactive_12_mon": 2, "Churned": 412, "Did not Churn": 2178, "total": 2590, "frac_churned": 15.907335907335906, "frac_total": 32.46427676109301}, {"months_inactive_12_mon": 3, "Churned": 637, "Did not Churn": 2380, "total": 3017, "frac_churned": 21.11368909512761, "frac_total": 37.81649536224618}, {"months_inactive_12_mon": 4, "Churned": 102, "Did not Churn": 237, "total": 339, "frac_churned": 30.08849557522124, "frac_total": 4.249185259463525}, {"months_inactive_12_mon": 5, "Churned": 23, "Did not Churn": 121, "total": 144, "frac_churned": 15.972222222222221, "frac_total": 1.8049636500376034}, {"months_inactive_12_mon": 6, "Churned": 14, "Did not Churn": 78, "total": 92, "frac_churned": 15.217391304347828, "frac_total": 1.153171220857358}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

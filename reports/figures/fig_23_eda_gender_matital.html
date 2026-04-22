@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 15, "labelLimit": 150, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 15, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "hconcat": [{"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "marital_status", "type": "nominal"}, {"field": "Churned", "type": "quantitative"}, {"field": "Did not Churn", "type": "quantitative"}, {"field": "frac_churned", "format": ",.2f", "title": "Fraction Churned (%)", "type": "quantitative"}], "x": {"field": "frac_churned", "title": "Fraction of Churned Customers (%)", "type": "quantitative"}, "y": {"field": "marital_status", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 407}, {"mark": {"type": "bar"}, "encoding": {"tooltip": [{"field": "marital_status", "type": "nominal"}, {"field": "total", "format": ",", "title": "Number of Customers", "type": "quantitative"}, {"field": "frac_total", "format": ",.2f", "title": "Fraction of Customers (%)", "type": "quantitative"}], "x": {"field": "total", "title": "Number of Customers", "type": "quantitative"}, "y": {"field": "marital_status", "scale": {"type": "linear"}, "sort": "-x", "title": null, "type": "nominal"}}, "height": 125, "width": 407}], "data": {"name": "data-b237f9e8bd3e664cb874c0c4adf4223c"}, "resolve": {"scale": {"y": "independent"}}, "title": {"text": "For Known Marital Status, Churn Rate is Similar Regardless of Marital Status of Customers", "align": "left", "anchor": "start", "dx": 65, "fontSize": 18}, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-b237f9e8bd3e664cb874c0c4adf4223c": [{"marital_status": "Divorced", "Churned": 97, "Did not Churn": 492, "total": 589, "frac_churned": 16.468590831918505, "frac_total": 7.382802707445475}, {"marital_status": "Married", "Churned": 554, "Did not Churn": 3153, "total": 3707, "frac_churned": 14.94469921769625, "frac_total": 46.46527951867636}, {"marital_status": "Single", "Churned": 519, "Did not Churn": 2568, "total": 3087, "frac_churned": 16.812439261418856, "frac_total": 38.69390824768112}, {"marital_status": "Unknown", "Churned": 112, "Did not Churn": 483, "total": 595, "frac_churned": 18.823529411764707, "frac_total": 7.458009526197042}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

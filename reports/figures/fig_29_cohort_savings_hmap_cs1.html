@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}, "axis": {"domain": false, "grid": false, "labelAngle": 0, "labelFontSize": 16, "labelLimit": 400, "ticks": false, "titleFontSize": 18}, "legend": {"labelFontSize": 16, "labelLimit": 150, "symbolOpacity": 1, "titleFontSize": 18, "titleLimit": 400}}, "layer": [{"mark": {"type": "rect", "stroke": "white", "strokeWidth": 1.0}, "encoding": {"color": {"field": "expected_savings_per_customer", "legend": {"title": "Savings per Customer"}, "scale": {"scheme": "reds"}, "type": "quantitative"}, "tooltip": [{"field": "num_customers", "title": "Number of At-Risk Customers", "type": "quantitative"}, {"field": "total_intervention_cost", "format": ",", "title": "Total Cost", "type": "quantitative"}, {"field": "y_pred_proba", "format": ",.2f", "title": "Avg. Predicted Probability", "type": "quantitative"}, {"field": "clv", "format": ",.2f", "title": "Avg. CLV", "type": "quantitative"}, {"field": "expected_savings", "format": ",.2f", "title": "Expected Savings", "type": "quantitative"}, {"field": "savings_error_pct", "format": ",.2f", "title": "Savings Error (%)", "type": "quantitative"}, {"field": "save_offer", "title": "Recommendation", "type": "nominal"}], "x": {"axis": {"labelAngle": -45}, "field": "value_tier", "sort": ["Bronze", "Silver", "Gold", "Platinum"], "title": "Revenue Tier (CLV)", "type": "nominal"}, "y": {"axis": {"labelAngle": 0}, "field": "risk_level", "sort": ["High", "Medium", "Low"], "title": "Churn Risk Level", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "middle", "fontSize": 18}, "encoding": {"color": {"condition": {"test": "(datum.expected_savings_per_customer > 400)", "value": "white"}, "value": "black"}, "text": {"field": "expected_savings_per_customer", "format": ",.3f", "type": "quantitative"}, "x": {"axis": {"labelAngle": -45}, "field": "value_tier", "sort": ["Bronze", "Silver", "Gold", "Platinum"], "title": "Revenue Tier (CLV)", "type": "nominal"}, "y": {"axis": {"labelAngle": 0}, "field": "risk_level", "sort": ["High", "Medium", "Low"], "title": "Churn Risk Level", "type": "nominal"}}}], "data": {"name": "data-ff05245afc9e27417f3de1671a0bcdec"}, "height": 350, "title": {"text": "At-Risk Cohort Outreach & Offer Guide", "anchor": "start", "dx": 75, "font": "Arial", "fontSize": 18, "offset": 10, "orient": "top"}, "width": 300, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-ff05245afc9e27417f3de1671a0bcdec": [{"risk_level": "High", "value_tier": "Platinum", "save_offer": "Personalized Executive Call + 1-Year Fee Waiver + 25k Points", "true_savings": 56774.229199999994, "expected_savings": 55142.82978490768, "num_customers": 108, "y_pred_proba": 0.9547984484014895, "clv": 1468.4305629629628, "total_intervention_cost": 5400, "expected_savings_per_customer": 510.5817572676637, "savings_error_pct": -2.873485801710043, "num_customers_cumsum": 108}, {"risk_level": "Medium", "value_tier": "Platinum", "save_offer": "Priority Relationship Manager Check-in + Luxury Lounge Access Upgrade", "true_savings": 16758.832879999998, "expected_savings": 16655.06275987881, "num_customers": 37, "y_pred_proba": 0.8615429987442973, "clv": 1451.191816216216, "total_intervention_cost": 1850, "expected_savings_per_customer": 450.13683134807593, "savings_error_pct": -0.6191965804792332, "num_customers_cumsum": 145}, {"risk_level": "Low", "value_tier": "Platinum", "save_offer": "Priority Relationship Manager Check-in + Luxury Lounge Access Upgrade", "true_savings": 7514.258319999999, "expected_savings": 6453.062534545678, "num_customers": 16, "y_pred_proba": 0.7724794307101708, "clv": 1466.0253124999997, "total_intervention_cost": 800, "expected_savings_per_customer": 403.3164084091049, "savings_error_pct": -14.122428858079514, "num_customers_cumsum": 161}, {"risk_level": "High", "value_tier": "Gold", "save_offer": "Retention Team Call + 50% Annual Fee Rebate + 10k Points", "true_savings": 50827.28263999999, "expected_savings": 48827.417219874376, "num_customers": 158, "y_pred_proba": 0.9538137654121464, "clv": 941.8594708860758, "total_intervention_cost": 7900, "expected_savings_per_customer": 309.03428620173656, "savings_error_pct": -3.9346298213309607, "num_customers_cumsum": 319}, {"risk_level": "Medium", "value_tier": "Gold", "save_offer": "Personalized Email + 0% Balance Transfer Offer for 6 Months", "true_savings": 24988.950799999995, "expected_savings": 23334.082268454345, "num_customers": 81, "y_pred_proba": 0.8608406612677133, "clv": 982.3415432098762, "total_intervention_cost": 4050, "expected_savings_per_customer": 288.0750897340043, "savings_error_pct": -6.622401015514624, "num_customers_cumsum": 400}]}};
+      var embedOpt = {"renderer": "svg", "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

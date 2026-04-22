@@ -88,7 +88,10 @@ Below are the notebooks for performing data analysis, ML development (validation
      - preliminary versions
        - `03_eda_v0.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/.rough-work/03_eda_v0.ipynb))
        - `03_eda_v1.ipynb`<sup>[1](#myfootnote1)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/03_eda_v1.ipynb))
-     - focus on developing a hypothesis about useful features to predict churn and to inform data transformation of categorical and ordinal data before performing Machine Learning (ML) development
+     - focus on developing an EDA notebook that can inform ML development that fits into the current use-case
+       - develop hypothesis about useful features to predict churn by feature type
+       - discuss implications of class imbalance
+       - inform data transformation of categorical and ordinal features before performing Machine Learning (ML) development
        - `03_eda_v2.ipynb`<sup>[2](#myfootnote2)</sup> ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/03_eda_v2.ipynb))
 4. ML Validation - Cost-Sensitive Learning
    - run ML experiments using linear models and tree-based models with the Metaflow framework

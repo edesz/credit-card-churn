@@ -19,6 +19,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
+import src.cc_churn.viz_altair as vzu
 from src.cc_churn.costs import calc_predicted_savings, calc_true_savings
 from src.cc_churn.scoring import get_scorers
 from src.cc_churn.transformers import CategoryCombiner2
@@ -46,7 +47,6 @@ def base_df(request):
         .rename(columns=str.lower)
         .rename(
             columns={
-                # "Income_Category": "income_category",
                 "Card_Category": "card_category",
                 "Total_Trans_Amt": "total_trans_amt",
                 "total_revolving_bal": "total_revolv_bal",
@@ -58,7 +58,12 @@ def base_df(request):
     )
 
     label_mapper = {"Existing Customer": 0, "Attrited Customer": 1}
-    df["is_churned"] = df["is_churned"].map(label_mapper)
+    df = df.assign(
+        is_churned=lambda df: df["is_churned"].map(label_mapper),
+        outcome=lambda df: df["is_churned"].map(
+            {1: "Churned", 0: "Did not Churn"}
+        ),
+    )
 
     # Add mock predictions
     np.random.seed(42)
@@ -376,6 +381,18 @@ def s3_setup():
         bucket = "test-bucket"
         client.create_bucket(Bucket=bucket)
         yield client, bucket
+
+
+@pytest.fixture
+def mock_export(monkeypatch):
+    called = {}
+
+    def _mock(*args, **kwargs):
+        called["called"] = True
+        called["kwargs"] = kwargs
+
+    monkeypatch.setattr(vzu, "export_altair_chart", _mock)
+    return called
 
 
 @pytest.fixture(scope="session")
