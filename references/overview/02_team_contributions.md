@@ -19,8 +19,8 @@ Github Profile: [link](https://github.com/edesz)
    - management of the team's Github repository
      - created repository files
        - created [`README.md`](https://github.com/edesz/credit-card-churn/blob/main/README.md) to quickstart code development for team members
-       - [Open Source License](../LICENSE.md)
-       - [Code of Conduct](../CODE_OF_CONDUCT.md)
+       - [Open Source License](../../LICENSE.md)
+       - [Code of Conduct](../../CODE_OF_CONDUCT.md)
        - configured [Github Actions](https://github.com/edesz/credit-card-churn/blob/main/.github/workflows/main.yml) workflows to orchestrate unit testing and deployment of documentation
      - created project [Documentation](https://edesz.github.io/jupyter-book-2-demo/) using [JupyterBook 2](https://jupyterbook.org/) and [MyST](https://mystmd.org/)
 2. Analysis

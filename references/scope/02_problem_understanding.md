@@ -34,7 +34,7 @@ The predicted at-risk customers will be delivered to the credit card division ma
 
 ### Impact of Churn
 
-Using the assumed estimated revenue and costs, which will be defined in [the next step](../references/03_costs.md), the impact of credit card customer churn to the client is a loss of approximately
+Using the assumed estimated revenue and costs, which will be defined in [the next step](./03_costs.md), the impact of credit card customer churn to the client is a loss of approximately
 
 1. 508 dollars of CLV (CLV) per customer
 2. 10% of overall CLV

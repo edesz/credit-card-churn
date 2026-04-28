@@ -21,7 +21,7 @@ We divided this task into five phases, or sections.
 
 We started by scoping the project to quantify the magnitude of the problem. We did this with two Key Performance Indicators (KPIs) used in the finance industry to measure customer churn. After determining that the problem facing the client was important and actionable using the provided data, we proceeded to perform the analysis required to address the client's [business problem](./00_overview.md#business-problem).
 
-To ensure all team members were working with a single source of truth, the raw data `.xlsx` file was stored in a private [Cloudflare R2 bucket](cloudflare). All processed datasets and analysis artifacts were stored in the same bucket. [Access keys](r2-access-keys) were generated in order to allow team members programmatic access to the R2 bucket.
+To ensure all team members were working with a single source of truth, the raw data `.xlsx` file was stored in a private [Cloudflare R2 bucket](https://www.cloudflare.com/en-ca/developer-platform/products/r2/). All processed datasets and analysis artifacts were stored in the same bucket. [Access keys](https://developers.cloudflare.com/r2/api/tokens/) were generated in order to allow team members programmatic access to the R2 bucket.
 
 (analysis)=
 ## Analysis
@@ -52,19 +52,19 @@ Using the unseen data, at-risk customers were identified and model interpretabil
 (data-validation)=
 ## Data Validation
 
-In order to use the ML workflow developed here with new customer data, new (unseen) customers should have the same characteristics as those in the sample we used in this project. So, during the data validation phase, we developed a data model using the [Pandera](pandera) Python package to validate the customer data using two complimentary types of data validation tests.
+In order to use the ML workflow developed here with new customer data, new (unseen) customers should have the same characteristics as those in the sample we used in this project. So, during the data validation phase, we developed a data model using the [Pandera](https://pypi.org/project/pandera/) Python package to validate the customer data using two complimentary types of data validation tests.
 
 ### Example Based Tests
 
-First, we performed [example-based tests](ex-tests). A data schema was defined with with specific rules (e.g. column datatypes, constraints, etc.) and used to validate the data. These tests were focused on whether a specific input (customer data) has characteristics we expect based on the sample and datatype of data we used during ML development in the analysis phase. These wree rigid characteristics, often based on the bounds of data that were observed in the available customer data.
+First, we performed [example-based tests](https://pandera.readthedocs.io/en/stable/dataframe_models.html). A data schema was defined with with specific rules (e.g. column datatypes, constraints, etc.) and used to validate the data. These tests were focused on whether a specific input (customer data) has characteristics we expect based on the sample and datatype of data we used during ML development in the analysis phase. These wree rigid characteristics, often based on the bounds of data that were observed in the available customer data.
 
 ### Hypothesis Tests
 
-We also used [hypothesis testing](hypoth-tests) against a single column or combinations of columns. Statistical checks were defined directly in the data validation schema. These were not rigid checks of the data. Instead, their purpose was to verify that the data follows certain statistical distributions or relationships rather than just checking individual values.
+We also used [hypothesis testing](https://pandera.readthedocs.io/en/stable/hypothesis.html) against a single column or combinations of columns. Statistical checks were defined directly in the data validation schema. These were not rigid checks of the data. Instead, their purpose was to verify that the data follows certain statistical distributions or relationships rather than just checking individual values.
 
 ## Unit Testing
 
-During the analysis phase, we developed several custom Python modules to perform the analysis. So, in the unit testing phase, we used the Python package [Pytest](pytest) to write unit tests for these custom modules. The [Coverage](coverage-py) package was used to measure code coverage in tests. Tests are stored in the `tests` folder.
+During the analysis phase, we developed several custom Python modules to perform the analysis. So, in the unit testing phase, we used the Python package [Pytest](https://pypi.org/project/pytest/) to write unit tests for these custom modules. The [Coverage](https://pypi.org/project/coverage/) package was used to measure code coverage in tests. Tests are stored in the `tests` folder.
 
 ```{note} Tested Modules
 :class: dropdown
@@ -82,13 +82,4 @@ The following custom modules in `src` were tested
    - 0 of 2 modules
 ```
 
-For brevity, unit tests are not discussed in this project documentation. They are available in the [project's `tests` folder on Github](tests).
-
-[cloudflare]: https://www.cloudflare.com/en-ca/developer-platform/products/r2/
-[r2-access-keys]: https://developers.cloudflare.com/r2/api/tokens/
-[pandera]: https://pypi.org/project/pandera/
-[ex-tests]: https://pandera.readthedocs.io/en/stable/dataframe_models.html
-[hypoth-tests]: https://pandera.readthedocs.io/en/stable/hypothesis.html
-[tests]: https://github.com/edesz/credit-card-churn/tree/main/tests
-[pytest]: https://pypi.org/project/pytest/
-[coverage-py]: https://pypi.org/project/coverage/
+For brevity, unit tests are not discussed in this project documentation. They are available in the [project's `tests` folder on Github](https://github.com/edesz/credit-card-churn/tree/main/tests).
