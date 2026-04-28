@@ -88,7 +88,7 @@ executed-notebooks/manual/*
 executed-notebooks/scripted/*
 
 # exclude output figures from source control by default
-reports/figures/*
+reports/figures/*.*
 
 # exclude models from source control by default
 models/*/*
