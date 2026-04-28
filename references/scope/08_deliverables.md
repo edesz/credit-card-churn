@@ -1,4 +1,4 @@
-# 7. Project Deliverables
+# Project Deliverables
 
 ## Objective
 

@@ -145,7 +145,7 @@ def main(
         + experiment_runs_params__5
     )
 
-    if nb_nums == "01":
+    if "01" in nb_nums:
         np_param_01 = dict(
             r2_key_raw_data="BankChurners.xlsx",
             label="is_churned",
@@ -158,11 +158,11 @@ def main(
         nb_list = [
             {"prefix": "01", "path": str(nb_paths[0]), "params": np_param_01}
         ]
-    elif nb_nums == "02":
+    elif "02" in nb_nums:
         nb_list = [
             {"prefix": "02", "path": str(nb_paths[1]), "params": bus_params}
         ]
-    elif nb_nums == "03":
+    elif "03" in nb_nums:
         nb_param_03 = dict(
             r2_key_train="train_data.parquet.gzip",
             r2_key_val="validation_data.parquet.gzip",
@@ -172,24 +172,24 @@ def main(
         nb_list = [
             {"prefix": "02", "path": str(nb_paths[2]), "params": nb_param_03}
         ]
-    elif nb_nums == "04":
+    elif "04" in nb_nums:
         nb_list = [
             {"prefix": "04", "path": str(nb_paths[3]), "params": params}
             for params in experiment_runs_params__all
         ]
-    elif nb_nums == "08":
+    elif "08" in nb_nums:
         nb_list = [
             {"prefix": "08", "path": str(nb_paths[7]), "params": bus_params}
         ]
-    elif nb_nums == "09":
+    elif "09" in nb_nums:
         nb_list = [
             {"prefix": "09", "path": str(nb_paths[8]), "params": bus_params}
         ]
-    elif nb_nums == "10":
+    elif "10" in nb_nums:
         nb_list = [
             {"prefix": "10", "path": str(nb_paths[9]), "params": bus_params}
         ]
-    elif nb_nums == "11":
+    elif "11" in nb_nums:
         nb_param_11 = dict(
             r2_key_train="train_data.parquet.gzip",
             r2_key_val="validation_data.parquet.gzip",
@@ -199,7 +199,7 @@ def main(
         nb_list = [
             {"prefix": "11", "path": str(nb_paths[10]), "params": nb_param_11}
         ]
-    elif nb_nums == "12":
+    elif "12" in nb_nums:
         nb_param_12 = dict(r2_key_raw_data="BankChurners.xlsx")
         nb_list = [
             {"prefix": "12", "path": str(nb_paths[11]), "params": nb_param_12}

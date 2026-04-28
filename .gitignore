@@ -87,6 +87,9 @@ data/processed/*
 executed-notebooks/manual/*
 executed-notebooks/scripted/*
 
+# exclude output figures from source control by default
+reports/figures/*
+
 # exclude models from source control by default
 models/*/*
 notebooks/.metaflow/*
@@ -109,3 +112,6 @@ notebooks/.metaflow/*
 .ruff_cache/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+# MyST build outputs
+_build

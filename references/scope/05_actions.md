@@ -1,4 +1,4 @@
-## 4. Actions Being Informed by Project Goal
+# Actions Being Informed by Project Goal
 
 ## Objective
 

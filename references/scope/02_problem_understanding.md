@@ -1,4 +1,11 @@
-# 1. Problem
+---
+authors:
+  - edesz
+date: 2025-10-04
+numbering: false
+---
+
+# Problem
 
 ## Objective
 
@@ -19,7 +26,7 @@ As per [Canadian banking laws](https://www.globallegalinsights.com/practice-area
 
 So, Canadian banks do not release specific credit card churn rates, making a precise number unavailable. We will compare this churn rate to that at banks in the US.
 
-In the US, the overall churn rate at financial institutions is ~19% ([1](https://customergauge.com/blog/average-churn-rate-by-industry), [2](https://thefinancialbrand.com/news/bank-onboarding/the-churn-challenge-four-big-ideas-for-banks-and-credit-unions-looking-to-drive-down-attrition-182528)). At US banks, a [credit card churn rate of 25% is at the start of the high range (20%-30%)](https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking). So, a churn rate of 16% and trending up at the bank is a concern.
+In the US, the overall churn rate at financial institutions is ~19% ([1](https://customergauge.com/blog/average-churn-rate-by-industry), [2](https://thefinancialbrand.com/news/bank-onboarding/the-churn-challenge-four-big-ideas-for-banks-and-credit-unions-looking-to-drive-down-attrition-182528)). At banks [in the US, a credit card churn rate of 25% is at the start of the high range (20%-30%)](https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking). So, a churn rate of 16% and trending up at the bank is a concern.
 
 ### Client
 
@@ -27,18 +34,18 @@ The predicted at-risk customers will be delivered to the credit card division ma
 
 ### Impact of Churn
 
-Using the assumed estimated revenue and costs defined in `02_costs.md`, the impact of credit card customer churn to the client is a loss of approximately
+Using the assumed estimated revenue and costs, which will be defined in [the next step](../references/03_costs.md), the impact of credit card customer churn to the client is a loss of approximately
 
 1. 508 dollars of CLV (CLV) per customer
 2. 10% of overall CLV
 
-When the cost to acquire a new customer is taken into account (CaC), assumed to be $200 per customer ([1](https://www.reviewtrackers.com/blog/bank-customer-retention), [2](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/)) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars overall, due to churn.
+When the cost to acquire a new customer is taken into account (CaC), assumed to be $200 per customer ([1](https://www.reviewtrackers.com/blog/bank-customer-retention), [2](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/)) this adds up to a loss of 708 dollars per customer, or 1,151,828 dollars due to churn.
 
 If customer churn continues at the same rate, then this cost will be incurred each year. If churn grows, as has been observed, then this annual cost will also grow.
 
 There are two metrics for which the bank is in danger of exceeding industry standards
 
-1. In the US, the average CLV per credit card customer across all financial services is ~$808 USD. The CLV of remaining (non-churned) customers is $877, which is just above this value.
+1. In the US, the average CLV per credit card customer across all financial services is approximately 808 USD. The CLV of remaining (non-churned) customers is 877 USD, which is just above this value.
 2. The industry standard for churn rate in the financial sector is ~19%. The standard for high churn starts at ~25%. The current churn rate at McMaster Bank is ~16%, which is again just below this threshold.
 
 The client's observation that more and more customers are churning suggests churn rate is growing which would cause both metrics to exceed industry standards. When this happens, it has the following consequence

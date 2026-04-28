@@ -1,4 +1,10 @@
-# 2. Costs
+---
+authors:
+  - edesz
+date: 2025-10-04
+---
+
+# Costs
 
 In order to help estimate the quantitative impact (cost) of customer churn to a bank, we will identify the components of cost.
 

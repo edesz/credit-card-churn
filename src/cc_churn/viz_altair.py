@@ -87,13 +87,14 @@ def export_altair_chart(
     Examples:
         >>> export_altair_chart(chart, "plot.html")
     """
-    alt_chart.save(
-        fpath,
-        mode=mode,
-        engine=engine,
-        override_data_transformer=override_data_transformer,
-        embed_options=embed_options,
-    )
+    pass
+    # alt_chart.save(
+    #     fpath,
+    #     mode=mode,
+    #     engine=engine,
+    #     override_data_transformer=override_data_transformer,
+    #     embed_options=embed_options,
+    # )
 
 
 def plot_grouped_overlapping_altair_histogram(

@@ -1,4 +1,4 @@
-# 5. Data Sources
+# Data Sources
 
 ## Overview
 

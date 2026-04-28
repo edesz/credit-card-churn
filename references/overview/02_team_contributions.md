@@ -1,0 +1,136 @@
+---
+authors:
+  - edesz
+date: 2025-04-24
+---
+
+# Team Member Contributions
+
+## High-Level Summary
+
+A high-level summary of the contributions of each team member to this project is presented below.
+
+### edesz
+
+Github Profile: [link](https://github.com/edesz)
+
+1. Project Management
+   - project planning using [Github Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects) and [Issues](https://github.com/edesz/credit-card-churn/issues?q=is%3Aissue%20state%3Aclosed)
+   - management of the team's Github repository
+     - created repository files
+       - created [`README.md`](https://github.com/edesz/credit-card-churn/blob/main/README.md) to quickstart code development for team members
+       - [Open Source License](../LICENSE.md)
+       - [Code of Conduct](../CODE_OF_CONDUCT.md)
+       - configured [Github Actions](https://github.com/edesz/credit-card-churn/blob/main/.github/workflows/main.yml) workflows to orchestrate unit testing and deployment of documentation
+     - created project [Documentation](https://edesz.github.io/jupyter-book-2-demo/) using [JupyterBook 2](https://jupyterbook.org/) and [MyST](https://mystmd.org/)
+2. Analysis
+   - performed [project scoping](https://datasciencepublicpolicy.org/our-work/tools-guides/data-science-project-scoping-guide/)
+   - managed data on private team Cloudflare R2 bucket
+   - defined Python package management in [`pyproject.toml`](https://github.com/edesz/credit-card-churn/blob/main/pyproject.toml) for all four sections of the project
+     - performed comprehensive EDA to help develop hypotheses about customer behaviour and inform cost-sensitive ML model development
+3. ML Development
+   - performed cost-sensitive ML model validation, evaluation and inference, including model interpretability
+     - estimated two business metrics from ML model inference, for reporting purposes
+4. Unit Testing
+   - developed test suite, with code coverage report, for 12 of the custom Python modules used in
+     - data I/O to and/or from Cloudflare R2 bucket
+     - EDA
+     - cost-sensitive ML
+5. Data Validation
+     - development of data model in Python to validate raw customer data
+
+### sinderpreet31
+
+Github Profile: [link](https://github.com/sinderpreet31)
+
+1. Analysis
+   - initial exploratory data analysis (EDA)
+   - feature engineering
+   - preliminary linear model ML development
+
+### IlkhamFY
+
+Github Profile: [link](https://github.com/IlkhamFY)
+
+1. Analysis
+   - end-to-end scripted ML model development, including SHAP interpretability
+   - development of custom modules
+     - [`src/business`](https://github.com/edesz/credit-card-churn/tree/main/src/business)
+     - [`src/evaluation`](https://github.com/edesz/credit-card-churn/tree/main/src/evaluation)
+     - `src/utils`
+       - [`data_preprocessing`](https://github.com/edesz/credit-card-churn/blob/main/src/utils/data_preprocessing.py)
+       - [`feature_engineering`](https://github.com/edesz/credit-card-churn/blob/main/src/utils/feature_engineering.py)
+         - [scripts](https://github.com/edesz/credit-card-churn/tree/main/scripts)
+   - creation of supporting [documentation](https://github.com/edesz/credit-card-churn/tree/main/docs) for custom modules
+   - creation of a [project summary](https://github.com/edesz/credit-card-churn/blob/main/PROJECT_SUMMARY.md) based on end-to-end script
+
+## Code Implementation
+
+This section contains the notebooks that were developed as part of the first four [implementation phases](./01_approach.md#implementation-phases).
+
+### Project Scoping
+
+The `02_scoping.ipynb` notebook ([link](../../notebooks/02_scoping.ipynb)) was used to perform quantitative analysis to [scope out this project](./01_approach.md#scoping). It estimated the quantitative impact of credit card churn to quantify the problem facing the client using two KPIs.
+
+### Analysis
+
+The following notebooks were developed as part of the [Analysis](./01_approach.md#analysis) phase
+
+1. Preprocess and Split Raw Data
+   - create train, validation and test splits
+   - `01_split_data.ipynb` ([link](../../notebooks/01_split_data.ipynb))
+2. EDA
+   - perform exploratory data analysis (EDA) on the processed combined training and validation data split
+     - preliminary versions
+       - `03_eda_v0.ipynb` ([link](../../notebooks/.rough-work/03_eda_v0.ipynb))
+       - `03_eda_v1.ipynb` ([link](https://github.com/edesz/credit-card-churn/blob/main/notebooks/.rough-work/03_eda_v1.ipynb))
+     - final version
+       - discuss implications of class imbalance
+       - determine candidate data transformations of categorical and ordinal features before performing ML development
+       - develop a hypothesis about useful features to predict churn, by feature type
+       - `03_eda_v2.ipynb` ([link](../../notebooks/03_eda_v2.ipynb))
+
+### ML Model Development
+
+The notebooks below are part of [stream 1](./01_approach.md#stream-1) of the ML Model Development phase
+
+1. ML Validation - Cost-Sensitive Learning
+   - develop a parameterized workflow to run ML experiments using linear models and tree-based models with the [Metaflow](https://metaflow.org/) framework
+   - this notebook was programmatically run with different input parameters for each ML experiment on the combined training validation data split
+   - `04_run_validation_experiments.ipynb` ([link](../../notebooks/04_run_validation_experiments.ipynb))
+2. Get best combination of ML model, features and feature pre-processing from results of validation experiments in the previous step
+   - `05_get_best_validation_experiment.ipynb` ([link](../../notebooks/05_get_best_validation_experiment.ipynb))
+3. ML Evaluation
+   - evaluate best ML model performance on unseen (test split) data
+   - `06_evaluate.ipynb` ([link](../../notebooks/06_evaluate.ipynb))
+4. ML Inference
+   - perform inference on all available customer data
+   - `07_inference.ipynb` ([link](../../notebooks/07_inference.ipynb))
+5. Estimate Business Metrics on inference predictions
+   - the following notebooks used inference predictions to identify the *top* customers at risk of canceling credit card services, while constrained by two budget scenarios, using
+     - ROI
+       - `08_estimate_cohort_size_using_roi.ipynb` ([link](../../notebooks/08_estimate_cohort_size_using_roi.ipynb))
+     - (Net) Savings
+       - `09_estimate_cohort_size_using_savings.ipynb` ([link](../../notebooks/09_estimate_cohort_size_using_savings.ipynb))
+6. Inference Customer Profiling
+   - create profiles for all customers predicted to be at risk of canceling credit card services
+   - `10_get_at_risk_customer_profiles.ipynb` ([link](../../notebooks/10_get_at_risk_customer_profiles.ipynb))
+7. Interpret Best Machine Learning Model
+   - use SHAP to explain the best ML model when using the best features identified during model validation in step 1. above
+   - `11_interpret_model_predictions.ipynb` ([link](../../notebooks/11_interpret_model_predictions_no_outputs.ipynb))
+
+The `13_production_ml_pipeline.ipynb` notebook ([link](../../notebooks/13_production_ml_pipeline.ipynb)) implements the end-to-end pipeline developed during [stream 2](./01_approach.md#stream-2) of the ML Model Development phase. It contains the following
+
+1. comprehensive ML pipeline with `XGBoost`, `LightGBM`, `RandomForest`
+2. SHAP interpretability, CLV calculator, ROI optimization
+
+It provides a production-ready infrastructure with the following custom Python modules
+
+1. `src/models`
+2. `src/business`
+3. `src/evaluation`
+4. `src/utils`
+
+### Data Validation
+
+The `12_validate_data.ipynb` notebook ([link](../../notebooks/12_validate_data.ipynb)) used a custom data model to [validate the raw credit card customer data](./01_approach.md#data-validation). It used the Python `pandera` package to develop the data schema.
