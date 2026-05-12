@@ -162,7 +162,7 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │   ├── cc_churn
 │   │   ├── costs_savings.py          <- Implement functions to estimate savings.
 │   │   ├── costs.py                  <- Implement functions to estimate ROI.
-|   |   ├── eda.py                    <- Implement functions to transform data for use in EDA.
+│   │   ├── eda.py                    <- Implement functions to transform data for use in EDA.
 │   │   ├── evaluation.py             <- Implement code to evaluate predictions.
 │   │   ├── explanation.py            <- Implement code to explain best model.
 │   │   ├── __init__.py
