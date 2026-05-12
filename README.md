@@ -8,7 +8,7 @@
 
 Use ML to identify credit card customers at a bank who are at risk of churning, for retrospective targeting.
 
-Read the project scope [here](./references/scope/02_problem_understanding.md).
+Read the project scope [here](./references/scope/01_problem_understanding.md).
 
 ## Getting Started
 
