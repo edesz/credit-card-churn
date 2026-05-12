@@ -8,7 +8,7 @@
 
 Use ML to identify credit card customers at a bank who are at risk of churning, for retrospective targeting.
 
-See the project scope [here](./references/scope/02_problem_understanding.md).
+Read the project scope [here](./references/scope/02_problem_understanding.md).
 
 ## Getting Started
 
@@ -16,14 +16,14 @@ See the project scope [here](./references/scope/02_problem_understanding.md).
 
 1. [Python](https://www.python.org/)
 2. [Pixi](https://pixi.prefix.dev/latest/) for package management
-3. [Customer churn data](https://www.kaggle.com/datasets/imanemag/bankchurnerscsv) is stored as `BankChurners.xlsx` in private R2 bucket, accessible to contributors
+3. [Customer churn data](https://www.kaggle.com/datasets/imanemag/bankchurnerscsv) is stored as `BankChurners.xlsx` in private Cloudflare R2 or AWS S3 bucket, accessible to project contributors
 4. `.env` file should be placed one level above root directory, to support programmatic access to data files using the [`boto3` Python package](https://pypi.org/project/boto3/). See R2 `boto3` documentation for [example usage](https://developers.cloudflare.com/r2/examples/aws/boto3/).
 
 ### Installation and Development
 
 1. Create virtual environment for literate programming using Jupyterlab and start the server
    ```bash
-   pixi run jlab
+   make jlab
    ```
 
    This command runs a Jupyterlab server and launches the web user interface in the default browser. The site will be available at http://localhost:8888.
@@ -33,44 +33,46 @@ See the project scope [here](./references/scope/02_problem_understanding.md).
 Run
 
 ```bash
-pixi task list
+make help
 ```
 
-to see all available tasks
+to see all available `make` rules
 
 ```bash
-Tasks that can run on this machine:
------------------------------------
-dval, jlab, mlval, test
-Task   Description
-dval   Validate customer data with Pandera
-jlab   Launch Jupyterlab
-mlval  Run ML Validation experiments with Metaflow
-test   Run unit tests with Pytest
+Available rules:
+
+dval                Run data validation with Pandera 
+jlab                Run Jupyterlab 
+mlval               Run ML Validation experiments with Metaflow 
+nbs                 Run notebooks 
+pixi-upgrade        Upgrade conda package versions with pxi 
+pixi2conda          Export pixi environment config to conda .yml
+tests               Run unit tests with Pytest
 ```
 
 ## Sections
 
 There are five phases to this project
 
-1. `jlab` (Project Scoping)
-   - scope out the project using *all* provided customer data to determine the importance of the business problem, by estimating loss incurred using two KPIs
-2. `jlab` (Analysis, including ML and Data Validation)
-   - split the data into train, validation and test splits
-   - explore the combined train+validation split of the customer data
-   - develop a parameterized ML experiment flow using Metaflow for use during validation, using the combined train+validation split
-   - compare all ML experiments to determine the best one
-   - evaluate the best model+feature's performance on unseen data (test split)
-   - on all available data (combined train+validation+test split)
-      - make inference predictions
-      - estimate business metrics
-      - interpret model predictions
-3. `mlval` (overview of ML Validation)
-   - during validation, ML experiments were run using Metaflow to determine the best combination of ML model, features and feature pre-processing were determined
-4. `dval` (Data Validation)
-   - in preparation for inferernce, the best ML model to predict customer churn was trained on all available data. At the same time, a data model was developed using Pandera in order to validate inference data before making predictions on it.
-5. `test` (Unit Testing)
-   - custom Python modules that were developed during the validation, evaluation and inference phases were tested using the Pytest framework
+1. `make jlab` (Project Scoping)
+   - Creates a project scope using *all* provided customer data to determine the importance of the business problem, by estimating churn loss incurred using two KPIs
+2. `make jlab` (Analysis, including ML and Data Validation)
+   - Splits the data into train, validation and test splits
+   - Explores the combined train+validation split of the customer data
+   - Develops a parameterized ML experiment flow using Metaflow for use during validation, using the combined train+validation split
+   - Compares all ML experiments to determine the best one
+   - Evaluates the best model+feature's performance on unseen data (test split)
+   - On all available data (combined train+validation+test split)
+      - makes inference predictions
+      - estimates business metrics
+      - interprets model predictions
+   - Develops end-to-end pipeline to run entire workflow
+3. `make mlval` (dedicated ML validation)
+   - During validation, approximately 25 ML experiments are run using Metaflow to determine the best combination of ML model, features and feature pre-processing
+4. `make dval` (dedicated data validation)
+   - In preparation for inferernce, the best ML model to predict customer churn was trained on all available data. At the same time, a data model was developed using Pandera in order to validate inference and historical data before making predictions on it.
+5. `make tests` (Unit Testing)
+   - Custom Python modules that were developed during the validation, evaluation and inference phases were tested using the Pytest framework
 
 ## Contributing
 
@@ -134,15 +136,16 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │   └── R2_SETUP_GUIDE.md             <- Guide to use Python to connect to team resources on R2 bucket.
 ├── executed-notebooks                <- Executed Jupyter notebooks.
 ├── LICENSE                           <- Open-source license.
+├── Makefile                          <- Makefile with convenience commands like `make jlab` or `make tests`.
+├── CODE_OF_CONDUCT.md                <- Define expected participant behaviour.
+├── PROJECT_SUMMARY.md
+├── README.md                         <- The top-level README for developers using this project.
 ├── notebooks                         <- Jupyter notebooks with data analysis.
 ├── papermill_runner.py               <- Programmatic execution of notebooks.
-├── PROJECT_SUMMARY.md
-├── pyproject.toml
-├── pytest.ini                        <- Pytest configuration file.
-├── CODE_OF_CONDUCT.md                <- Define expected participant behaviour.
-├── README.md                         <- The top-level README for developers using this project.
+├── pyproject.toml                    <- Python configuration file for managing Python environments.
+├── pytest.ini                        <- Pytest configuration file for running unit tests.
 ├── references                        <- Documentation for project scoping.
-├── environment.yml                   <- Conda packages needed for interactive analysis.
+├── environment.yml                   <- Conda packages needed for interactive analysis with MyBinder.
 ├── requirements.txt                  <- Python packages needed for scripted analysis.
 ├── ruff.toml                         <- Configuration for code linting and formatting.
 ├── scripts
@@ -162,8 +165,9 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 |   |   ├── eda.py                    <- Implement functions to transform data for use in EDA.
 │   │   ├── evaluation.py             <- Implement code to evaluate predictions.
 │   │   ├── explanation.py            <- Implement code to explain best model.
-│   │   ├── mflow_utils.py            <- Implement Metaflow custom helper functions.
 │   │   ├── __init__.py
+│   │   ├── mflow_utils.py            <- Implement Metaflow custom helper functions.
+│   │   ├── mf_monitor_.py            <- Monitor ML model performance using tests for concept and data drift.
 │   │   ├── scoring.py                <- Code to define custom ML scoring metrics.
 │   │   ├── transformers.py           <- Source code to define custom scikit-learn transformers.
 │   │   ├── tuning.py                 <- Source code to tune decision threshold.
@@ -178,6 +182,8 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │   │   └── io_utils.py               <- Source code to read and write to private R2 bucket.
 │   └── utils
 │       ├── data_preprocessing.py     <- Code to preprocess data for pipeline ML notebook.
+│       ├── df_utils.py               <- Code to display or summarize data stoerd in a DataFrame.
+│       ├── display_utils.py          <- Code to display contents of a Python module using Pygments.
 │       ├── feature_engineering.py    <- Code to engineer features for pipeline ML notebook.
 │       └── __init__.py
 └── tests                             <- Unit test definitions, using pytest.

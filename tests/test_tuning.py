@@ -3,7 +3,6 @@
 
 """Test methods to validate threshold tuning during the validation phase."""
 
-
 import numpy as np
 import pandas as pd
 

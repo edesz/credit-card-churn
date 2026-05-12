@@ -3,7 +3,6 @@
 
 """Test methods to estimate business savings from customer attributes."""
 
-
 import numpy as np
 import pandas as pd
 

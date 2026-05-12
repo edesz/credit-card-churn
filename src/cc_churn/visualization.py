@@ -208,6 +208,7 @@ def plot_shap_summary_plots(
     axis_label_fontsize: int = 14,
     y_axis_annot_fontsize: int = 14,
     wspace: float = 0.5,
+    fpath: str = "../reports/figures/myfile.png",
     fig_size: tuple = (15, 12),
 ) -> None:
     """Plots SHAP summary visualizations for model interpretation.
@@ -222,6 +223,7 @@ def plot_shap_summary_plots(
         axis_label_fontsize: Font size for axis labels.
         y_axis_annot_fontsize: Font size for annotation text.
         wspace: Width space between subplots.
+        fpath: The destination file path for sving the figure.
         fig_size: Tuple defining figure size.
 
     Returns:
@@ -230,7 +232,7 @@ def plot_shap_summary_plots(
     Examples:
         >>> plot_shap_summary_plots(shap_values)
     """
-    _, (ax1, ax2) = plt.subplots(1, 2, sharey=False, figsize=fig_size)
+    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=False, figsize=fig_size)
     plt.subplots_adjust(wspace=wspace)
 
     shap.plots.bar(shap_explainer_values, ax=ax2, show=False)
@@ -257,3 +259,6 @@ def plot_shap_summary_plots(
     ax1.tick_params(axis="both", labelsize=axis_label_fontsize)
     ax1.set_xlabel("Mean Absolute SHAP value", fontsize=axis_label_fontsize)
     _ = ax1.set_yticklabels([])
+
+    if fpath:
+        fig.savefig(fpath, dpi=300, bbox_inches="tight")

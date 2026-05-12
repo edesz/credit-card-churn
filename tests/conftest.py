@@ -3,16 +3,20 @@
 
 """Define pytest fixtures."""
 
-
+import random
 from pathlib import Path
+from typing import List, Union
 
 import altair as alt
 import boto3
+import evidently.metrics as em
 import numpy as np
 import pandas as pd
 import pytest
+import sklearn.ensemble as skens
 import sklearn.model_selection as mds
 import sklearn.preprocessing as pp
+from evidently import BinaryClassification, DataDefinition, Dataset
 from moto import mock_aws
 from sklearn import preprocessing as pp
 from sklearn.compose import ColumnTransformer
@@ -20,6 +24,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 import src.cc_churn.viz_altair as vzu
+import src.r2.io_utils as r2io
 from src.cc_churn.costs import calc_predicted_savings, calc_true_savings
 from src.cc_churn.scoring import get_scorers
 from src.cc_churn.transformers import CategoryCombiner2
@@ -51,6 +56,7 @@ def base_df(request):
                 "Total_Trans_Amt": "total_trans_amt",
                 "total_revolving_bal": "total_revolv_bal",
                 "attrition_flag": "is_churned",
+                "total_relationship_count": "num_products",
             }
         )
         .astype(dtypes_categoricals)
@@ -84,6 +90,8 @@ def data_split(base_df):
         stratify=base_df[label],
     )
 
+    df_train = df_train.sample(frac=1.0, random_state=88)
+
     X_train = df_train.drop(columns=[label])
     y_train = df_train[label]
 
@@ -106,46 +114,6 @@ def params():
     )
 
 
-# @pytest.fixture(scope="session")
-# def class_weights(data_split):
-#     _, y_train, _, _ = data_split
-
-#     weights = skut.compute_class_weight(
-#         class_weight="balanced",
-#         classes=np.array([0, 1]),
-#         y=y_train.to_numpy(),
-#     )
-
-#     return {0: float(weights[0]), 1: float(weights[1])}
-
-
-# @pytest.fixture(scope="session")
-# def preprocessor():
-#     numeric_features = [
-#         "months_on_book",
-#         "total_trans_amt",
-#         "total_trans_ct",
-#         "total_revolv_bal",
-#     ]
-
-#     return ColumnTransformer(
-#         transformers=[
-#             ("num", Pipeline([("scaler", pp.MinMaxScaler())]), numeric_features)
-#         ],
-#         remainder="drop",
-#     )
-
-
-# @pytest.fixture(scope="session")
-# def model():
-#     return skens.HistGradientBoostingClassifier(
-#         max_depth=3,
-#         l2_regularization=0.25,
-#         class_weight="balanced",
-#         random_state=42,
-#     )
-
-
 @pytest.fixture(scope="session")
 def sample_predictions():
     y_train = pd.Series([0, 0, 1, 1])
@@ -161,23 +129,6 @@ def sample_predictions():
 def scorers():
     scorers = get_scorers(["f2", "recall"])
     return scorers
-
-
-# @pytest.fixture(scope="session")
-# def trained_model(data_split, model, preprocessor):
-#     X_train, y_train, _, _ = data_split
-
-#     _ = preprocessor.fit(X_train)
-#     columns_transformed = (
-#         preprocessor.named_transformers_["num"].get_feature_names_out().tolist()
-#     )
-#     X_train_pre = pd.DataFrame(
-#         preprocessor.transform(X_train),
-#         columns=columns_transformed,
-#         index=X_train.index,
-#     )
-#     model.fit(X_train_pre, y_train)
-#     return model, X_train_pre
 
 
 @pytest.fixture(scope="session")
@@ -369,7 +320,7 @@ def sample_r2_df():
     return pd.DataFrame(dict_values).convert_dtypes(dtype_backend="pyarrow")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def s3_setup():
     """Creates a mocked S3 client and bucket.
 
@@ -381,6 +332,60 @@ def s3_setup():
         bucket = "test-bucket"
         client.create_bucket(Bucket=bucket)
         yield client, bucket
+
+
+@pytest.fixture
+def mock_latest_and_read(monkeypatch):
+    """Mocks key lookup and parquet reader."""
+    calls = {}
+
+    def mock_get_latest(*args, **kwargs):
+        calls["key_called"] = True
+        return "some/key.parquet.gzip"
+
+    def mock_read_parquet(*args, **kwargs):
+        calls["read_called"] = True
+        calls["kwargs"] = kwargs
+        return pd.DataFrame({"a": [1, 2]})
+
+    monkeypatch.setattr(r2io, "get_latest_s3_file_optimized", mock_get_latest)
+    monkeypatch.setattr(r2io, "pandas_read_parquet_r2", mock_read_parquet)
+    return calls
+
+
+@pytest.fixture
+def sample_joblib_object():
+    """Provides a simple serializable Python object."""
+    return {"model": "xgboost", "score": 0.91}
+
+
+@pytest.fixture
+def mock_latest_and_joblib(monkeypatch):
+    """Mocks latest-key lookup and joblib loading."""
+    calls = {}
+
+    def mock_get_latest(*args, **kwargs):
+        calls["key_called"] = True
+        return "models/latest.joblib"
+
+    def mock_load(*args, **kwargs):
+        calls["load_called"] = True
+        calls["kwargs"] = kwargs
+        return {"model": "rf"}
+
+    monkeypatch.setattr(
+        r2io,
+        "get_latest_s3_file_optimized",
+        mock_get_latest,
+    )
+
+    monkeypatch.setattr(
+        r2io,
+        "joblib_load_key_from_r2",
+        mock_load,
+    )
+
+    return calls
 
 
 @pytest.fixture
@@ -430,3 +435,339 @@ def sample_altair_chart():
     df = pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     chart = alt.Chart(df).mark_point().encode(x="x", y="y")
     return chart
+
+
+@pytest.fixture
+def sample_code():
+    """Provides sample Python code as file content.
+
+    Args:
+        None
+
+    Returns:
+        str: Multi-line Python code string.
+    """
+    return "print('hello')\nprint('world')\nprint('!')\n"
+
+
+@pytest.fixture
+def simple_df():
+    """Creates a simple dataset for uplift/gain tests."""
+    return pd.DataFrame(
+        {
+            "y": [1, 0, 1, 0, 0],
+            "p": [0.9, 0.8, 0.7, 0.4, 0.1],
+        }
+    )
+
+
+@pytest.fixture
+def metrics_df():
+    """Creates sample metrics DataFrame."""
+    return pd.DataFrame(
+        {
+            "model_name": ["LR", "LR"],
+            "split": ["val", "test"],
+            "test_f2": [0.80, 0.75],
+            "test_recall": [0.90, 0.88],
+        }
+    )
+
+
+# @pytest.fixture
+# def sample_uplift_df():
+#     """Creates sample uplift curve data."""
+#     return pd.DataFrame(
+#         {
+#             "percentile": [0.2, 0.4, 0.6, 0.8, 1.0],
+#             "uplift": [2.0, 1.8, 1.5, 1.2, 1.0],
+#         }
+#     )
+
+
+# @pytest.fixture
+# def sample_gain_df():
+#     """Creates sample gain curve data."""
+#     return pd.DataFrame(
+#         {
+#             "percentile": [0.2, 0.4, 0.6, 0.8, 1.0],
+#             "gain": [0.4, 0.7, 0.85, 0.95, 1.0],
+#         }
+#     )
+
+
+@pytest.fixture
+def df_uplift() -> pd.DataFrame:
+    """Fixture providing a cumulative uplift curve."""
+    return pd.DataFrame(
+        {
+            "percentile": [i / 100 for i in range(5, 55, 5)],
+            "uplift": [
+                6.05,
+                5.97,
+                5.40,
+                4.69,
+                3.89,
+                3.28,
+                2.84,
+                2.49,
+                2.22,
+                2.00,
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def df_gain() -> pd.DataFrame:
+    """Fixture providing a cumulative gain curve."""
+    return pd.DataFrame(
+        {
+            "percentile": [0.10, 0.20, 0.30, 0.40, 0.50, 0.60],
+            "gain": [5.00, 4.95, 3.90, 3.10, 2.60, 2.30],
+        }
+    )
+
+
+@pytest.fixture(scope="session")
+def evidently_datasets(data_split):
+    X_train, y_train, X_test, y_test = data_split
+
+    df_train = X_train.copy()
+    df_train["is_churned"] = y_train
+
+    df_test = X_test.copy()
+    df_test["is_churned"] = y_test
+
+    # Required columns for Evidently
+    df_train = df_train.assign(
+        y_true=df_train["is_churned"].astype(str),
+        y_pred=df_train["y_pred"].astype(str),
+    )
+    df_test = df_test.assign(
+        y_true=df_test["is_churned"].astype(str),
+        y_pred=df_test["y_pred"].astype(str),
+    )
+
+    ordinal_features = ["income_category", "education_level"]
+    categorical_features = [
+        "gender",
+        "marital_status",
+        "card_category",
+        "dependent_count",
+    ]
+    numeric_features = list(
+        set(X_train.select_dtypes(include=["number"]).columns.tolist())
+        - set(["clientnum", "y_pred", "y_pred_proba", "is_churned"])
+    )
+
+    data_definition = DataDefinition(
+        numerical_columns=numeric_features + ["y_pred_proba"],
+        categorical_columns=(
+            ordinal_features + categorical_features + ["y_pred", "y_true"]
+        ),
+        classification=[
+            BinaryClassification(
+                target="y_true",
+                prediction_labels="y_pred",
+                prediction_probas="y_pred_proba",
+                pos_label="1",
+            )
+        ],
+    )
+
+    dataset_train = Dataset.from_pandas(
+        df_train, data_definition=data_definition
+    )
+    dataset_test = Dataset.from_pandas(df_test, data_definition=data_definition)
+
+    return dataset_train, dataset_test
+
+
+@pytest.fixture(scope="session")
+def sample_metrics(base_df):
+    """Provides a realistic set of drift metrics used in production."""
+
+    numeric_features = list(
+        set(base_df.select_dtypes(include=["number"]).columns.tolist())
+        - set(["clientnum", "y_pred", "y_pred_proba", "is_churned"])
+    )
+
+    ordinal_features = ["income_category", "education_level"]
+    categorical_features = [
+        "gender",
+        "marital_status",
+        "card_category",
+        "dependent_count",
+    ]
+
+    metrics = [
+        em.ValueDrift(column=c, method="wasserstein", threshold=0.05)
+        for c in numeric_features + ["y_pred_proba"]
+    ] + [
+        em.ValueDrift(column=c, method="jensenshannon", threshold=0.05)
+        for c in ordinal_features + categorical_features + ["y_pred", "y_true"]
+    ]
+
+    return metrics
+
+
+@pytest.fixture(scope="session", params=[9])
+def numeric_features(request):
+    numericals = [
+        "total_trans_amt",
+        "total_revolv_bal",
+        "total_ct_chng_q4_q1",
+        "num_products",
+        "total_amt_chng_q4_q1",
+        "months_inactive_12_mon",
+        "contacts_count_12_mon",
+        "credit_limit",
+        "months_on_book",
+    ]
+    numericals_shuffled = random.sample(numericals, k=request.param)
+    return numericals_shuffled
+
+
+@pytest.fixture(scope="session")
+def get_Xy(data_split) -> List[Union[pd.DataFrame, pd.Series]]:
+    X_train, y_train, X_test, y_test = data_split
+    X, y = [pd.concat([X_train, X_test]), pd.concat([y_train, y_test])]
+    return [X, y]
+
+
+@pytest.fixture(scope="session")
+def pipeline(numeric_features) -> Pipeline:
+    numeric_transformer = Pipeline([("scaler", pp.MinMaxScaler())])
+    transformers = [("num", numeric_transformer, numeric_features)]
+
+    preprocessor = ColumnTransformer(
+        transformers, remainder="drop", verbose_feature_names_out=False
+    ).set_output(transform="pandas")
+
+    transformers_preprocessors = [("pre", preprocessor)]
+
+    clf = skens.HistGradientBoostingClassifier(
+        max_depth=3,
+        l2_regularization=0.25,
+        class_weight="balanced",
+        random_state=42,
+    )
+    pipe = Pipeline(transformers_preprocessors + [("clf", clf)]).set_output(
+        transform="pandas"
+    )
+    return pipe
+
+
+@pytest.fixture(scope="session")
+def trained_pipeline(pipeline, get_Xy) -> List[Union[Pipeline, np.ndarray]]:
+    X, y = get_Xy
+    _ = pipeline.fit(X, y)
+    y_pred = pipeline.predict(X)
+    return [pipeline, y_pred]
+
+
+@pytest.fixture(scope="session")
+def preprocess_data(trained_pipeline, get_Xy) -> pd.DataFrame:
+    pipe, y_pred = trained_pipeline
+    X, y = get_Xy
+
+    pipe_transf_pre, _ = [pipe.named_steps["pre"], pipe.named_steps["clf"]]
+    best_features = (
+        pipe.named_steps["pre"]
+        .named_transformers_["num"]
+        .named_steps["scaler"]
+        .get_feature_names_out()
+        .tolist()
+    )
+
+    features_non_preprocessed = list(set(list(X)) - set(best_features))
+
+    _ = pipe_transf_pre.fit(X)
+    columns_transformed = list(
+        pipe_transf_pre.get_feature_names_out(input_features=list(X)).tolist()
+    )
+
+    X_transformed_preprocessed = pd.DataFrame(
+        pipe_transf_pre.transform(X),
+        columns=columns_transformed,
+        index=X.index,
+    )
+
+    df_transf_pre = pd.concat(
+        [
+            X[features_non_preprocessed],
+            X_transformed_preprocessed,
+            y.rename("y"),
+        ],
+        axis=1,
+    )[list(X) + ["y"]]
+
+    df_transf_pre = df_transf_pre.assign(y_pred=y_pred)
+    return df_transf_pre
+
+
+@pytest.fixture(scope="session")
+def get_shap_values_inputs(trained_pipeline) -> List:
+    pipe, _ = trained_pipeline
+    model = pipe.named_steps["clf"]
+    best_features = (
+        pipe.named_steps["pre"]
+        .named_transformers_["num"]
+        .named_steps["scaler"]
+        .get_feature_names_out()
+        .tolist()
+    )
+    return [model, best_features]
+
+
+@pytest.fixture(scope="session")
+def expected_shap_values() -> pd.DataFrame:
+    expected = [
+        {
+            "feature": "total_trans_amt",
+            "y_class == 1": 2.0885696067733392,
+            "y_class == 0": 1.1094070900869124,
+        },
+        {
+            "feature": "total_revolv_bal",
+            "y_class == 1": 0.9105218915463017,
+            "y_class == 0": 0.5541132815538157,
+        },
+        {
+            "feature": "total_ct_chng_q4_q1",
+            "y_class == 1": 0.7297208040328211,
+            "y_class == 0": 0.3456090024349042,
+        },
+        {
+            "feature": "num_products",
+            "y_class == 1": 0.47973882653631456,
+            "y_class == 0": 0.26269088194467005,
+        },
+        {
+            "feature": "total_amt_chng_q4_q1",
+            "y_class == 1": 0.32504312949926467,
+            "y_class == 0": 0.2770954480182687,
+        },
+        {
+            "feature": "months_inactive_12_mon",
+            "y_class == 1": 0.27239414601820405,
+            "y_class == 0": 0.3196610225527143,
+        },
+        {
+            "feature": "contacts_count_12_mon",
+            "y_class == 1": 0.2290909334104806,
+            "y_class == 0": 0.23490676106894415,
+        },
+        {
+            "feature": "credit_limit",
+            "y_class == 1": 0.056199224258841184,
+            "y_class == 0": 0.06308792379982318,
+        },
+        {
+            "feature": "months_on_book",
+            "y_class == 1": 0.09400804735828071,
+            "y_class == 0": 0.08297436432449141,
+        },
+    ]
+    return pd.DataFrame.from_records(expected)

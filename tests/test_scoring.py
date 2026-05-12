@@ -3,7 +3,6 @@
 
 """Test prediction scorers."""
 
-
 import numpy as np
 import pytest
 

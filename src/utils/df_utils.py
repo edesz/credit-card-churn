@@ -10,7 +10,9 @@ import pandas as pd
 from IPython.display import display
 
 
-def show_df(df: pd.DataFrame) -> List[Union[pd.DataFrame, float]]:
+def show_df(
+    df: pd.DataFrame, verbose: bool = False
+) -> List[Union[pd.DataFrame, float]]:
     """Displays DataFrame summary and memory usage.
 
     This function computes and displays a summary including missing
@@ -18,15 +20,17 @@ def show_df(df: pd.DataFrame) -> List[Union[pd.DataFrame, float]]:
     prints memory usage.
 
     Args:
-        df: Input DataFrame.
+        df: The input pandas DataFrame to summarize.
+        verbose: The boolean flag indicating whether to display the
+            summary DataFrame using IPython display utilities.
 
     Returns:
-        List[Union[pd.DataFrame, float]]:
-            - Summary DataFrame with column diagnostics.
-            - Total memory usage in KB.
+        List[Union[pd.DataFrame, float]]: The list containing:
+            - The summary DataFrame with column-level diagnostics.
+            - The total memory usage of the DataFrame in KB.
 
     Examples:
-        >>> summary, mem = show_df(df)
+        >>> df_summary, mem_kb = show_df(df, verbose=True)
     """
     df_summary = (
         df.isna()
@@ -49,7 +53,8 @@ def show_df(df: pd.DataFrame) -> List[Union[pd.DataFrame, float]]:
         )
     )
     total_memory_KB = df.memory_usage(index=True, deep=True).sum() / 1000
-    display(df_summary)
+    if verbose:
+        display(df_summary)
     print(
         f"Shape: {len(df):,} rows X {df.shape[1]:,} columns, Memory Usage: "
         f"{total_memory_KB:.3f} KB"
@@ -66,20 +71,22 @@ def highlight_abs_greater(
     absolute value exceeds a specified threshold.
 
     Args:
-        df: Input DataFrame of numeric values.
-        threshold: Threshold for highlighting.
+        df: The input DataFrame of numeric values.
+        threshold: The threshold for highlighting.
 
     Returns:
-        pd.DataFrame: DataFrame of CSS styles for highlighting.
+        pd.DataFrame: The DataFrame with CSS styles for highlighting.
 
     Examples:
         >>> df.style.apply(highlight_abs_greater, threshold=0.5)
     """
     # create mask where absolute value is greater than a threshold
     mask = df.abs() > threshold
+
     # get CSS for true and empty string for false
-    return pd.DataFrame(
+    df_css = pd.DataFrame(
         np.where(mask, "background-color: yellow", ""),
         index=df.index,
         columns=df.columns,
     )
+    return df_css

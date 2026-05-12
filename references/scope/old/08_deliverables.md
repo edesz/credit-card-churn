@@ -8,13 +8,15 @@ This section lists the contents to be provided to the client.
 
 ### Analysis
 
-All source code used in this project will be [provided in a Github repository](#https://github.com/edesz/credit-card-churn).
+The following will be provided in a Github repository
+
+1. Python notebooks as discussed in the project `README.md` on github repository ([link](https://github.com/edesz/credit-card-churn/blob/main/README.md#analysis))
 
 ### Data Preparation
 
-The three processed data splits will be provided in a separate file in the team's private Cloudflare R2 storage bucket
+The following will be provided in a private Cloudflare R2 storage bucket
 
-1. Train, Validation, Test data splits
+1. (Data Files) Train, Validation, Test data splits
    - `train_data.parquet.gzip`
    - `validation_data.parquet.gzip`
    - `test_data.parquet.gzip`
@@ -39,14 +41,6 @@ The following will be provided in a private Cloudflare R2 storage bucket
 
 ### Business Requirements
 
-The recommended at-risk customers will be provided in the team's private Cloudflare R2 storage bucket
+The following will be provided in a private Cloudflare R2 storage bucket
 
-1. using [ROI and under two budget scenarios](./07_reporting_metrics/#roi-usage)
-   - `YYYY-mm-dd/at_risk_customers_with_business_metrics_roi__<model-name>__<YYYYmmdd>_<HHMMSS>.parquet.gzip`
-2. using [net savings and combinations of binned risk level and customer value tiers](./07_reporting_metrics.md#net-savings-usage)
-   - `YYYY-mm-dd/at_risk_customers_with_business_metrics_savings__<model-name>__<YYYYmmdd>_<HHMMSS>.parquet.gzip`
-   - summary for each bin showing the following
-     - attributes of bin (e.g. low risk and medium value tier, medium risk and high value tier, etc.)
-     - estimated net savings per customer
-     - number of customers
-     - recommended targeting strategy
+1. (File with At-Risk Customers) File with at-risk customers and with identification of at-risk customers that are predicted by the model to maximize Return on Investment (ROI) if they are targeted.

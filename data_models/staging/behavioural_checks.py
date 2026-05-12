@@ -141,25 +141,6 @@ class BehaviouralChecks:
         # Valid rows = NOT anomalous
         return ~anomaly_mask
 
-    @pa.check("Attrition_Flag", element_wise=False)
-    def check_value_counts(cls, s: pd.Series) -> bool:
-        """
-        Validate class distribution for the target variable.
-
-        Ensures that the proportion of "Existing Customer" observations
-        meets a minimum threshold, reflecting the expected class imbalance
-        in the dataset.
-
-        Args:
-            s (pd.Series): Target column containing attrition labels.
-
-        Returns:
-            bool: True if the proportion of "Existing Customer" is greater
-            than or equal to 0.83, otherwise False.
-        """
-        vc = s.value_counts(normalize=True)
-        return vc.get("Existing Customer", 0) >= 0.83
-
     @pa.check(
         "Total_Revolving_Bal (Balance unpaid at month end)",
         groupby="Attrition_Flag",
@@ -188,8 +169,8 @@ class BehaviouralChecks:
         if existing is None or attrited is None:
             return False
 
-        # Perform the t-test
-        t_stat, p_value = stats.ttest_ind(existing, attrited)
+        # Perform the t-test to check if the means are different
+        _, p_value = stats.ttest_ind(existing, attrited, equal_var=True)
 
         # Check if the difference is statistically significant (p < 0.05)
         return p_value < 0.05
@@ -216,9 +197,8 @@ class BehaviouralChecks:
         """
         existing = grouped_data.get("Existing Customer")
         attrited = grouped_data.get("Attrited Customer")
-        # Use a t-test to check if the means are different
-        _, p_val = stats.ttest_ind(existing, attrited, equal_var=False)
-        # Expecting a very high significance ($p < 0.01$)
+        _, p_val = stats.ttest_ind(existing, attrited, equal_var=True)
+        # expecting a very high significance here (p < 0.01)
         return p_val < 0.01
 
     @pa.check(
@@ -244,7 +224,7 @@ class BehaviouralChecks:
         """
         existing = grouped_data.get("Existing Customer")
         attrited = grouped_data.get("Attrited Customer")
-        _, p_val = stats.ttest_ind(existing, attrited, equal_var=False)
+        _, p_val = stats.ttest_ind(existing, attrited, equal_var=True)
         return p_val < 0.01
 
     @pa.check(
@@ -269,8 +249,8 @@ class BehaviouralChecks:
         """
         existing = grouped_data.get("Existing Customer")
         attrited = grouped_data.get("Attrited Customer")
-        # We expect mean(attrited) > mean(existing)
-        return attrited.mean() > existing.mean()
+        _, p_val = stats.ttest_ind(existing, attrited, equal_var=True)
+        return p_val < 0.01 and attrited.mean() > existing.mean()
 
     @pa.check(
         "Avg_Utilization_Ratio (Credit usage/Total Credit available)",
@@ -294,7 +274,7 @@ class BehaviouralChecks:
         """
         existing = grouped_data.get("Existing Customer")
         attrited = grouped_data.get("Attrited Customer")
-        _, p_val = stats.ttest_ind(existing, attrited, equal_var=False)
+        _, p_val = stats.ttest_ind(existing, attrited, equal_var=True)
         return p_val < 0.01 and existing.mean() > attrited.mean()
 
     @pa.check(
@@ -318,4 +298,5 @@ class BehaviouralChecks:
         """
         existing = grouped_data.get("Existing Customer")
         attrited = grouped_data.get("Attrited Customer")
-        return attrited.mean() > existing.mean()
+        _, p_val = stats.ttest_ind(existing, attrited, equal_var=True)
+        return p_val < 0.01 and attrited.mean() > existing.mean()

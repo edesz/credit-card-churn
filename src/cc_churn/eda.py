@@ -3,7 +3,6 @@
 
 """Define utilities that are used to transform data for use in EDA."""
 
-
 import pandas as pd
 
 
@@ -16,13 +15,13 @@ def get_grouped_churn_rate(df: pd.DataFrame, col_to_group: str) -> pd.DataFrame:
     non-churned customers, along with percentage metrics.
 
     Args:
-        df: Input DataFrame containing customer data. Must include
+        df: The input DataFrame containing customer data. Must include
             `clientnum` and `outcome` columns.
-        col_to_group: Column name used to group customers (e.g.,
+        col_to_group: The column name used to group customers (e.g.,
             categorical feature).
 
     Returns:
-        pd.DataFrame: Aggregated DataFrame with the following columns:
+        pd.DataFrame: The aggregated DataFrame with the following columns:
             - grouping column (`col_to_group`)
             - Churned: count of churned customers
             - Did not Churn: count of retained customers

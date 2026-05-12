@@ -9,16 +9,40 @@ import pytest
 import src.cc_churn.viz_altair as vzu
 
 
-def check_save(expected_calls, mock_export, chart_type=alt.Chart) -> None:
+def check_save(
+    expected_calls,
+    mock_export,
+    chart_type=None,
+    expected_fpath="test.html",
+) -> None:
+    """Validates whether export_altair_chart was called correctly."""
+
+    was_called = mock_export.get("called", False)
+
     if expected_calls == 1:
-        assert mock_export.get("called") is True
+        assert was_called is True
         assert "kwargs" in mock_export
 
         kwargs = mock_export["kwargs"]
-        assert isinstance(kwargs["alt_chart"], chart_type)
-        assert kwargs["fpath"] == "test.html"
+
+        if chart_type:
+            assert isinstance(kwargs["alt_chart"], chart_type)
+        else:
+            import altair as alt
+
+            assert isinstance(
+                kwargs["alt_chart"],
+                (
+                    alt.Chart,
+                    alt.LayerChart,
+                    alt.HConcatChart,
+                ),
+            )
+
+        assert kwargs["fpath"] == expected_fpath
+
     else:
-        assert mock_export.get("called") is False or "kwargs" not in mock_export
+        assert was_called is False or "kwargs" not in mock_export
 
 
 @pytest.mark.parametrize(
@@ -166,6 +190,7 @@ def test_bar_chart_custom_scale(
 
 
 def test_histogram_encoding(sample_df_plot):
+    """Verifies histogram layer encoding configuration."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -179,14 +204,20 @@ def test_histogram_encoding(sample_df_plot):
 
     spec = chart.to_dict()
 
-    assert spec["mark"]["type"] == "bar"
-    assert spec["encoding"]["x"]["bin"]["maxbins"] == 5
-    assert spec["encoding"]["y"]["aggregate"] == "count"
-    assert spec["encoding"]["y"]["stack"] is None
+    assert "hconcat" in spec
+    assert len(spec["hconcat"]) == 2
+
+    hist_spec = spec["hconcat"][0]
+
+    assert hist_spec["mark"]["type"] == "bar"
+    assert hist_spec["encoding"]["x"]["bin"]["maxbins"] == 5
+    assert hist_spec["encoding"]["y"]["aggregate"] == "count"
+    assert hist_spec["encoding"]["y"]["stack"] is None
 
 
 @pytest.mark.parametrize("scale", ["log", "symlog", "linear"])
 def test_histogram_y_scale(sample_df_plot, scale):
+    """Verifies y-axis scaling is correctly applied."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -200,7 +231,10 @@ def test_histogram_y_scale(sample_df_plot, scale):
     )
 
     spec = chart.to_dict()
-    assert spec["encoding"]["y"]["scale"]["type"] == scale
+
+    hist_spec = spec["hconcat"][0]
+
+    assert hist_spec["encoding"]["y"]["scale"]["type"] == scale
 
 
 @pytest.mark.parametrize(
@@ -208,13 +242,12 @@ def test_histogram_y_scale(sample_df_plot, scale):
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_returns_chart(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies function returns an Altair Chart object.
-
-    Args:
-        None
-    """
+    """Verifies function returns horizontally concatenated chart."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -227,7 +260,8 @@ def test_histogram_returns_chart(
         save_params=save_params,
     )
 
-    assert isinstance(chart, alt.Chart)
+    assert isinstance(chart, alt.HConcatChart)
+
     check_save(expected_calls, mock_export)
 
 
@@ -236,13 +270,12 @@ def test_histogram_returns_chart(
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_mark_and_encoding(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies histogram uses bar mark and correct encodings.
-
-    Args:
-        None
-    """
+    """Verifies histogram uses correct mark and encoding."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -257,10 +290,13 @@ def test_histogram_mark_and_encoding(
 
     spec = chart.to_dict()
 
-    assert spec["mark"]["type"] == "bar"
-    assert spec["encoding"]["x"]["field"] == "value"
-    assert spec["encoding"]["y"]["aggregate"] == "count"
-    assert spec["encoding"]["color"]["field"] == "flag"
+    hist_spec = spec["hconcat"][0]
+
+    assert hist_spec["mark"]["type"] == "bar"
+    assert hist_spec["encoding"]["x"]["field"] == "value"
+    assert hist_spec["encoding"]["y"]["aggregate"] == "count"
+    assert hist_spec["encoding"]["color"]["field"] == "flag"
+
     check_save(expected_calls, mock_export)
 
 
@@ -268,9 +304,13 @@ def test_histogram_mark_and_encoding(
     "save_params, expected_calls",
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
-def test_histogram_encoding(
-    sample_df_plot, mock_export, save_params, expected_calls
+def test_histogram_encoding_with_boxplot(
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
+    """Verifies histogram and boxplot are horizontally concatenated."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -285,10 +325,19 @@ def test_histogram_encoding(
 
     spec = chart.to_dict()
 
-    assert spec["mark"]["type"] == "bar"
-    assert spec["encoding"]["x"]["bin"]["maxbins"] == 5
-    assert spec["encoding"]["y"]["aggregate"] == "count"
-    assert spec["encoding"]["y"]["stack"] is None
+    assert "hconcat" in spec
+    assert len(spec["hconcat"]) == 2
+
+    hist_spec = spec["hconcat"][0]
+    box_spec = spec["hconcat"][1]
+
+    assert hist_spec["mark"]["type"] == "bar"
+    assert box_spec["mark"]["type"] == "boxplot"
+
+    assert hist_spec["encoding"]["x"]["bin"]["maxbins"] == 5
+    assert hist_spec["encoding"]["y"]["aggregate"] == "count"
+    assert hist_spec["encoding"]["y"]["stack"] is None
+
     check_save(expected_calls, mock_export)
 
 
@@ -303,7 +352,7 @@ def test_histogram_encoding(
     "save_params, expected_calls",
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
-def test_histogram_y_scale(
+def test_histogram_tooltip_and_y_scale(
     sample_df_plot,
     mock_export,
     tooltip,
@@ -311,6 +360,7 @@ def test_histogram_y_scale(
     save_params,
     expected_calls,
 ):
+    """Verifies tooltip and y-scale configuration."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -326,12 +376,20 @@ def test_histogram_y_scale(
     )
 
     spec = chart.to_dict()
-    assert spec["encoding"]["y"]["scale"]["type"] == "log"
+
+    hist_spec = spec["hconcat"][0]
+
+    assert hist_spec["encoding"]["y"]["scale"]["type"] == "log"
+
     if expect_tooltip:
-        tooltip_enc = spec["encoding"]["tooltip"]
+        tooltip_enc = hist_spec["encoding"]["tooltip"]
+
         assert isinstance(tooltip_enc, list)
         assert tooltip_enc[0]["field"] == "value"
         assert tooltip_enc[0]["type"] == "quantitative"
+    else:
+        assert "tooltip" not in hist_spec["encoding"]
+
     check_save(expected_calls, mock_export)
 
 
@@ -340,13 +398,12 @@ def test_histogram_y_scale(
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_binning_applied(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies binning is applied to x-axis with correct number of bins.
-
-    Args:
-        None
-    """
+    """Verifies histogram binning configuration."""
     num_bins = 10
 
     chart = vzu.plot_grouped_overlapping_altair_histogram(
@@ -363,7 +420,10 @@ def test_histogram_binning_applied(
 
     spec = chart.to_dict()
 
-    assert spec["encoding"]["x"]["bin"]["maxbins"] == num_bins
+    hist_spec = spec["hconcat"][0]
+
+    assert hist_spec["encoding"]["x"]["bin"]["maxbins"] == num_bins
+
     check_save(expected_calls, mock_export)
 
 
@@ -372,13 +432,12 @@ def test_histogram_binning_applied(
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_properties(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies chart title and figure size properties.
-
-    Args:
-        None
-    """
+    """Verifies chart properties and concatenation spacing."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -393,9 +452,18 @@ def test_histogram_properties(
 
     spec = chart.to_dict()
 
-    assert "title" in spec
-    assert spec["width"] == 700
-    assert spec["height"] == 350
+    assert "hconcat" in spec
+    assert spec["config"]["concat"]["spacing"] == 25
+
+    hist_spec = spec["hconcat"][0]
+    box_spec = spec["hconcat"][1]
+
+    assert hist_spec["width"] == 450
+    assert hist_spec["height"] == 350
+
+    assert box_spec["width"] == 250
+    assert box_spec["height"] == 350
+
     check_save(expected_calls, mock_export)
 
 
@@ -404,13 +472,12 @@ def test_histogram_properties(
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_customization_applied(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies customize_altair_chart() config is applied.
-
-    Args:
-        None
-    """
+    """Verifies customize_altair_chart configuration is applied."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -425,13 +492,12 @@ def test_histogram_customization_applied(
 
     spec = chart.to_dict()
 
-    # Check axis config from customize_altair_chart
     axis_config = spec["config"]["axis"]
+
     assert axis_config["ticks"] is False
     assert axis_config["grid"] is False
     assert axis_config["domain"] is False
 
-    # Check legend config exists
     assert "legend" in spec["config"]
 
     check_save(expected_calls, mock_export)
@@ -442,13 +508,12 @@ def test_histogram_customization_applied(
     [({"fpath": "test.html"}, 1), ({}, 0)],
 )
 def test_histogram_color_scale(
-    sample_df_plot, mock_export, save_params, expected_calls
+    sample_df_plot,
+    mock_export,
+    save_params,
+    expected_calls,
 ):
-    """Verifies custom color scale parameters are applied.
-
-    Args:
-        None
-    """
+    """Verifies custom color scale configuration."""
     chart = vzu.plot_grouped_overlapping_altair_histogram(
         df=sample_df_plot,
         num_bins=5,
@@ -458,18 +523,49 @@ def test_histogram_color_scale(
         color_by_col="flag",
         legend_title="Flag",
         ptitle=alt.TitleParams(text="Histogram"),
-        scale_params=dict(domain=[True, False], range=["blue", "grey"]),
+        scale_params=dict(
+            domain=[True, False],
+            range=["blue", "grey"],
+        ),
         save_params=save_params,
     )
 
     spec = chart.to_dict()
 
-    scale = spec["encoding"]["color"]["scale"]
+    hist_spec = spec["hconcat"][0]
+
+    scale = hist_spec["encoding"]["color"]["scale"]
 
     assert scale["domain"] == [True, False]
     assert scale["range"] == ["blue", "grey"]
 
     check_save(expected_calls, mock_export)
+
+
+def test_boxplot_configuration(sample_df_plot):
+    """Verifies boxplot configuration and encodings."""
+    chart = vzu.plot_grouped_overlapping_altair_histogram(
+        df=sample_df_plot,
+        num_bins=5,
+        xvar="value",
+        xtitle="Value",
+        ytitle="Count",
+        color_by_col="flag",
+        legend_title="Flag",
+        ptitle=alt.TitleParams(text="Histogram"),
+    )
+
+    spec = chart.to_dict()
+
+    box_spec = spec["hconcat"][1]
+
+    assert box_spec["mark"]["type"] == "boxplot"
+
+    assert box_spec["encoding"]["x"]["field"] == "flag"
+    assert box_spec["encoding"]["y"]["field"] == "value"
+    assert box_spec["encoding"]["color"]["field"] == "flag"
+
+    assert box_spec["mark"]["extent"] == 1.5
 
 
 @pytest.mark.parametrize(
@@ -852,3 +948,201 @@ def test_export_altair_chart_calls_save(monkeypatch):
         "override_data_transformer": True,
         "embed_options": {"renderer": "svg"},
     }
+
+
+@pytest.mark.parametrize(
+    "save_params, expected_calls",
+    [({"fpath": "uplift.html"}, 1), ({}, 0)],
+)
+def test_uplift_curve_basic(
+    df_uplift, mock_export, save_params, expected_calls
+):
+    """Verifies uplift curve returns layered Altair chart."""
+    chart = vzu.plot_uplift_curve(
+        df=df_uplift,
+        xvar="percentile",
+        yvar="uplift",
+        xtitle="Percentile",
+        ytitle="Uplift",
+        ptitle=alt.TitleParams(text="Uplift Curve"),
+        tooltip=[alt.Tooltip("percentile"), alt.Tooltip("uplift")],
+        save_params=save_params,
+    )
+
+    assert isinstance(chart, alt.LayerChart)
+
+    spec = chart.to_dict()
+
+    assert "layer" in spec
+    assert len(spec["layer"]) == 2
+
+    check_save(
+        expected_calls,
+        mock_export,
+        expected_fpath=save_params.get("fpath", "test.html"),
+    )
+
+
+def test_uplift_curve_encodings(df_uplift):
+    """Verifies uplift curve encoding fields."""
+    chart = vzu.plot_uplift_curve(
+        df=df_uplift,
+        xvar="percentile",
+        yvar="uplift",
+        xtitle="Percentile",
+        ytitle="Uplift",
+        ptitle=alt.TitleParams(text="Uplift Curve"),
+        tooltip=[alt.Tooltip("percentile"), alt.Tooltip("uplift")],
+    )
+
+    spec = chart.to_dict()
+
+    line_layer = spec["layer"][0]
+
+    assert line_layer["mark"]["type"] == "line"
+    assert line_layer["encoding"]["x"]["field"] == "percentile"
+    assert line_layer["encoding"]["y"]["field"] == "uplift"
+
+
+def test_uplift_curve_rule_line(df_uplift):
+    """Verifies vertical rule is added at plateau."""
+    plateau = 0.4
+
+    chart = vzu.plot_uplift_curve(
+        df=df_uplift,
+        xvar="percentile",
+        yvar="uplift",
+        xtitle="Percentile",
+        ytitle="Uplift",
+        ptitle=alt.TitleParams(text="Uplift Curve"),
+        tooltip=[alt.Tooltip("percentile")],
+        plateau=plateau,
+    )
+
+    spec = chart.to_dict()
+
+    rule_layer = spec["layer"][1]
+
+    assert rule_layer["mark"]["type"] == "rule"
+    assert rule_layer["encoding"]["x"]["field"] == "x"
+
+
+def test_uplift_curve_tooltip(df_uplift):
+    """Verifies tooltip is correctly applied."""
+    tooltip = [alt.Tooltip("percentile"), alt.Tooltip("uplift")]
+
+    chart = vzu.plot_uplift_curve(
+        df=df_uplift,
+        xvar="percentile",
+        yvar="uplift",
+        xtitle="Percentile",
+        ytitle="Uplift",
+        ptitle=alt.TitleParams(text="Uplift Curve"),
+        tooltip=tooltip,
+    )
+
+    spec = chart.to_dict()
+
+    encoding_tooltip = spec["layer"][0]["encoding"]["tooltip"]
+
+    assert isinstance(encoding_tooltip, list)
+    assert encoding_tooltip[0]["field"] == "percentile"
+
+
+@pytest.mark.parametrize(
+    "save_params, expected_calls",
+    [({"fpath": "gain.html"}, 1), ({}, 0)],
+)
+def test_gain_curve_basic(df_gain, mock_export, save_params, expected_calls):
+    """Verifies gain curve returns layered chart."""
+    chart = vzu.plot_gain_curve(
+        df=df_gain,
+        xvar="percentile",
+        yvar="gain",
+        xtitle="Percentile",
+        ytitle="Gain",
+        ptitle=alt.TitleParams(text="Gain Curve"),
+        tooltip=[alt.Tooltip("percentile"), alt.Tooltip("gain")],
+        save_params=save_params,
+    )
+
+    assert isinstance(chart, alt.LayerChart)
+
+    spec = chart.to_dict()
+
+    assert "layer" in spec
+    assert len(spec["layer"]) == 3
+
+    assert spec["layer"][0]["mark"]["type"] == "line"
+    assert spec["layer"][1]["mark"]["type"] == "line"
+    assert spec["layer"][2]["mark"]["type"] == "rule"
+
+    check_save(
+        expected_calls,
+        mock_export,
+        expected_fpath=save_params.get("fpath", "test.html"),
+    )
+
+
+def test_gain_curve_encodings(df_gain):
+    """Verifies gain curve encoding fields."""
+    chart = vzu.plot_gain_curve(
+        df=df_gain,
+        xvar="percentile",
+        yvar="gain",
+        xtitle="Percentile",
+        ytitle="Gain",
+        ptitle=alt.TitleParams(text="Gain Curve"),
+        tooltip=[alt.Tooltip("percentile"), alt.Tooltip("gain")],
+    )
+
+    spec = chart.to_dict()
+
+    line_layer = spec["layer"][0]
+
+    assert line_layer["mark"]["type"] == "line"
+    assert line_layer["encoding"]["x"]["field"] == "percentile"
+    assert line_layer["encoding"]["y"]["field"] == "gain"
+
+
+def test_gain_curve_baseline(df_gain):
+    """Verifies baseline diagonal line exists."""
+    chart = vzu.plot_gain_curve(
+        df=df_gain,
+        xvar="percentile",
+        yvar="gain",
+        xtitle="Percentile",
+        ytitle="Gain",
+        ptitle=alt.TitleParams(text="Gain Curve"),
+        tooltip=[alt.Tooltip("percentile")],
+    )
+
+    spec = chart.to_dict()
+
+    baseline_layer = spec["layer"][1]
+
+    assert baseline_layer["mark"]["type"] == "line"
+    assert baseline_layer["encoding"]["x"]["field"] == "x"
+    assert baseline_layer["encoding"]["y"]["field"] == "y"
+
+
+def test_gain_curve_tooltip(df_gain):
+    """Verifies tooltip is correctly applied."""
+    tooltip = [alt.Tooltip("percentile"), alt.Tooltip("gain")]
+
+    chart = vzu.plot_gain_curve(
+        df=df_gain,
+        xvar="percentile",
+        yvar="gain",
+        xtitle="Percentile",
+        ytitle="Gain",
+        ptitle=alt.TitleParams(text="Gain Curve"),
+        tooltip=tooltip,
+    )
+
+    spec = chart.to_dict()
+
+    encoding_tooltip = spec["layer"][0]["encoding"]["tooltip"]
+
+    assert isinstance(encoding_tooltip, list)
+    assert encoding_tooltip[0]["field"] == "percentile"

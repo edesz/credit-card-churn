@@ -3,6 +3,7 @@
 
 """Run Jupyter notebooks."""
 
+import copy
 import json
 import os
 from datetime import datetime
@@ -29,7 +30,7 @@ def convert_nb_to_html(notebook_path: Path) -> None:
 
     output_path = Path(str(notebook_path).replace("ipynb", "html"))
     html_exporter = HTMLExporter()
-    (body, _) = html_exporter.from_notebook_node(notebook_content)
+    body, _ = html_exporter.from_notebook_node(notebook_content)
     with output_path.open(mode="w", encoding="utf-8") as f:
         f.write(body)
     print(f"Exported {notebook_path.name} to {output_path.name}")
@@ -84,9 +85,19 @@ def main(
     nbs_dir = PROJ_ROOT / "notebooks"
     nb_dir_output = PROJ_ROOT / "executed-notebooks" / "scripted"
 
-    nb_paths = sorted(list(nbs_dir.glob("*.ipynb")))
+    nb_paths = sorted(list(nbs_dir.glob("*.ipynb")))[1:]
+    # print(nb_paths)
+
+    prefix_r2 = "cloud-run"
 
     bus_params = dict(
+        columns=[
+            "clientnum",
+            "card_category",
+            "total_revolv_bal",
+            "total_trans_amt",
+            "is_churned",
+        ],
         interchange_rate=0.02,
         apr=0.18,
         card_fees={"Blue": 0, "Silver": 50, "Gold": 100, "Platinum": 200},
@@ -145,74 +156,134 @@ def main(
         + experiment_runs_params__5
     )
 
+    nb_list_all = []
     if "01" in nb_nums:
         np_param_01 = dict(
             r2_key_raw_data="BankChurners.xlsx",
             label="is_churned",
             n_cv_folds=5,
             size_val=0.175,
-            r2_key_train="train_data.parquet.gzip",
-            r2_key_val="validation_data.parquet.gzip",
-            r2_key_test="test_data.parquet.gzip",
+            prefix=prefix_r2,
+            r2_key_train=f"{prefix_r2}/train_data.parquet.gzip",
+            r2_key_val=f"{prefix_r2}/validation_data.parquet.gzip",
+            r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
         )
         nb_list = [
             {"prefix": "01", "path": str(nb_paths[0]), "params": np_param_01}
         ]
-    elif "02" in nb_nums:
+        nb_list_all += nb_list
+    if "02" in nb_nums:
+        nb_param_02 = copy.deepcopy(bus_params)
+        nb_param_02.update(dict(prefix=f"{prefix_r2}/"))
         nb_list = [
-            {"prefix": "02", "path": str(nb_paths[1]), "params": bus_params}
+            {"prefix": "02", "path": str(nb_paths[1]), "params": nb_param_02}
         ]
-    elif "03" in nb_nums:
+        nb_list_all += nb_list
+    if "03" in nb_nums:
         nb_param_03 = dict(
-            r2_key_train="train_data.parquet.gzip",
-            r2_key_val="validation_data.parquet.gzip",
+            prefix=prefix_r2,
+            r2_key_train=f"{prefix_r2}/train_data.parquet.gzip",
+            r2_key_val=f"{prefix_r2}/validation_data.parquet.gzip",
             label="is_churned",
             threshold_correlation=0.55,
         )
         nb_list = [
-            {"prefix": "02", "path": str(nb_paths[2]), "params": nb_param_03}
+            {"prefix": "03", "path": str(nb_paths[2]), "params": nb_param_03}
         ]
-    elif "04" in nb_nums:
+        nb_list_all += nb_list
+    if "04" in nb_nums:
         nb_list = [
             {"prefix": "04", "path": str(nb_paths[3]), "params": params}
             for params in experiment_runs_params__all
         ]
-    elif "08" in nb_nums:
+        nb_list_all += nb_list
+    if "05" in nb_nums:
+        np_param_05 = dict(primary_metric_val="prauc", threshold_overfit=5)
+        nb_list = [
+            {"prefix": "05", "path": str(nb_paths[4]), "params": np_param_05}
+        ]
+        nb_list_all += nb_list
+    if "06" in nb_nums:
+        np_param_06 = dict(
+            prefix=prefix_r2,
+            r2_key_train=f"{prefix_r2}/train_data.parquet.gzip",
+            r2_key_val=f"{prefix_r2}/validation_data.parquet.gzip",
+            r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
+            primary_metric_eval="f2",
+            threshold_overfit=5,
+        )
+        nb_list = [
+            {"prefix": "06", "path": str(nb_paths[5]), "params": np_param_06}
+        ]
+        nb_list_all += nb_list
+    if "07" in nb_nums:
+        np_param_07 = dict(
+            prefix=prefix_r2,
+            r2_key_train=f"{prefix_r2}/train_data.parquet.gzip",
+            r2_key_val=f"{prefix_r2}/validation_data.parquet.gzip",
+            r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
+        )
+        nb_list = [
+            {"prefix": "07", "path": str(nb_paths[6]), "params": np_param_07}
+        ]
+        nb_list_all += nb_list
+    if "08" in nb_nums:
+        nb_param_08 = copy.deepcopy(bus_params)
+        nb_param_08.update(
+            dict(prefix=prefix_r2, r2_key_pred="all_predictions__")
+        )
         nb_list = [
             {"prefix": "08", "path": str(nb_paths[7]), "params": bus_params}
         ]
-    elif "09" in nb_nums:
+        nb_list_all += nb_list
+    if "09" in nb_nums:
+        nb_param_09 = copy.deepcopy(bus_params)
+        nb_param_09.update(dict(prefix=prefix_r2))
+        nb_param_09 = {
+            k: v
+            for k, v in nb_param_09.items()
+            if k not in ["replacement_cost"]
+        }
+        nb_param_09["columns"] += ["model_name", "y_pred_proba", "y_pred"]
         nb_list = [
-            {"prefix": "09", "path": str(nb_paths[8]), "params": bus_params}
+            {"prefix": "09", "path": str(nb_paths[8]), "params": nb_param_09}
         ]
-    elif "10" in nb_nums:
+        nb_list_all += nb_list
+    if "10" in nb_nums:
+        nb_param_10 = dict(prefix=prefix_r2, r2_key_pred="all_predictions__")
         nb_list = [
-            {"prefix": "10", "path": str(nb_paths[9]), "params": bus_params}
+            {"prefix": "10", "path": str(nb_paths[9]), "params": nb_param_10}
         ]
-    elif "11" in nb_nums:
+        nb_list_all += nb_list
+    if "11" in nb_nums:
         nb_param_11 = dict(
-            r2_key_train="train_data.parquet.gzip",
-            r2_key_val="validation_data.parquet.gzip",
-            r2_key_test="test_data.parquet.gzip",
+            prefix=prefix_r2,
+            key_prefix="best_model__",
+            r2_key_pred_prefix="all_predictions__",
+            r2_key_train=f"{prefix_r2}/train_data.parquet.gzip",
+            r2_key_val=f"{prefix_r2}/validation_data.parquet.gzip",
+            r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
             label="is_churned",
         )
         nb_list = [
             {"prefix": "11", "path": str(nb_paths[10]), "params": nb_param_11}
         ]
-    elif "12" in nb_nums:
+        nb_list_all += nb_list
+    if "12" in nb_nums:
         nb_param_12 = dict(r2_key_raw_data="BankChurners.xlsx")
         nb_list = [
             {"prefix": "12", "path": str(nb_paths[11]), "params": nb_param_12}
         ]
+        nb_list_all += nb_list
 
     # convert value of params key to json object (without this, pyarrow
     # makes all rows of the params column have the same keys)
-    for item in nb_list:
+    for item in nb_list_all:
         if "params" in item:
             item["params"] = json.dumps(item["params"])
 
     # Convert list of records into pyarrow table
-    pa_table = pa.Table.from_pylist(nb_list)
+    pa_table = pa.Table.from_pylist(nb_list_all)
 
     # Create a pyarrow filter condition for each partial string using "prefix"
     filters = [

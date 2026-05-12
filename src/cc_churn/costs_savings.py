@@ -3,7 +3,6 @@
 
 """Define helper functions to assign cost to model predictions using savings."""
 
-
 from typing import List, Optional, Union
 
 import pandas as pd
@@ -234,17 +233,15 @@ def get_cohort_within_budget(
             customer DataFrame, the campaign mix summary, the total
             realizable impact, and the average benefit per customer.
     """
-    # 1. get combinations of risk_level and value_tier that contain the required
-    # maximum number of customers (n)
+    # step 1. get combinations of risk_level and value_tier that contain the
+    # required maximum number of customers (n)
     df_realizable_clv_tier_risk_level = (
-        df_matrix_agg.nlargest(  # .query("value_tier != 'Bronze'")
-            n, ["expected_savings_per_customer"]
-        )
+        df_matrix_agg.nlargest(n, ["expected_savings_per_customer"])
         .assign(num_customers_cumsum=lambda df: df["num_customers"].cumsum())
         .pipe(filter_matrix_by_limit, "num_customers_cumsum", n)
     )
 
-    # 2. get required combinations of risk_level and value_tier
+    # step 1. (contd.) get required combinations of risk_level and value_tier
     combo_filter = " | ".join(
         "((risk_level == '"
         + df_realizable_clv_tier_risk_level["risk_level"].astype(str)
@@ -253,7 +250,7 @@ def get_cohort_within_budget(
         + "'))"
     )
 
-    # 2. get top customers from raw customers data
+    # step 2. get top customers from raw customer data
     df_ranked = (
         # get customers who meet required combinations of risk_level & value_tier
         df.query(combo_filter)
@@ -261,13 +258,14 @@ def get_cohort_within_budget(
         .nlargest(n, ["expected_savings"])
     )
 
-    # 3. view the breakdown of combinations of risk levels and value tiers from
+    # step 3. show breakdown of combinations of risk levels and value tiers from
     # where these top N customers come
     campaign_mix = summarize_campaign_mix(
         df_ranked, "expected_savings_per_customer", intervention_cost
     )
 
-    # 4. calculate the realizable benefit
+    # step 4. calculate the realizable benefit (average expected savings per
+    # customer, across all tiers)
     total_impact = df_ranked["expected_savings"].sum()
     average_efficiency = df_ranked["expected_savings"].mean()
     print(f"Total Realizable Impact: ${total_impact:,.2f}")

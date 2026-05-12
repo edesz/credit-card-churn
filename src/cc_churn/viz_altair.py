@@ -109,34 +109,64 @@ def plot_grouped_overlapping_altair_histogram(
         domain=[True, False], range=["red", "lightgrey"]
     ),
     y_scale: str = "linear",
+    label_angle_box: Union[int, float] = -70,
+    plot_spacing: Union[int, float] = 25,
     tooltip: List[Union[str, alt.Tooltip, None]] = None,
     save_params: Dict[str, Union[str, bool, Dict]] = {},
-    fig_size: Dict[str, int] = dict(width=700, height=350),
+    fig_size_hist: Dict[str, int] = dict(width=450, height=350),
+    fig_size_bar: Dict[str, int] = dict(width=250, height=350),
 ) -> alt.Chart:
-    """Plots overlapping grouped histogram using Altair.
+    """Plots grouped histogram and boxplot charts using Altair.
+
+    This function creates a horizontally concatenated Altair visualization
+    consisting of:
+
+    1. An overlapping grouped histogram showing the distribution of a
+    numeric variable across categories.
+    2. A grouped boxplot summarizing the same variable distribution for
+    each category.
+
+    Both charts are colored by the same grouping variable and displayed
+    side-by-side to support complementary distribution analysis.
 
     Args:
-        df: Input DataFrame.
-        num_bins: Number of histogram bins.
-        xvar: Column for x-axis.
-        xtitle: X-axis title.
-        ytitle: Y-axis title.
-        color_by_col: Column for grouping colors.
-        legend_title: Legend title.
-        ptitle: Chart title.
-        scale_params: Color scale parameters.
-        y_scale: Scale type for y-axis.
-        tooltip: Tooltip configuration.
-        save_params: Parameters for saving chart.
-        fig_size: Chart dimensions.
+        df: The input pandas DataFrame containing plotting data.
+        num_bins: The maximum number of histogram bins.
+        xvar: The numeric column plotted on the histogram x-axis and
+            boxplot y-axis.
+        xtitle: The histogram x-axis title.
+        ytitle: The histogram y-axis title.
+        color_by_col: The categorical column used for grouped coloring.
+        legend_title: The legend title for grouped categories.
+        ptitle: The Altair chart title configuration.
+        scale_params: The dictionary containing Altair color scale
+            parameters.
+        y_scale: The scale type for the histogram y-axis.
+        label_angle_box: The rotation angle for boxplot category labels.
+        plot_spacing: The spacing between the histogram and boxplot.
+        tooltip: Optional tooltip configuration for the histogram.
+        save_params: Optional parameters passed to
+            `export_altair_chart()`.
+        fig_size_hist: The histogram figure dimensions.
+        fig_size_bar: The boxplot figure dimensions.
 
     Returns:
-        alt.Chart: Generated histogram chart.
+        alt.Chart: The horizontally concatenated Altair chart containing
+            the grouped histogram and grouped boxplot visualizations.
 
     Examples:
-        >>> chart = plot_grouped_overlapping_altair_histogram(df, 20, ...)
+        >>> chart = plot_grouped_overlapping_altair_histogram(
+        ...     df=df,
+        ...     num_bins=20,
+        ...     xvar="credit_limit",
+        ...     xtitle="Credit Limit",
+        ...     ytitle="Count",
+        ...     color_by_col="is_churned",
+        ...     legend_title="Churn Status",
+        ...     ptitle=alt.TitleParams("Credit Limit Distribution"),
+        ... )
     """
-    encoding = dict(
+    hist_encoding = dict(
         x=alt.X(xvar, bin=alt.Bin(maxbins=num_bins), title=xtitle),
         y=alt.Y(
             "count()",
@@ -151,14 +181,39 @@ def plot_grouped_overlapping_altair_histogram(
         ),
     )
     if tooltip is not None:
-        encoding["tooltip"] = tooltip
+        hist_encoding["tooltip"] = tooltip
 
-    chart = (
+    box_outliers_cfg = {"stroke": "#7f7f7f", "size": 50, "strokeWidth": 1.0}
+    box_median_cfg = dict(strokeWidth=1.75, opacity=1.0, stroke="black")
+    box_rule_cfg = {"strokeWidth": 3, "color": "#9498a0"}
+
+    histogram = (
         alt.Chart(df)
         .mark_bar(opacity=0.6)
-        .encode(**encoding)
-        .properties(title=ptitle, **fig_size)
+        .encode(**hist_encoding)
+        .properties(title=ptitle, **fig_size_hist)
     )
+    box = (
+        alt.Chart(df)
+        .mark_boxplot(
+            extent=1.5,
+            rule=box_rule_cfg,
+            median=alt.MarkConfig(**box_median_cfg),
+            outliers=box_outliers_cfg,
+            size=20,
+        )
+        .encode(
+            x=alt.X(
+                color_by_col,
+                axis=alt.Axis(labelAngle=label_angle_box),
+                title=None,
+            ),
+            y=alt.Y(xvar, title=None),
+            color=alt.Color(color_by_col, title=None),
+        )
+        .properties(**fig_size_bar)
+    )
+    chart = alt.hconcat(histogram, box).configure_concat(spacing=plot_spacing)
     chart = customize_altair_chart(chart)
     if save_params:
         export_altair_chart(alt_chart=chart, **save_params)
@@ -295,6 +350,7 @@ def plot_altair_heatmap(
     text_alt_condition: alt.expr,
     tooltip: List[alt.Tooltip],
     ptitle: alt.TitleParams,
+    x_label_angle: int = 0,
     legend_title: Union[str, None] = None,
     xtitle: Union[str, None] = None,
     ytitle: Union[str, None] = None,
@@ -317,6 +373,7 @@ def plot_altair_heatmap(
         text_alt_condition: Condition for text color.
         tooltip: Tooltip configuration.
         ptitle: Chart title.
+        x_label_angle: Angle of x-axis labels.
         legend_title: Legend title.
         xtitle: X-axis title.
         ytitle: Y-axis title.
@@ -330,7 +387,12 @@ def plot_altair_heatmap(
         >>> chart = plot_altair_heatmap(df, ...)
     """
     base = alt.Chart(df).encode(
-        x=alt.X(xvar, title=xtitle, sort=xsort, axis=alt.Axis(labelAngle=-45)),
+        x=alt.X(
+            xvar,
+            title=xtitle,
+            sort=xsort,
+            axis=alt.Axis(labelAngle=x_label_angle),
+        ),
         y=alt.Y(yvar, title=ytitle, sort=ysort, axis=alt.Axis(labelAngle=0)),
     )
     chart = base.mark_rect(**border_attrs).encode(
@@ -488,6 +550,161 @@ def plot_altair_simple_bar_chart(
     chart = alt.layer(bars, text)
     chart = customize_altair_chart(
         chart, 0, 17, 18, label_limit=400, legend_label_limit=400
+    )
+    if save_params:
+        export_altair_chart(alt_chart=chart, **save_params)
+    return chart
+
+
+def plot_uplift_curve(
+    df: pd.DataFrame,
+    xvar: str,
+    yvar: str,
+    xtitle: str,
+    ytitle: str,
+    ptitle: alt.TitleParams,
+    tooltip: List[alt.Tooltip],
+    plateau: float = 0.05,
+    save_params: Dict[str, Union[str, bool, Dict]] = {},
+    fig_size: dict = dict(width=400, height=350),
+) -> alt.Chart:
+    """Generates a cumulative uplift curve.
+
+    Args:
+        df_uplift: DataFrame containing the percentile and uplift values.
+        xvar: Name of the column to plot on the x-axis.
+        yvar: Name of the column to plot on the y-axis.
+        xtitle: Label for the x-axis.
+        ytitle: Label for the y-axis.
+        ptitle: Title configuration for the chart.
+        tooltip: List of Altair tooltips to display on hover.
+        plateau: The percentile of the elbow in uplift, to draw a vertical line.
+        save_params: Parameters for saving chart.
+        fig_size: Dictionary specifying width and height of the chart.
+
+    Returns:
+        A styled Altair Chart object showing the cumulative uplift curve.
+
+    Example:
+        >>> data = {'y': [1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+        ...         'p': [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05]}
+        >>> df = pd.DataFrame(data)
+        >>> df_uplift = calculate_cumulative_uplift(df, 'y', 'p')
+        >>> chart = plot_uplift_curve(
+        ...     df_uplift=df_uplift,
+        ...     xvar='percentile',
+        ...     yvar='uplift',
+        ...     xtitle='Population Percentile',
+        ...     ytitle='Cumulative Uplift',
+        ...     ptitle=alt.TitleParams(text='Uplift Curve'),
+        ...     tooltip=[alt.Tooltip('percentile'), alt.Tooltip('uplift')]
+        ... )
+        >>> chart
+    """
+    line = (
+        alt.Chart(df)
+        .mark_line(
+            point={
+                "filled": False,
+                "fill": "white",
+                "color": "darkred",
+                "size": 80,
+            },
+            color="darkred",
+        )
+        .encode(
+            x=alt.X(xvar, title=xtitle),
+            y=alt.Y(yvar, title=ytitle),
+            tooltip=tooltip,
+        )
+    )
+    rule = (
+        alt.Chart(pd.DataFrame({"x": [plateau]}))
+        .mark_rule(color="darkgreen", strokeDash=[5, 5])
+        .encode(x="x:Q")
+    )
+    chart = customize_altair_chart(
+        alt.layer(line, rule).properties(title=ptitle, **fig_size)
+    )
+    if save_params:
+        export_altair_chart(alt_chart=chart, **save_params)
+    return chart
+
+
+def plot_gain_curve(
+    df: pd.DataFrame,
+    xvar: str,
+    yvar: str,
+    xtitle: str,
+    ytitle: str,
+    ptitle: alt.TitleParams,
+    tooltip: List[alt.Tooltip],
+    plateau: float = 0.05,
+    save_params: Dict[str, Union[str, bool, Dict]] = {},
+    fig_size: dict = dict(width=400, height=350),
+) -> alt.Chart:
+    """Generates a gain curve showing cumulative positives found.
+
+    Args:
+        df: DataFrame containing the percentile and gain values.
+        xvar: Name of the column to plot on the x-axis.
+        yvar: Name of the column to plot on the y-axis.
+        xtitle: Label for the x-axis.
+        ytitle: Label for the y-axis.
+        ptitle: Title configuration for the chart.
+        tooltip: List of Altair tooltips to display on hover.
+        plateau: The percentile of the elbow in gain, to draw a vertical line.
+        save_params: Parameters for saving chart.
+        fig_size: Dictionary specifying width and height of the chart.
+
+    Returns:
+        An Altair Chart object showing the cumulative gain curve.
+
+    Example:
+        >>> data = {'y': [1, 1, 0, 0, 0], 'p': [0.9, 0.8, 0.4, 0.2, 0.1]}
+        >>> df = pd.DataFrame(data)
+        >>> df_gain = calculate_cumulative_gain(df, 'y', 'p')
+        >>> chart = plot_gain_curve(
+        ...     df=df_gain,
+        ...     xvar='percentile',
+        ...     yvar='gain',
+        ...     xtitle='Population Percentile',
+        ...     ytitle='Cumulative Gain',
+        ...     ptitle=alt.TitleParams(text='Gain Curve'),
+        ...     tooltip=[alt.Tooltip('percentile'), alt.Tooltip('gain')]
+        ... )
+        >>> chart
+    """
+    # baseline (diagonal line representing random model)
+    baseline = (
+        alt.Chart(pd.DataFrame({"x": [0, 1], "y": [0, 1]}))
+        .mark_line(color="gray", strokeDash=[4, 4])
+        .encode(x="x:Q", y="y:Q")
+    )
+    line = (
+        alt.Chart(df)
+        .mark_line(
+            point={
+                "filled": False,
+                "fill": "white",
+                "color": "darkred",
+                "size": 80,
+            },
+            color="darkred",
+        )
+        .encode(
+            x=alt.X(xvar, title=xtitle),
+            y=alt.Y(yvar, title=ytitle),
+            tooltip=tooltip,
+        )
+    )
+    rule = (
+        alt.Chart(pd.DataFrame({"x": [plateau]}))
+        .mark_rule(color="darkgreen", strokeDash=[5, 5])
+        .encode(x="x:Q")
+    )
+    chart = customize_altair_chart(
+        alt.layer(line, baseline, rule).properties(title=ptitle, **fig_size)
     )
     if save_params:
         export_altair_chart(alt_chart=chart, **save_params)

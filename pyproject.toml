@@ -26,8 +26,11 @@ numpy = ">=2.4.3,<3"
 pyarrow = ">=23.0.1,<24"
 python-dotenv = ">=1.2.2,<2"
 openpyxl = ">=3.1.5,<4"
-boto3 = ">=1.42.95,<2"
+xlsxwriter = ">=3.2.9,<4"
+boto3 = ">=1.43.6,<2"
+mypy-boto3-s3 = ">=1.43.5,<2"
 pandas = ">=3.0.2,<4"
+great_tables = ">=0.21.0,<0.22"
 pandera-pandas = ">=0.31.1,<0.32"
 pandera-hypotheses = ">=0.31.1,<0.32"
 matplotlib = ">=3.10.9,<4"
@@ -36,9 +39,11 @@ vegafusion = ">=2.0.3,<3"
 altair = ">=6.1.0,<7"
 vl-convert-python = ">=2.0.0rc1,<3"
 scikit-learn = ">=1.8.0,<2"
-metaflow = ">=2.19.22,<3"
+tqdm = ">=4.67.3,<5"
+metaflow = ">=2.19.29,<3"
 xgboost = ">=3.2.0,<4"
 joblib = ">=1.5.3,<2"
+evidently = ">=0.7.21,<0.8"
 shap = ">=0.51.0,<0.52"
 
 # ================== Make this project available as a package ==================
@@ -52,12 +57,12 @@ cc-churn = { path = ".", editable = true }
 # create a notebooks feature for exploration
 ipykernel = ">=7.2.0,<8"
 ipywidgets = ">=8.1.8,<9"
-jupyterlab = ">=4.5.6,<5"
+jupyterlab = ">=4.5.7,<5"
 jupyterlab-myst = ">=2.6.0,<3"
 jupysql = ">=0.11.1,<0.12"
-jupytext = ">=1.19.1,<2"
-jupyter_server_ydoc = ">=2.3.0,<3"
-jupyter_server_documents = ">=0.2.0,<0.3"
+jupytext = ">=1.19.2,<2"
+jupyter_server_ydoc = ">=2.4.0,<3"
+jupyter_server_documents = ">=0.2.1,<0.3"
 jupyter_server_fileid = ">=0.9.2,<0.10"
 jupyter-ruff = ">=0.3.1,<0.4"
 nbconvert = ">=7.17.1,<8"
@@ -66,20 +71,20 @@ panel = ">=1.8.10,<2"
 toml = ">=0.10.2,<0.11"
 
 [tool.pixi.feature.nbrunner.dependencies]
-# create a notebook runner feature to perform data or ML validation
+# create a notebook runner feature to programmatically run notebooks
 ipykernel = ">=7.2.0,<8"
 nbconvert = ">=7.17.1,<8"
 nbformat = ">=5.10.4,<6"
-pytz = ">=2026.1.post1,<2027"
+pytz = ">=2026.2,<2027"
 papermill = ">=2.7.0,<3"
-typer = ">=0.24.2,<0.25"
+typer = ">=0.25.1,<0.26"
 
 [tool.pixi.feature.test.dependencies]
 # create a test feature
 ipykernel = ">=7.2.0,<8"
-moto = ">=5.1.22,<6"
+moto = ">=5.2.1,<6"
 pytest = ">=9.0.3,<10"
-coverage = ">=7.13.5,<8"
+coverage = ">=7.14.0,<8"
 pytest-html = ">=4.2.0,<5"
 
 # ========= Specify non-essential dependencies in environments ========
@@ -114,15 +119,9 @@ test = { cmd = """
     """, default-environment = "test" }
 
 [tool.pixi.feature.nbrunner.tasks]
-# programmatically run ML validation experiments for the nbrunner feature
-mlval = { cmd = """
-    python3 papermill_runner.py 05
+# programmatically run notebooks for nbrunner feature
+nbs = { cmd = """
+    python3 papermill_runner.py
     """, description="""\
-    Run ML Validation experiments with Metaflow\
-    """, default-environment = "nbrunner" }
-# programmatically run data validation for the nbrunner feature
-dval = { cmd = """
-    python3 papermill_runner.py 13
-    """, description="""\
-    Validate customer data with Pandera\
+    Run notebooks with papermill\
     """, default-environment = "nbrunner" }
