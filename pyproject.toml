@@ -151,7 +151,7 @@ quarto-render = { cmd = """
     Render documentation with Quarto\
     """, default-environment = "docs" }
 quarto-publish-gh-pages = { cmd = """
-    quarto render
+    quarto publish gh-pages
     """, description="""\
     Create Github Actions configuration for Quarto\
     """, default-environment = "docs" }
