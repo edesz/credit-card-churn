@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="edesz">
+<meta name="dcterms.date" content="2026-05-02">
+
+<title>Validation – Credit-Card Churn Modeling and Targeting</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/05_get_best_validation_experiment.html" rel="next">
+<link href="../notebooks/03_eda_v2.html" rel="prev">
+<script src="../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-146db0ac44596bedc180064ef88298d3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-e21fd87140603ceea546999bacba3363.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"express",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta property="og:title" content="Validation – Credit-Card Churn Modeling and Targeting">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://edesz.github.io/credit-card-churn/notebooks/data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==">
+<meta property="og:site_name" content="Credit-Card Churn Modeling and Targeting">
+<meta property="og:image:alt" content="">
+</head>
+
+<body class="nav-sidebar docked quarto-dark"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = true;
+    const darkModeDefault = authorPrefersDark;
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/04_run_validation_experiments.html">ML Development</a></li><li class="breadcrumb-item"><a href="../notebooks/04_run_validation_experiments.html">ML Validation</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Churn Insights</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://edesz.github.io/credit-card-churn" title="Homepage" class="quarto-navigation-tool px-1" aria-label="Homepage" target="_blank"><i class="bi bi-globe"></i></a>
+    <a href="https://github.com/edesz/credit-card-churn" title="" class="quarto-navigation-tool px-1" aria-label="" target="_blank"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Overview</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/overview/00_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Business Problem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/overview/01_approach.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Approach</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/overview/02_team_contributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Team Member Contributions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Project Scoping</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/01_problem_understanding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Problem Understanding</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/02_costs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Costs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/03_goals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Goals</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/04_actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Actions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/05_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references/scope/06_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Analysis</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Analysis</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01_split_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Retrieval and Splitting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02_scoping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Analysis for Scoping</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03_eda_v2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EDA</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">ML Development</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/04_run_validation_experiments.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ML Validation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05_get_best_validation_experiment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Best Validation Experiment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/06_evaluate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/07_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ML Inference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Data Validation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/12_validate_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation Model</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#about" id="toc-about" class="nav-link active" data-scroll-target="#about">About</a>
+  <ul>
+  <li><a href="#ml-experiment-inputs" id="toc-ml-experiment-inputs" class="nav-link" data-scroll-target="#ml-experiment-inputs">ML Experiment Inputs</a></li>
+  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a></li>
+  </ul></li>
+  <li><a href="#python-imports" id="toc-python-imports" class="nav-link" data-scroll-target="#python-imports">Python Imports</a></li>
+  <li><a href="#python-imports-1" id="toc-python-imports-1" class="nav-link" data-scroll-target="#python-imports-1">Python Imports</a></li>
+  <li><a href="#user-inputs" id="toc-user-inputs" class="nav-link" data-scroll-target="#user-inputs">User Inputs</a></li>
+  <li><a href="#validation" id="toc-validation" class="nav-link" data-scroll-target="#validation">Validation</a>
+  <ul>
+  <li><a href="#approach-to-handle-class-imbalance" id="toc-approach-to-handle-class-imbalance" class="nav-link" data-scroll-target="#approach-to-handle-class-imbalance">Approach to Handle Class Imbalance</a></li>
+  <li><a href="#ml-experiments" id="toc-ml-experiments" class="nav-link" data-scroll-target="#ml-experiments">ML Experiments</a></li>
+  <li><a href="#ml-model-selection" id="toc-ml-model-selection" class="nav-link" data-scroll-target="#ml-model-selection">ML Model Selection</a></li>
+  <li><a href="#experiments" id="toc-experiments" class="nav-link" data-scroll-target="#experiments">Experiments</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.dev/edesz/credit-card-churn/blob/main/notebooks/04_run_validation_experiments.ipynb" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/edesz/credit-card-churn/blob/main/notebooks/04_run_validation_experiments.ipynb" class="toc-action"><i class="bi empty"></i>View source</a></li><li><a href="https://github.com/edesz/credit-card-churn/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/04_run_validation_experiments.html">ML Development</a></li><li class="breadcrumb-item"><a href="../notebooks/04_run_validation_experiments.html">ML Validation</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Validation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>edesz <a href="https://orcid.org/0000-0001-9039-5496" class="quarto-title-author-orcid" aria-label="ORCID profile for edesz"> <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Last Updated</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 2, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<h2 id="about" class="anchored">About</h2>
+<p>This step performs cost-sensitive Machine Learning (ML) model development using tree-based and linear models.</p>
+<h3 id="ml-experiment-inputs" class="anchored">ML Experiment Inputs</h3>
+<p>In order to account for the strong class imbalance, nested cross-validation (CV) is performed using <code>scikit-learn</code>’s <code>TunedThresholdClassifierCV()</code> within <code>cross_validate()</code> on the combined training and validation data.</p>
+<p>This gives the best classifier decision threshold (via inner CV).</p>
+<p>Outer CV is then used to compare the choices of</p>
+<ol type="1">
+<li>classifier (i.e.&nbsp;the ML model)</li>
+<li>features</li>
+<li>feature pre-processing (based on the selected features)</li>
+</ol>
+<p>This approach follows the example in the <a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_tuned_decision_threshold.html#tuning-the-decision-threshold"><code>scikit-learn</code> documentation</a>.</p>
+<p>In order to prevent data leakage, these three choices are combined into a single <code>scikit-learn</code> <code>Pipeline</code>, which is passed to the nested cross-validation function. The choices are compared using ML experiments. Details are explained later.</p>
+<p>The choice of features is specifically to <a href="../notebooks/03_eda_v2.html#eda-hypothesis">test the hypothesis we formed in the EDA step</a> that only numerical features are sufficient to predict credict card customer churn. To verify this hypothesis, we will run experiments that include or exclude the other types of features (categorical and ordinal). The scores from these experiments can be used to prove or disprove the hypothesis: if scores do not improve with the other two types of features then we have proved the hypothesis that only numerical features in the sample credit card customer data are sufficient to predict churn.</p>
+<p>The out-of-sample performance of the best combination of the three choices above is evaluated against the test data, which was not used in model development.</p>
+<h3 id="workflow" class="anchored">Workflow</h3>
+<p>This step is used to run a single validation experiment. The next step compares all runs of this step (i.e.&nbsp;all ML experiments) to determine the best choices for each of the three inputs from above.</p>
+<p>The <a href="https://pypi.org/project/metaflow/">Metaflow</a> framework is used to define a paramterized flow that can be run with parameters that are combinations of the three choices from above. <code>feat_group</code> and <code>model_fpath</code> are the two flow parameters that change from one flow run to the next. <code>experiment_num</code> is an experiment run counter to keep track of the experiment runs. Other flow parameters do not change across runs.</p>
+<p><code>feat_group</code> is specified directly as a string. It controls the choice of features. Feature pre-prcoessing is set internally by the flow and changes based on the choice of features specified in <code>feat_group</code>. Two variables specified in the <strong>User Inputs</strong> section (<code>experiment_num</code> and <code>clf_name</code>) determine the value of <code>model_fpath</code>. Based on these choices, this step can be used to run one experiment at a time. In this way, by changing the three variables <code>feat_group</code>, <code>experiment_num</code> and <code>clf_name</code>, the parameters of each Metaflow run are changed.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Outputs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Artifacts of each Metaflow validation flow run are stored localy in the <code>notebooks/.metaflow/ValidationFlow/</code> directory. Nothing is exported to the R2 bucket.</p>
+</div>
+</div>
+<h2 id="python-imports" class="anchored">Python Imports</h2>
+<p>All the required Python libraries are imported below</p>
+<div id="b12cd196-4757-429d-83eb-4d9e72547ae4" class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn.ensemble <span class="im">as</span> skens</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> great_tables <span class="im">import</span> GT, loc, md, style</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas <span class="im">import</span> DataFrame</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><code>joblib</code> is imported below since it is needed to serialize untrained model objects to the local disk, for use in the custom Metaflow flow for validation. Metaflow is the ML experimentation framework used here. So, <code>joblib</code> is <em>also</em> imported later in the notebook cell that is used to both define the Metaflow flow, which <a href="https://docs.metaflow.org/metaflow/managing-flows/notebook-runs">requires all necessary imports in the same notebook cell, and then to run it</a>. Similarly, <code>pathlib</code> is imported here to speficy the filepath save the models to. It is <em>also</em> imported later in the cell that runs the Metaflow to help extract the name of the model from its filepath. <code>pandas</code> and <code>great_tables</code> are imported for creating a table used in discussion of the logic of choosing ML scoring metrics.</p>
+<h2 id="python-imports-1" class="anchored">Python Imports</h2>
+<p>The required Python modules are imported below</p>
+<div id="fdd8d654-8d18-4790-9e3f-47fe036c7b99" class="cell" data-editable="true" data-quarto-private-1="{&quot;key&quot;:&quot;slideshow&quot;,&quot;value&quot;:{&quot;slide_type&quot;:&quot;&quot;}}" data-tags="[]">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> joblib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Define the path to the project root directory</p>
+<div id="cd2d7a0a-57c7-4f71-aed3-ba992cbc7ccc" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>PROJ_ROOT <span class="op">=</span> Path.cwd().parent</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Load environment variables with secrets for use in <code>boto3</code></p>
+<div id="11b850c8-1dfb-4291-8e5f-8cdd7616974b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> load_dotenv(dotenv_path<span class="op">=</span>PROJ_ROOT.parent <span class="op">/</span> <span class="st">".env"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The required custom modules (not for use in the validation flow itself) are imported below</p>
+<div id="0243e233-f4a8-489a-82f6-3372a4c0527e" class="cell" data-editable="true" data-quarto-private-1="{&quot;key&quot;:&quot;slideshow&quot;,&quot;value&quot;:{&quot;slide_type&quot;:&quot;&quot;}}" data-tags="[]">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> utils.display_utils <span class="im">import</span> pygments_highlight</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<h2 id="user-inputs" class="anchored">User Inputs</h2>
+<p>Below we define variables that will be used later to run the Metaflow validation flow</p>
+<div id="83f989cc-b175-4910-8e7b-bfb25893ffae" class="cell" data-editable="true" data-quarto-private-1="{&quot;key&quot;:&quot;slideshow&quot;,&quot;value&quot;:{&quot;slide_type&quot;:&quot;&quot;}}" data-tags="[&quot;parameters&quot;]">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R2 data bucket details</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>prefix <span class="op">=</span> <span class="st">"cloud-run"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>r2_key_train <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>prefix<span class="sc">}</span><span class="ss">/train_data.parquet.gzip"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>r2_key_val <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>prefix<span class="sc">}</span><span class="ss">/validation_data.parquet.gzip"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># datatypes for categorical and ordinal columns</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>dtypes_ordinals <span class="op">=</span> {</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"income_category"</span>: <span class="st">"string[pyarrow]"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"education_level"</span>: <span class="st">"string[pyarrow]"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>dtypes_categoricals <span class="op">=</span> {</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"gender"</span>: <span class="st">"string[pyarrow]"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marital_status"</span>: <span class="st">"string[pyarrow]"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"card_category"</span>: <span class="st">"string[pyarrow]"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>ordinal_features <span class="op">=</span> [<span class="st">"income_category"</span>, <span class="st">"education_level"</span>]</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>categorical_features <span class="op">=</span> [<span class="st">"gender"</span>, <span class="st">"marital_status"</span>, <span class="st">"dependent_count"</span>]</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'credit_limit' and exclude "avg_open_to_buy" which is correlated</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'total_revolv_bal' and exclude "avg_utilization_ratio" which is correlated</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'total_trans_amt' and exclude 'total_trans_ct'</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>numeric_features_1 <span class="op">=</span> [</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"months_on_book"</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"num_products"</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"months_inactive_12_mon"</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"contacts_count_12_mon"</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_amt_chng_q4_q1"</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_trans_amt"</span>,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_ct_chng_q4_q1"</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"credit_limit"</span>,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_revolv_bal"</span>,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'avg_open_to_buy' and exclude "credit_limit" which is correlated</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'avg_utilization_ratio' and exclude "total_revolv_bal" which is correlated</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co"># - 'total_trans_ct' and exclude 'total_trans_amt' which is correlated</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>numeric_features_2 <span class="op">=</span> [</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"months_on_book"</span>,</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"num_products"</span>,</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"months_inactive_12_mon"</span>,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"contacts_count_12_mon"</span>,</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_amt_chng_q4_q1"</span>,</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_trans_ct"</span>,</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_ct_chng_q4_q1"</span>,</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avg_open_to_buy"</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avg_utilization_ratio"</span>,</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co"># variable metaflow experiment run parameters</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_1]"</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>experiment_num <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>clf_name <span class="op">=</span> <span class="st">"LogisticRegression"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every parameter from the above cell is also a parameter of the Metaflow validation flow.</p>
+<p>The following parameters are changed from one validation experiment run to another</p>
+<ol type="1">
+<li><code>feat_group</code></li>
+<li><code>experiment_num</code></li>
+<li><code>clf_name</code></li>
+</ol>
+<p>All other parameters do not change from one run of the flow to another.</p>
+</div>
+</div>
+<p>Below is the path to the ML models directory in which untrained <code>scikit-learn</code> and <code>xgboost</code> models will be stored</p>
+<div id="b5252831-3d59-4ff8-be3a-eb2fb5bee9ae" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>models_dir <span class="op">=</span> PROJ_ROOT <span class="op">/</span> <span class="st">"models"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The filepath of a single model will be passed to the validation below so it can be loaded when the flow is run.</p>
+<h2 id="validation" class="anchored">Validation</h2>
+<h3 id="approach-to-handle-class-imbalance" class="anchored">Approach to Handle Class Imbalance</h3>
+<p>Next, we will run experiments to find the best performing ML pipeline.</p>
+<p>A pipeline will consist of the following steps</p>
+<ol type="1">
+<li>feature transformation
+<ul>
+<li>grouping of infrequent categories</li>
+</ul></li>
+<li>feature pre-processing
+<ul>
+<li>numerical features
+<ul>
+<li>min-max scaling</li>
+</ul></li>
+<li>ordinal features
+<ul>
+<li>ordinal encoding</li>
+</ul></li>
+<li>categorical features
+<ul>
+<li>one-hot encoding, or</li>
+<li>no encoding</li>
+</ul></li>
+</ul></li>
+<li>classification model (classifier)
+<ul>
+<li><code>scikit-learn</code> models (<code>LogisticRegression</code>, <code>RandomForestClassifier</code> and <code>HistGradientBoostingClassifier</code>)
+<ul>
+<li>using <code>class_weights="balanced"</code> to handle the class imbalance</li>
+</ul></li>
+<li><code>scikit-learn</code> (ensemble) <code>VotingClassifier</code>
+<ul>
+<li>using <code>class_weights="balanced"</code> to handle the class imbalance</li>
+</ul></li>
+<li><code>xgboost</code>’s <code>XGBClassifier</code> using the <code>scikit-learn</code> API
+<ul>
+<li>using <code>scale_pos_weight</code>, determined from the combined train+validation data, to handle the class imbalance</li>
+</ul></li>
+</ul></li>
+</ol>
+<p>As mentioned in the <strong>About</strong> section above, in each experiment, the choice of features and classifier will be changed in order to determine the best features. The pre-processing will change depending on the chosen features. <code>HistGradientBoostingClassifier</code> can internally handle categorical features, so it will be used with or without one-hot encoding.</p>
+<p><a id="decision-threshold-optimization"></a></p>
+<p>Due to the class imbalance, we will determine the optimal decision threshold for a classifier. In order to optimize this threshold, we will use three custom methods defined in <code>src/cc_churn/tuning.py</code></p>
+<ol type="1">
+<li><p>First, we will perform nested cross-validation by passing <code>scikit-learn</code>’s <code>TunedThresholdClassifierCV()</code> to <code>cross_validate()</code>. For a single ML experiment, <code>TunedThresholdClassifierCV()</code> performs internal cross-validation (CV) to find the optimal classifier decision threshold for the classifier step in the ML pipeline using stratified five-fold cross-validation and <code>prauc</code> as the evaluation metric. <code>cross_validate()</code> then uses outer cross-validation to evaluate the performance of this pipeline, for the selected features, with an optimal decision threshold again using stratified five-fold cross-validation.</p>
+<p>The outer CV returns a <code>DataFrame</code> with the train and test fold scores for all five outer CV folds (one row per fold) and for multiple evaluation metrics (one column per metric). The benefit of this approach is that inner CV optimizes the decision threshold while outer CV evaluates generalized model performance on data not used to tune the threshold. This approach avoids data leakage and gives an unbiased estimate of model performance. This is performed by the <code>tune_threshold_cv()</code> method.</p></li>
+<li><p>Next, we append the best decision threshold from inner CV to each row of this <code>DataFrame</code>. Each row of the <code>DataFrame</code> corresponds to a different outer CV fold. For a given experiment, five-fold outer CV gives a <code>DataFrame</code> with five rows. However, the best decision threshold is determined separately for each outer CV fold. So, each outer fold sees a different training subset that has slightly different class balance, probability distributions and decision boundary behavior. With this in mind, the optimal threshold is data-dependent, and naturally varies across folds. For this reason, the best decision threshold differs from row to row (outer CV fold to fold) of this <code>DataFrame</code>.</p>
+<p>Although they are different, the best thresholds should be similar, but not identical, to each other across the five outer CV folds. A small variation in their values indicates the model is stable. On the other hand, a large variation suggests model instability. This step is implemented using the <code>combine_cv_scores_thresholds()</code> method.</p></li>
+<li><p>In practice, we won’t be using five different best thresholds to make the final predictions. Instead, as is done in cross-validation, we aggregate the evaluation scores and best thresholds across all five outer CV folds and get the average. So, this last aggregation step is performed using the <code>agg_cv_scores_thresholds()</code> method.</p></li>
+</ol>
+<p>The three methods above are combined into a wrapper named <code>validate()</code> in <code>src/cc_churn/validation.py</code>, that calls them in succession.</p>
+<h3 id="ml-experiments" class="anchored">ML Experiments</h3>
+<p>The following five ML experiments are run</p>
+<ol type="1">
+<li><a id="experiment-1"></a> experiment 1
+<ul>
+<li><strong>features:</strong> only select numerical features using
+<ul>
+<li>all uncorrelated features</li>
+<li>the first from every pair of correlated features</li>
+<li><code>feat_group</code> = <code>[numerical_1]</code></li>
+</ul></li>
+<li><strong>pre-processing:</strong>
+<ul>
+<li>min-max scaling for all numerical features</li>
+</ul></li>
+<li><strong>classifiers:</strong>
+<ul>
+<li>perform six runs within this experiment, with a different classifier used in each run
+<ul>
+<li><code>LogisticRegression</code> (with <code>class_weights="balanced"</code>)</li>
+<li><code>HistGradientBoostingClassifier</code></li>
+<li><code>RandomForestClassifier</code></li>
+<li><code>XGBClassifier</code></li>
+<li><code>LogisticRegression</code> (without <code>class_weights="balanced"</code>)</li>
+<li><code>VotingClassifier</code> (soft voting) that combines the first four classifiers from above</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><a id="experiment-2"></a> experiment 2
+<ul>
+<li><strong>features:</strong> only select numerical features using
+<ul>
+<li>all uncorrelated features</li>
+<li>the second from every pair of correlated features</li>
+<li><code>feat_group</code> = <code>[numerical_2]</code></li>
+</ul></li>
+<li><strong>pre-processing:</strong>
+<ul>
+<li>same as in experiment 1</li>
+</ul></li>
+<li><strong>classifiers:</strong> same as in experiment 1</li>
+</ul></li>
+<li><a id="experiment-3"></a> experiment 3
+<ul>
+<li><strong>features:</strong> select numerical features from experiment 1 and ordinal features
+<ul>
+<li><code>feat_group</code> = <code>[numerical_1,ordinal]</code></li>
+</ul></li>
+<li><strong>pre-processing:</strong>
+<ul>
+<li>min-max scaling for all numerical features</li>
+<li>ordinal encoding for ordinal features</li>
+</ul></li>
+<li><strong>classifiers:</strong> same as in experiments 1 and 2</li>
+</ul></li>
+<li><a id="experiment-4"></a> experiment 4
+<ul>
+<li><strong>features:</strong> select all features
+<ul>
+<li>numerical features from experiment 1</li>
+<li>ordinal features from experiment 3</li>
+<li>categorical features</li>
+<li><code>feat_group</code> = <code>[numerical_1,ordinal,categorical_ohe_encoding]</code></li>
+</ul></li>
+<li><strong>pre-processing:</strong>
+<ul>
+<li>min-max scaling for all numerical features</li>
+<li>ordinal encoding for ordinal features</li>
+<li>one-hot encoding for categorical features</li>
+</ul></li>
+<li><strong>classifiers:</strong>
+<ul>
+<li>perform five runs within this experiment, with a different classifier used in each run
+<ul>
+<li><code>LogisticRegression</code> (with <code>class_weights="balanced"</code>)</li>
+<li><code>RandomForestClassifier</code></li>
+<li><code>XGBClassifier</code></li>
+<li><code>LogisticRegression</code> (without <code>class_weights="balanced"</code>)</li>
+<li><code>VotingClassifier</code> (soft voting) that combines the first three classifiers from above</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><a id="experiment-5"></a> experiment 5
+<ul>
+<li><strong>features:</strong> select all features
+<ul>
+<li>same as in experiment 4</li>
+<li><code>feat_group</code> = <code>[numerical_1,ordinal,categorical_no_encoding]</code></li>
+</ul></li>
+<li><strong>pre-processing</strong>
+<ul>
+<li>min-max scaling for all numerical features</li>
+<li>ordinal encoding for ordinal features</li>
+<li>categorical features
+<ul>
+<li>cast as the <code>category</code> data type</li>
+<li>no one-hot encoding for categorical features</li>
+</ul></li>
+</ul></li>
+<li><strong>classifiers:</strong>
+<ul>
+<li>perform one run within this experiment, with a classifier that is directed to internally encode features with the <code>category</code> dtype
+<ul>
+<li><code>HistGradientBoostingClassifier</code></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ol>
+<p>Experiments 3, 4 and 5, which add categorical and ordinal features, will determine if sensitive features can be dropped without negatively impacting model performance.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>ML Experiment versus Experiment Run
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Metaflow considers each flow run to be an experiment run. A run ID is assigned to each run of a flow. No experiment ID is assigned. So, we will use the Metaflow run ID to identify each experiment run. For a specific experiment run, one combination of model, feature list and feature pre-processing is used. We will use the above experiment numbers to identify the experiments. So, each experiment can have multiple runs.</p>
+</div>
+</div>
+<h3 id="ml-model-selection" class="anchored">ML Model Selection</h3>
+<p>Below is the list of classifiers to be validated for combinations of numerical and numerical+ordinal features in experiments 1, 2 and 3</p>
+<div id="81dc5466-83d9-4833-b1a7-ca352e27d6a8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>models <span class="op">=</span> {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LogisticRegression_imbalanced"</span>: LogisticRegression(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="va">None</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LogisticRegression"</span>: LogisticRegression(</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"HistGradientBoostingClassifier"</span>: skens.HistGradientBoostingClassifier(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        l2_regularization<span class="op">=</span><span class="fl">0.25</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RandomForestClassifier"</span>: skens.RandomForestClassifier(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        n_estimators<span class="op">=</span><span class="dv">800</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"XGBClassifier"</span>: xgb.XGBClassifier(</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        objective<span class="op">=</span><span class="st">"binary:logistic"</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        eval_metric<span class="op">=</span><span class="st">"logloss"</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        gamma<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        eta<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        min_child_weight<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        scale_pos_weight<span class="op">=</span><span class="fl">5.223088923556943</span>,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ensemble__VotingClassifier"</span>: skens.VotingClassifier(</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        estimators<span class="op">=</span>[</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>                <span class="st">"lr"</span>,</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>                LogisticRegression(class_weight<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>                <span class="st">"hbc"</span>,</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>                skens.HistGradientBoostingClassifier(</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                    max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>                    l2_regularization<span class="op">=</span><span class="fl">0.25</span>,</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>                    class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>                    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>                <span class="st">"rf"</span>,</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>                skens.RandomForestClassifier(</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>                    n_estimators<span class="op">=</span><span class="dv">800</span>,</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>                    max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>                    class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>                    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>                    n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>                <span class="st">"xgb"</span>,</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>                xgb.XGBClassifier(</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>                    objective<span class="op">=</span><span class="st">"binary:logistic"</span>,</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>                    eval_metric<span class="op">=</span><span class="st">"logloss"</span>,</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>                    enable_categorical<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>                    gamma<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>                    max_depth<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>                    eta<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>                    min_child_weight<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>                    scale_pos_weight<span class="op">=</span><span class="fl">5.223088923556943</span>,</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>                    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>                    n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>        voting<span class="op">=</span><span class="st">"soft"</span>,</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Specifying Class Weights for <em>XGBClassifier</em>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For <code>XGBClassifier()</code>, the value of the <a href="../notebooks/03_eda_v2.html#scale-pos-weight"><code>scale_pos_weight</code> parameter was determined during EDA</a> and is hard-coded here to handle the class imbalance of the data.</p>
+</div>
+</div>
+<p>Below is the list of classifiers to be validated, for features that include categoricals with one-hot encoding in experiment 4</p>
+<div id="27236ef0-d9fa-4964-9703-267533e7d241" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>models_ohe_cat_encoding <span class="op">=</span> {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LogisticRegression_imbalanced"</span>: LogisticRegression(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="va">None</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LogisticRegression"</span>: LogisticRegression(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RandomForestClassifier"</span>: skens.RandomForestClassifier(</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        n_estimators<span class="op">=</span><span class="dv">800</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"XGBClassifier"</span>: xgb.XGBClassifier(</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        objective<span class="op">=</span><span class="st">"binary:logistic"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        eval_metric<span class="op">=</span><span class="st">"logloss"</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        gamma<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        eta<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        min_child_weight<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        scale_pos_weight<span class="op">=</span><span class="fl">5.223088923556943</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>        n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ensemble__VotingClassifier"</span>: skens.VotingClassifier(</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        estimators<span class="op">=</span>[</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                <span class="st">"lr"</span>,</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                LogisticRegression(class_weight<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>                <span class="st">"rf"</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                skens.RandomForestClassifier(</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>                    n_estimators<span class="op">=</span><span class="dv">800</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>                    max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                    class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                    n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>            (</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                <span class="st">"xgb"</span>,</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>                xgb.XGBClassifier(</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>                    objective<span class="op">=</span><span class="st">"binary:logistic"</span>,</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>                    eval_metric<span class="op">=</span><span class="st">"logloss"</span>,</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>                    gamma<span class="op">=</span><span class="dv">20</span>,</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>                    max_depth<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>                    eta<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>                    min_child_weight<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>                    scale_pos_weight<span class="op">=</span><span class="fl">5.223088923556943</span>,</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>                    random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>                    n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>        voting<span class="op">=</span><span class="st">"soft"</span>,</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The classifiers to be validated for categorical features without any encoding, but used with features converted to the <code>category</code> dtype in experiment 5, are shown below</p>
+<div id="e842074e-2c97-4af6-bc8e-afb090287dc2" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>models_no_cat_encoding <span class="op">=</span> {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"HistGradientBoostingClassifier"</span>: skens.HistGradientBoostingClassifier(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        max_depth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        l2_regularization<span class="op">=</span><span class="fl">0.25</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        categorical_features<span class="op">=</span>[<span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">13</span>],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        class_weight<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        random_state<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For passing different classifier objects to the same Metaflow flow, the models are now serialized to disk locally in <code>models/&lt;model-name&gt;.joblib</code> <a href="https://joblib.readthedocs.io/en/stable/generated/joblib.dump.html">using <code>joblib</code></a> and their filepaths are stored as strings in a dictionary that can be use to parameterize a Metaflow flow using the <code>model_fpath</code> parameter</p>
+<div id="b38648fd-1518-49e7-a5c2-e62860454855" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>models_fpaths <span class="op">=</span> {<span class="st">"01"</span>: {}, <span class="st">"02"</span>: {}, <span class="st">"03"</span>: {}, <span class="st">"04"</span>: {}, <span class="st">"05"</span>: {}}</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> expt_num, models_dict <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    [models, models, models, models_ohe_cat_encoding, models_no_cat_encoding],</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    experiment_num_str <span class="op">=</span> <span class="bu">str</span>(expt_num).zfill(<span class="dv">2</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k, model <span class="kw">in</span> models_dict.items():</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        model_fpath <span class="op">=</span> models_dir <span class="op">/</span> experiment_num_str <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">.joblib"</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> model_fpath.is_file():</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>            joblib.dump(model, model_fpath)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Serialized </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss"> for experiment </span><span class="sc">{</span>experiment_num_str<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        models_fpaths[experiment_num_str].update({k: <span class="bu">str</span>(model_fpath)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<h3 id="experiments" class="anchored">Experiments</h3>
+<p>The Metaflow flow for validation has the following three steps</p>
+<ol type="1">
+<li><code>extract()</code>
+<ul>
+<li>load train+validation data from R2 bucket and separate features (<code>X</code>) from class labels (<code>y</code>)</li>
+</ul></li>
+<li><code>preprocess</code>
+<ul>
+<li>defines a list of transformers and preprocessors than can be passed to a <code>scikit-learn</code> <code>Pipeline</code> that
+<ul>
+<li>transforms categorical features by grouping infrequent categories, using a <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin">custom <code>scikit-learn</code> transformer</a></li>
+<li>pre-processes numerical features <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html">using <code>MinMaxScaler()</code></a></li>
+<li>encodes ordinal features <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html">using <code>OrdinalEncoder()</code></a>
+<ul>
+<li>this encoder assumes infrequent category grouping has been performed in the previous step of the pipeline</li>
+</ul></li>
+<li>dummy encodes categorical features <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html">using <code>OneHotEncoder()</code></a> or does not encode them</li>
+</ul></li>
+</ul></li>
+<li><code>validate</code>
+<ul>
+<li>defines <code>scikit-learn</code> <code>Pipeline</code> with transformation, preprocessing and classification steps</li>
+<li>implements nested cross-validation as discussed earlier and stores all outer <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_validate.html">CV outputs from <code>cross_validate()</code></a> in a <code>DataFrame</code> in the class attribute <code>df_cv</code></li>
+</ul></li>
+</ol>
+<p>The code for the custom <code>scikit-learn</code> transformer to group infrequent categories in step 2. of the flow is shown below</p>
+<div id="d2aec74d-4bab-484b-9960-89e957caadf1" class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pygments_highlight(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    fpath<span class="op">=</span><span class="bu">str</span>(PROJ_ROOT <span class="op">/</span> <span class="st">"src"</span> <span class="op">/</span> <span class="st">"cc_churn"</span> <span class="op">/</span> <span class="st">"transformers.py"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    unwanted_lines<span class="op">=</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">11</span>))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">14</span>, <span class="dv">48</span>))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">49</span>, <span class="dv">61</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">65</span>, <span class="dv">81</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">98</span>, <span class="dv">109</span>))</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"friendly"</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><a id="validation-flow"></a></p>
+<p>The Metaflow validation flow is defined below</p>
+<div id="bcf7f94a-62c2-4ed7-aeea-caf230f98433" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boto3</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> joblib</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> r2.io_utils <span class="im">as</span> r2io</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn.model_selection <span class="im">as</span> mds</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn.preprocessing <span class="im">as</span> pp</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cc_churn.scoring <span class="im">import</span> get_scorers</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cc_churn.transformers <span class="im">import</span> CategoryCombiner2</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> metaflow <span class="im">import</span> FlowSpec, NBRunner, Parameter, step</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ValidationFlow(FlowSpec):</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    r2_keys <span class="op">=</span> Parameter(</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"r2_keys"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"R2 keys"</span>, default<span class="op">=</span><span class="st">"{'train': 'C', 'val': 'D'}"</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    dtypes_ordinals <span class="op">=</span> Parameter(</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"dtypes_ordinals"</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">"ordinal datatypes"</span>,</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        default<span class="op">=</span><span class="st">"{'B': 'string[pyarrow]'}"</span>,</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    dtypes_categoricals <span class="op">=</span> Parameter(</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"dtypes_categoricals"</span>,</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">"categorical datatypes"</span>,</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>        default<span class="op">=</span><span class="st">"{'G': 'string[pyarrow]'}"</span>,</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    numericals <span class="op">=</span> Parameter(</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"numericals"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"numerical features"</span>, default<span class="op">=</span><span class="st">"['A', 'B']"</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    ordinals <span class="op">=</span> Parameter(</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"ordinals"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"ordinal features"</span>, default<span class="op">=</span><span class="st">"['P', 'A']"</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    categoricals <span class="op">=</span> Parameter(</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"categoricals"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"categorical features"</span>, default<span class="op">=</span><span class="st">"['T', 'B']"</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    feat_group <span class="op">=</span> Parameter(</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"feat_group"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"feature set"</span>, default<span class="op">=</span><span class="st">"numericals_1"</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>    model_fpath <span class="op">=</span> Parameter(</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"model_fpath"</span>, <span class="bu">help</span><span class="op">=</span><span class="st">"model filepath"</span>, default<span class="op">=</span><span class="st">"model.joblib"</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> start(<span class="va">self</span>):</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.primary_metric_threshold_optim <span class="op">=</span> <span class="st">"f2"</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.metrics_list_val <span class="op">=</span> [<span class="st">"prauc"</span>, <span class="st">"f2"</span>, <span class="st">"recall"</span>, <span class="st">"rocauc"</span>]</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cv <span class="op">=</span> mds.StratifiedKFold(<span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">88</span>)</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span>(<span class="va">self</span>.extract)</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> extract(<span class="va">self</span>):</span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>        s3_client <span class="op">=</span> boto3.client(</span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>            <span class="st">"s3"</span>,</span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>            endpoint_url<span class="op">=</span>(</span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f"https://</span><span class="sc">{</span>os<span class="sc">.</span>getenv(<span class="st">'ACCOUNT_ID'</span>)<span class="sc">}</span><span class="ss">.r2.cloudflarestorage.com"</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>            aws_access_key_id<span class="op">=</span>os.getenv(<span class="st">"ACCESS_KEY_ID_USER2"</span>),</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a>            aws_secret_access_key<span class="op">=</span>os.getenv(<span class="st">"SECRET_ACCESS_KEY_USER2"</span>),</span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a>            region_name<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>        df_train, df_val <span class="op">=</span> [</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>            r2io.pandas_read_parquet_r2(</span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>                s3_client,</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>                os.getenv(<span class="st">"BUCKET_NAME"</span>),</span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a>                json.loads(<span class="va">self</span>.r2_keys)[split_type],</span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>            .astype(json.loads(<span class="va">self</span>.dtypes_ordinals))</span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a>            .astype(json.loads(<span class="va">self</span>.dtypes_categoricals))</span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> split_type <span class="kw">in</span> [<span class="st">"train"</span>, <span class="st">"val"</span>]</span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> pd.concat([df_train, df_val], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.X <span class="op">=</span> df.drop(columns<span class="op">=</span>[<span class="st">"is_churned"</span>])</span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.y <span class="op">=</span> df[<span class="st">"is_churned"</span>]</span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span>(<span class="va">self</span>.preprocess)</span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> preprocess(<span class="va">self</span>):</span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>        numeric_transformer <span class="op">=</span> Pipeline([(<span class="st">"scaler"</span>, pp.MinMaxScaler())])</span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>        categorical_transformer <span class="op">=</span> Pipeline(</span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a>            [(<span class="st">"ohe"</span>, pp.OneHotEncoder(drop<span class="op">=</span><span class="st">"if_binary"</span>, sparse_output<span class="op">=</span><span class="va">False</span>))]</span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a>        ordinal_transformer <span class="op">=</span> Pipeline(</span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a>            [</span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a>                (</span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"oe"</span>,</span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a>                    pp.OrdinalEncoder(</span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a>                        categories<span class="op">=</span>[</span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a>                            [</span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Unknown"</span>,</span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Less than $40K"</span>,</span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"$40K - $60K"</span>,</span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"$60K - $80K"</span>,</span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"$80K+"</span>,</span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a>                            ],</span>
+<span id="cb13-102"><a href="#cb13-102" aria-hidden="true" tabindex="-1"></a>                            [</span>
+<span id="cb13-103"><a href="#cb13-103" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Unknown"</span>,</span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Uneducated"</span>,</span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"High School"</span>,</span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"College"</span>,</span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Graduate"</span>,</span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"Post-Graduate"</span>,</span>
+<span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a>                            ],</span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a>                        ],</span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a>                        handle_unknown<span class="op">=</span><span class="st">"use_encoded_value"</span>,</span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a>                        unknown_value<span class="op">=</span>np.nan,</span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a>                    ),</span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a>            ]</span>
+<span id="cb13-116"><a href="#cb13-116" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a>        feat_group_dict <span class="op">=</span> {</span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a>            <span class="st">"[numericals_1]"</span>: [</span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"num"</span>, numeric_transformer, json.loads(<span class="va">self</span>.numericals))</span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a>            <span class="st">"[numericals_2]"</span>: [</span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"num"</span>, numeric_transformer, json.loads(<span class="va">self</span>.numericals))</span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a>            <span class="st">"[numericals_1,ordinals]"</span>: [</span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"num"</span>, numeric_transformer, json.loads(<span class="va">self</span>.numericals)),</span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"ord"</span>, ordinal_transformer, json.loads(<span class="va">self</span>.ordinals)),</span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a>            <span class="st">"[numericals_1,ordinals,categoricals_ohe_encoding]"</span>: [</span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"num"</span>, numeric_transformer, json.loads(<span class="va">self</span>.numericals)),</span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"ord"</span>, ordinal_transformer, json.loads(<span class="va">self</span>.ordinals)),</span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a>                (</span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"cat"</span>,</span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a>                    categorical_transformer,</span>
+<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a>                    json.loads(<span class="va">self</span>.categoricals),</span>
+<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a>                ),</span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a>            <span class="st">"[numericals_1,ordinals,categoricals_no_encoding]"</span>: [</span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"num"</span>, numeric_transformer, json.loads(<span class="va">self</span>.numericals)),</span>
+<span id="cb13-140"><a href="#cb13-140" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"ord"</span>, ordinal_transformer, json.loads(<span class="va">self</span>.ordinals)),</span>
+<span id="cb13-141"><a href="#cb13-141" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"cat"</span>, <span class="st">"passthrough"</span>, json.loads(<span class="va">self</span>.categoricals)),</span>
+<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a>        transformers <span class="op">=</span> feat_group_dict[<span class="va">self</span>.feat_group]</span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-146"><a href="#cb13-146" aria-hidden="true" tabindex="-1"></a>        preprocessor <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb13-147"><a href="#cb13-147" aria-hidden="true" tabindex="-1"></a>            transformers, remainder<span class="op">=</span><span class="st">"drop"</span>, verbose_feature_names_out<span class="op">=</span><span class="va">False</span></span>
+<span id="cb13-148"><a href="#cb13-148" aria-hidden="true" tabindex="-1"></a>        ).set_output(transform<span class="op">=</span><span class="st">"pandas"</span>)</span>
+<span id="cb13-149"><a href="#cb13-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-150"><a href="#cb13-150" aria-hidden="true" tabindex="-1"></a>        cat_ord_grouper <span class="op">=</span> CategoryCombiner2().set_output(transform<span class="op">=</span><span class="st">"pandas"</span>)</span>
+<span id="cb13-151"><a href="#cb13-151" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transformers_preprocessors <span class="op">=</span> [</span>
+<span id="cb13-152"><a href="#cb13-152" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"catgroup"</span>, cat_ord_grouper),</span>
+<span id="cb13-153"><a href="#cb13-153" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"pre"</span>, preprocessor),</span>
+<span id="cb13-154"><a href="#cb13-154" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb13-155"><a href="#cb13-155" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span>(<span class="va">self</span>.validate)</span>
+<span id="cb13-156"><a href="#cb13-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-157"><a href="#cb13-157" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-158"><a href="#cb13-158" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate(<span class="va">self</span>):</span>
+<span id="cb13-159"><a href="#cb13-159" aria-hidden="true" tabindex="-1"></a>        scorers <span class="op">=</span> get_scorers(<span class="va">self</span>.metrics_list_val)</span>
+<span id="cb13-160"><a href="#cb13-160" aria-hidden="true" tabindex="-1"></a>        clf <span class="op">=</span> joblib.load(<span class="va">self</span>.model_fpath)</span>
+<span id="cb13-161"><a href="#cb13-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-162"><a href="#cb13-162" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pipe <span class="op">=</span> Pipeline(</span>
+<span id="cb13-163"><a href="#cb13-163" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.transformers_preprocessors <span class="op">+</span> [(<span class="st">"clf"</span>, clf)]</span>
+<span id="cb13-164"><a href="#cb13-164" aria-hidden="true" tabindex="-1"></a>        ).set_output(transform<span class="op">=</span><span class="st">"pandas"</span>)</span>
+<span id="cb13-165"><a href="#cb13-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-166"><a href="#cb13-166" aria-hidden="true" tabindex="-1"></a>        tuned_model <span class="op">=</span> mds.TunedThresholdClassifierCV(</span>
+<span id="cb13-167"><a href="#cb13-167" aria-hidden="true" tabindex="-1"></a>            estimator<span class="op">=</span><span class="va">self</span>.pipe,</span>
+<span id="cb13-168"><a href="#cb13-168" aria-hidden="true" tabindex="-1"></a>            scoring<span class="op">=</span>scorers[<span class="va">self</span>.primary_metric_threshold_optim],</span>
+<span id="cb13-169"><a href="#cb13-169" aria-hidden="true" tabindex="-1"></a>            cv<span class="op">=</span><span class="va">self</span>.cv,</span>
+<span id="cb13-170"><a href="#cb13-170" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-171"><a href="#cb13-171" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.df_cv <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb13-172"><a href="#cb13-172" aria-hidden="true" tabindex="-1"></a>            mds.cross_validate(</span>
+<span id="cb13-173"><a href="#cb13-173" aria-hidden="true" tabindex="-1"></a>                tuned_model,</span>
+<span id="cb13-174"><a href="#cb13-174" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.X,</span>
+<span id="cb13-175"><a href="#cb13-175" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.y.to_numpy().ravel(),</span>
+<span id="cb13-176"><a href="#cb13-176" aria-hidden="true" tabindex="-1"></a>                scoring<span class="op">=</span>scorers,</span>
+<span id="cb13-177"><a href="#cb13-177" aria-hidden="true" tabindex="-1"></a>                cv<span class="op">=</span><span class="va">self</span>.cv,</span>
+<span id="cb13-178"><a href="#cb13-178" aria-hidden="true" tabindex="-1"></a>                params<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb13-179"><a href="#cb13-179" aria-hidden="true" tabindex="-1"></a>                return_train_score<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb13-180"><a href="#cb13-180" aria-hidden="true" tabindex="-1"></a>                return_estimator<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb13-181"><a href="#cb13-181" aria-hidden="true" tabindex="-1"></a>                n_jobs<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb13-182"><a href="#cb13-182" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb13-183"><a href="#cb13-183" aria-hidden="true" tabindex="-1"></a>        ).assign(</span>
+<span id="cb13-184"><a href="#cb13-184" aria-hidden="true" tabindex="-1"></a>            feat_group<span class="op">=</span><span class="va">self</span>.feat_group,</span>
+<span id="cb13-185"><a href="#cb13-185" aria-hidden="true" tabindex="-1"></a>            model_name<span class="op">=</span>Path(<span class="va">self</span>.model_fpath).name.replace(<span class="st">".joblib"</span>, <span class="st">""</span>),</span>
+<span id="cb13-186"><a href="#cb13-186" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-187"><a href="#cb13-187" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span>(<span class="va">self</span>.fit)</span>
+<span id="cb13-188"><a href="#cb13-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-189"><a href="#cb13-189" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-190"><a href="#cb13-190" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>):</span>
+<span id="cb13-191"><a href="#cb13-191" aria-hidden="true" tabindex="-1"></a>        _ <span class="op">=</span> <span class="va">self</span>.pipe.fit(<span class="va">self</span>.X, <span class="va">self</span>.y)</span>
+<span id="cb13-192"><a href="#cb13-192" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">next</span>(<span class="va">self</span>.end)</span>
+<span id="cb13-193"><a href="#cb13-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-194"><a href="#cb13-194" aria-hidden="true" tabindex="-1"></a>    <span class="at">@step</span></span>
+<span id="cb13-195"><a href="#cb13-195" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> end(<span class="va">self</span>):</span>
+<span id="cb13-196"><a href="#cb13-196" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb13-197"><a href="#cb13-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-198"><a href="#cb13-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-199"><a href="#cb13-199" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> NBRunner(ValidationFlow, pylint<span class="op">=</span><span class="va">False</span>).nbrun(</span>
+<span id="cb13-200"><a href="#cb13-200" aria-hidden="true" tabindex="-1"></a>    r2_keys<span class="op">=</span>json.dumps({<span class="st">"train"</span>: r2_key_train, <span class="st">"val"</span>: r2_key_val}),</span>
+<span id="cb13-201"><a href="#cb13-201" aria-hidden="true" tabindex="-1"></a>    dtypes_ordinals<span class="op">=</span>json.dumps(dtypes_ordinals),</span>
+<span id="cb13-202"><a href="#cb13-202" aria-hidden="true" tabindex="-1"></a>    dtypes_categoricals<span class="op">=</span>json.dumps(dtypes_categoricals),</span>
+<span id="cb13-203"><a href="#cb13-203" aria-hidden="true" tabindex="-1"></a>    numericals<span class="op">=</span>json.dumps(</span>
+<span id="cb13-204"><a href="#cb13-204" aria-hidden="true" tabindex="-1"></a>        numeric_features_1</span>
+<span id="cb13-205"><a href="#cb13-205" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">"numericals_1"</span> <span class="kw">in</span> feat_group</span>
+<span id="cb13-206"><a href="#cb13-206" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> numeric_features_2</span>
+<span id="cb13-207"><a href="#cb13-207" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb13-208"><a href="#cb13-208" aria-hidden="true" tabindex="-1"></a>    ordinals<span class="op">=</span>json.dumps(ordinal_features),</span>
+<span id="cb13-209"><a href="#cb13-209" aria-hidden="true" tabindex="-1"></a>    categoricals<span class="op">=</span>json.dumps(categorical_features),</span>
+<span id="cb13-210"><a href="#cb13-210" aria-hidden="true" tabindex="-1"></a>    feat_group<span class="op">=</span>feat_group,</span>
+<span id="cb13-211"><a href="#cb13-211" aria-hidden="true" tabindex="-1"></a>    model_fpath<span class="op">=</span>models_fpaths[<span class="bu">str</span>(experiment_num).zfill(<span class="dv">2</span>)][clf_name],</span>
+<span id="cb13-212"><a href="#cb13-212" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the <code>preprocess()</code> step of this flow, a dictionary <code>feat_group_dict</code> is defined that contains the list of transformers and corresponding features for the feature grouping used in all five experiments. This dictionary is sliced using an instance variable <code>.feat_group</code> that stores the user’s input for a single feature group. The resulting list of transformers is stored in <code>transformers</code>. This is list is finally used to assemble the overall list of transformers and feature pre-processors (<code>transformers_preprocessors</code>) that goes directly into a <code>scikit-learn.Pipeline</code> from the instance variable <code>.pipe</code> in the <code>validate()</code> step of the flow.</p>
+<p>In the <code>validate()</code> step, a dictionary of scorers is loaded based on a list that was hard-coded in the <code>start()</code> step. This dictionary is then sliced to get the primary scoring metric for the inner (<code>f2</code>) and outer (<code>prauc</code>) CV of nested CV <a href="../references/scope/06_analysis.html#choice-of-metrics">for use in threshold tuning and model selection</a> respectively. The ML model is then loaded from the flow parameter <code>model_path</code>. Finally, nested CV is run and the results are stored with experiment and run metadata (<code>feat_group</code> and <code>model_name</code>) in a <code>DataFrame</code> named <code>df_cv</code>. Since all <a href="https://docs.metaflow.org/internals/technical-overview#step-code">instance variables are persisted to disk</a>, <code>df_cv</code> is not exported to the R2 bucket.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>start()</code> step only performs lightweight data initialization and metadata setup.</p>
+</div>
+</div>
+<div id="train-all-validation" class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>fit()</code> step simply trains the ML model on all available data (combined train and validation split). This way the trained model for a specific experiment run, that is trained on all available data, can be directly used to make predictions without training.</p>
+</div>
+</div>
+<p>Below are the benefits of the relevant ML scoring metrics for churn modeling data which is imbalanced</p>
+<div id="250b2eb0-ba10-4fbe-abbf-91f9db803792" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df_metrics <span class="op">=</span> DataFrame.from_records(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"PR AUC"</span>: (</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Evaluates performance across all thresholds, not just one"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"F2 Score"</span>: (</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Good for evaluating a single decision threshold (e.g. 0.3 "</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                <span class="st">"cutoff on `y_pred_proba`)"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"PR AUC"</span>: <span class="st">"Good for model comparison and tuning"</span>,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"F2 Score"</span>: (</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Easy to explain to non-technical stakeholders: 'This score "</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">"balances catching churners (Recall) vs avoiding false alarms "</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">"(Precision), but weights catching churners more heavily.'"</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"PR AUC"</span>: (</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Use during model selection (because it is threshold-"</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">"independent)"</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"F2 Score"</span>: (</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Use when tuning/choosing the operating threshold that the "</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                <span class="st">"business will actually use for targeting"</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This is shown below</p>
+<div id="73b49631-cc12-44a4-9408-7a1414c303b7" class="cell" data-editable="true" data-quarto-private-1="{&quot;key&quot;:&quot;slideshow&quot;,&quot;value&quot;:{&quot;slide_type&quot;:&quot;&quot;}}" data-tags="[]">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gt <span class="op">=</span> (</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    GT(df_metrics)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    .tab_style(style<span class="op">=</span>style.text(weight<span class="op">=</span><span class="st">"bold"</span>), locations<span class="op">=</span>loc.column_header())</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    .tab_header(md(<span class="st">"**Candidate ML Scoring Metrics**"</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    .tab_style(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        style<span class="op">=</span>[</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>            style.fill(color<span class="op">=</span><span class="st">"teal"</span>),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>            style.text(color<span class="op">=</span><span class="st">"white"</span>),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>            style.text(weight<span class="op">=</span><span class="st">"bold"</span>),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        locations<span class="op">=</span>loc.body(rows<span class="op">=</span><span class="bu">len</span>(df_metrics) <span class="op">-</span> <span class="dv">1</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>gt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>With this in mind, here is a detailed walkthrough of the logic behind ML model metric selection for the validation phase (model comparison) and evaluation phase of this project</p>
+<div class="callout callout-style-default callout-tip callout-titled" data-collapsed="true">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Inner CV from Nested CV
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For each outer <em>training</em> fold, here is what the code is doing</p>
+<ol type="1">
+<li>Fit the pipeline</li>
+<li>Generate probabilities</li>
+<li>Search decision thresholds for the chosen classifier</li>
+<li>Select the threshold that maximizes F2-score</li>
+</ol>
+<p>So the inner loop <code>tuned_model = TunedThresholdClassifierCV(scoring='f2')</code> is answering the question <em>What threshold should this model use?</em>. This is exactly where the F2-score metric belongs.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" data-collapsed="true">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Outer CV Consideration from Nested CV
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Each outer <em>test</em> fold in nested CV sees the following</p>
+<ol type="1">
+<li>a fitted model</li>
+<li>a threshold selected using only the corresponding outer-fold training data</li>
+</ol>
+<p>The outer test fold (<code>cross_validate(... scoring=...)</code>) estimates <em>How well does the entire procedure generalize?</em> The question is what metric should summarize that performance. Choosing</p>
+<ol type="1">
+<li><code>scoring="prauc"</code>
+<ul>
+<li>means the outer CV answers the question <em>How good are the probabilities produced by this model?</em></li>
+</ul></li>
+<li><code>scoring="f2"</code>
+<ul>
+<li>answers the question <em>How good is the final churn targeting system?</em>, which is arguably more aligned with the business objective.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="phase-based-ml-metrics" class="callout callout-style-default callout-tip callout-titled" data-collapsed="true">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Our Chosen Phase-Based Approach
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Our approach is to report both <code>prauc</code> and <code>f2</code> and use them as follows</p>
+<ol type="1">
+<li>When comparing these ML experiments during the validation phase, <code>cross_validate(... scoring=["prauc", "f2", "recall", "rocauc"])</code> answers the question <em>Which model ranks the churners best?</em> and is useful for ML model comparison. So, <code>prauc</code> is used during the validation phase to compare combinations of models, features and feature pre-processing since it is threshold independent, stable and compares the quality of predicted probabilities.</li>
+<li>During the evaluation phase, <code>f2</code> is used as the primary scoring metric since it most closely reflects the relative business costs of false negatives and false positives in this churn-retention use case.</li>
+</ol>
+<p>ML scoring metrics are not universally better or worse. They are better or worse for a particular decision problem. The key is that we are using different metrics for different decisions.</p>
+<p>Once we have selected the best combination of features, feature pre-processing, classifier and the best decision threshold the question is no longer <em>Which model ranks customers best?</em>. That question was already answered during the validation phase. At that point, the threshold is part of the deployed system. The client is deploying something close to</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> Predicted probability <span class="op">&gt;</span> best decision threshold:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    target customer</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    do <span class="kw">not</span> target customer</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Since the actual business decision is thresholded, a threshold-dependent metric such as F2 is appropriate for final evaluation.</p>
+</div>
+</div>
+<p><a href="#ml-experiments">As discussed earlier</a>, the above metaflow <code>Flow</code> can be run with the following combinations of the <code>feat_group</code> and <code>model_fpath</code> parameters</p>
+<ol type="1">
+<li><a href="#experiment-1"><strong>experiment 1</strong></a>
+<ul>
+<li>numerical features with the models defined in <code>models</code></li>
+<li><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_1]"</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"HistGradientBoostingClassifier"</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"LogisticRegression_imbalanced"</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"LogisticRegression"</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"RandomForestClassifier"</span>]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"XGBClassifier"</span>]</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"01"</span>][<span class="st">"Ensemble__VotingClassifier"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><a href="#experiment-2"><strong>experiment 2</strong></a>
+<ul>
+<li>numerical features with the models defined in <code>models</code></li>
+<li><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_2]"</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"HistGradientBoostingClassifier"</span>]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"LogisticRegression_imbalanced"</span>]</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"LogisticRegression"</span>]</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"RandomForestClassifier"</span>]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"XGBClassifier"</span>]</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"02"</span>][<span class="st">"Ensemble__VotingClassifier"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><a href="#experiment-3"><strong>experiment 3</strong></a>
+<ul>
+<li>numerical and ordinal features with the models defined in <code>models</code></li>
+<li><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_1,ordinals]"</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"HistGradientBoostingClassifier"</span>]</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"LogisticRegression_imbalanced"</span>]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"LogisticRegression"</span>]</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"RandomForestClassifier"</span>]</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"XGBClassifier"</span>]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"03"</span>][<span class="st">"Ensemble__VotingClassifier"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><a href="#experiment-4"><strong>experiment 4</strong></a>
+<ul>
+<li>numerical, ordinal and dummy-encoded categorical features with the models defined in <code>models_ohe_cat_encoding</code></li>
+<li><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_1,ordinals,categoricals_ohe_encoding]"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"04"</span>][<span class="st">"LogisticRegression_imbalanced"</span>]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"04"</span>][<span class="st">"LogisticRegression"</span>]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"04"</span>][<span class="st">"RandomForestClassifier"</span>]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"04"</span>][<span class="st">"XGBClassifier"</span>]</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"04"</span>][<span class="st">"Ensemble__VotingClassifier"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+<li><a href="#experiment-5"><strong>experiment 5</strong></a>
+<ul>
+<li>numerical, ordinal and unencoded categorical features with the model defined in <code>models_no_cat_encoding</code></li>
+<li><div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>feat_group <span class="op">=</span> <span class="st">"[numericals_1,ordinals,categoricals_no_encoding]"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>model_fpath <span class="op">=</span> models_fpaths[<span class="st">"05"</span>][<span class="st">"HistGradientBoostingClassifier"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul></li>
+</ol>
+<h2 id="summary" class="anchored">Summary</h2>
+<p>We have defined a parameterized Metaflow flow to run ML experiments as part of the validation process. This flow can be run with parameters specific to each experiment as described in the <a href="#ml-experiments">experiments listed above</a>.</p>
+<p>In the next step, we will inspect the outputs of all runs of this flow.</p>
+
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/edesz\.github\.io\/credit-card-churn");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/03_eda_v2.html" class="pagination-link" aria-label="EDA">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">EDA</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/05_get_best_validation_experiment.html" class="pagination-link" aria-label="Best Validation Experiment">
+        <span class="nav-page-text">Best Validation Experiment</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://github.com/edesz" target="_blank">
+<p>© 2026 edesz</p>
+</a>
+  </li>  
+</ul>
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../CODE_OF_CONDUCT.html">
+<p>Code of Conduct</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../LICENSE.html">
+<p>License</p>
+</a>
+  </li>  
+</ul>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.dev/edesz/credit-card-churn/blob/main/notebooks/04_run_validation_experiments.ipynb" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/edesz/credit-card-churn/blob/main/notebooks/04_run_validation_experiments.ipynb" class="toc-action"><i class="bi empty"></i>View source</a></li><li><a href="https://github.com/edesz/credit-card-churn/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div><div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+<p>Built with ︎♥️ &amp; <a href="https://quarto.org">Quarto</a>, based on <a href="https://nasa-openscapes.github.io/earthdata-cloud-cookbook/">EarthdData Cloud Cookbook</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
