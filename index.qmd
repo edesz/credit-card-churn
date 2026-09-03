@@ -1,0 +1,73 @@
+---
+title: "Credit Card Churn Modeling and Insights"
+subtitle: "Supporting Data-Driven Targeting of Credit Card Customers at Risk of Churning" 
+date: last-modified
+author:
+  - name: "edesz"
+    attributes:
+      github: "edesz"
+  - name: "ilkham"
+    attributes:
+      github: "IlkhamFY"
+  - name: "sinderpreet31"
+    attributes:
+      github: "sinderpreet31"
+citation_url: https://edesz.github.io/credit-card-churn/
+slug: index
+---
+
+## Welcome
+
+**Welcome to our team's analysis of a client's credit card customer churn data!**.
+
+## Our Task
+
+We worked with the manager of the credit card division at a full-service bank to develop a predictive model of credit card customer churn from raw customer data, in order to address the client's issue of observed growing churn at the bank. These predictions would have to be used by the client and the client's management team to facilitate data-driven customer retention interventions.
+
+Throughout this project, our team used the [PyData stack for scientific computing in Python](https://www.pluralsight.com/resources/blog/guides/a-lap-around-the-pydata-stack), which consists of tools for performing data analysis, data visualization, statistical inference, machine learning and interactive computing.
+
+## Our Team's Approach
+
+In order to complete this task, we divided this project into the following five steps
+
+1. [Project Scoping](references/scope/01_problem_understanding.qmd)
+   - we used the [CMU Data Science scoping guide](https://datasciencepublicpolicy.org/wp-content/uploads/2025/02/Blank-Worksheet-January-2025.pdf) to scope out the project
+   - we used the provided historical customer data to quantify the impact of credit card customer churn at the bank by estimating business metrics relevant to the banking sector
+   - we determined that our team could deliver value to the client by developing a predictive Machine Learning (ML) churn model to proactively target at-risk customers
+2. [Exploratory Data Analysis](notebooks/03_eda_v2.ipynb)
+   - we analysed the raw customer data using [Pandas](https://pandas.pydata.org/) and extracted insights into and hypotheses about the bank's credit card customer behaviour and developed hypotheses
+   - we used these in the next step to develop predictive ML models
+3. [Machine Learning Development](notebooks/04_run_validation_experiments.ipynb)
+   - based on the outputs of our data analysis, we extracted [predictive ML features](https://en.wikipedia.org/wiki/Feature_(machine_learning)) from the raw customer data
+   - we trained ML models to predict customer churn, performing model validation, evaluation and inference using [Scikit Learn](https://scikit-learn.org/stable/) and [XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) with [MetaFlow](https://metaflow.org/) for orchestrating model development
+   - we used predictions of the best ML model to estimate net savings and combined this with our model's predicted probability of churn to segment the customers in the raw data and make targeting recommendations per customer segment
+4. [Data Validation](notebooks/12_validate_data.ipynb)
+   - we developed a data model to validate the raw customer data for use in ML development
+   - we used the [Pandera data validation framework](https://pandera.readthedocs.io/en/stable/) to develop the data model
+5. [Unit Testing](./tests)
+   - we wrote unit tests with the [PyTest framework](https://docs.pytest.org/en/stable/) to test the functionality of the custom Python modules that our team developed to implement steps 1. to 4. above
+   - we consolidated our unit tests under the `tests` folder on [our team's Github repository](https://github.com/edesz/credit-card-churn)
+
+:::{.callout-tip}
+## Usage Hints
+
+#### Business Problem and Project Scope
+
+If you would like to learn about the details of the business problem, how we scoped this project and the insights we extracted from the raw credit card customer data then we recommend starting with our [project overview](references/overview/00_overview.qmd) and the [approach](references/overview/01_approach.qmd) we settled on as as a team. This would build a solid background for you to then read through the Project Scoping and Exploratory Data Analysis steps.
+
+#### Programming for Machine Learning
+
+If you are viewing this documentation to also learn about our team's analysis techniques or review detailed Python code, then we recommend looking through the Machine Learning Development, Data Validation and Unit Testing steps from above. Our team's [Github repository](https://github.com/edesz/credit-card-churn) may also be a useful resource.
+
+#### Data Engineering
+
+If you would like to learn more about how we developed the data model in Python and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.
+:::
+
+:::{.callout-note}
+## Disclaimer
+
+While this churn prediction project utilizes a hypothetical scenario, our team approached it within the constraints and guardrails of a real-world client consultation in a live production environment.
+
+In the end-to-end five step workflow above, we incorporated realistic business constraints such as customer acquisition costs, retention budget limits, and model interpretability requirements to make a practical business impact.
+:::

@@ -18,7 +18,7 @@ Predicted Savings = Gross Savings - Cost
 Next, we will estimate the ROI as the ratio of net savings relative to intervention costs. ROI will be estimated using
 
 ```{math}
-:label: roi
+:label: roi-high-level
 ROI_N = Net Savings_N / Total Intervention Cost_N
 ```
 
@@ -34,7 +34,7 @@ Calculating the metrics after running a targeting campaign is beyond the scope o
 
 ## Net Savings
 
-(constraints)=
+(assumed-constraints)=
 ### Constraints
 
 We assume that
@@ -83,7 +83,7 @@ True savings answers the question *How much did the model actually save after th
 The true savings can be calculated for historical customer data using the following four scenarios that evaluate the net benefit of an intervention based on the models' predicted outcome and the actual (true) outcome
 
 1. Predicted outcome is churn
-   - If the true outcome is also churn and the client intervenes, then savings are earned when the client correctly targets an at-risk customer. However, the intervention is not guaranteed to succeed. With an [assumed success rate](#constraints) of `s`, the customer is retained. Therefore, the expected net savings becomes
+   - If the true outcome is also churn and the client intervenes, then savings are earned when the client correctly targets an at-risk customer. However, the intervention is not guaranteed to succeed. With an [assumed success rate](#assumed-constraints) of `s`, the customer is retained. Therefore, the expected net savings becomes
      ```{math}
      :label: true-savings-churn-correct
      True Savings_i = s \times CLV_i - c
@@ -134,7 +134,7 @@ The following workflow can be used to estimate the ROI using the ML model's pred
 
 1. Sort the model's predicted probabilities `y_pred_proba`, which is the risk of customer churn, in descending order, so the highest-risk customers are at the top
 2. Select the top *N* at-risk customers to be targeted
-3. Compute the total intervention cost for the top *N* customers using the [assumed intervention cost per customer](#constraints)
+3. Compute the total intervention cost for the top *N* customers using the [assumed intervention cost per customer](#assumed-constraints)
    ```{math}
    :label: total-intervention-cost
    \text{Total Intervention Cost}_N = N \times \text{Intervention Cost per Customer}

@@ -1,0 +1,102 @@
+---
+Title: Actions
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2025-10-04
+language:
+  title-block-published: "Last Updated"
+---
+
+# Actions Being Informed by Project Goal
+
+*This section addresses the actions that will be informed by accomplishing the project's goal.*
+
+## Actions to be Taken to Address the Goal
+
+### Identification of the Action
+
+The primary action enabled by this project is a targeted customer retention intervention.
+
+The client would use a predictive churn model to identify existing credit card customers who are at elevated risk of canceling their services within a defined future time horizon. These customers would then be prioritized for proactive engagement before they decide to churn.
+
+The intervention may include targeted outreach and tailored retention offers designed to encourage their continued use of the bank's credit card services. In addition, the predictive model outputs will be used to segment at-risk customers into subgroups, enabling our team to make recommendations for retention strategies based on customer characteristics and predicted churn risk.
+
+### How the Action Supports the Goal
+
+By proactively identifying and engaging customers at a high risk of churn, the bank can intervene before these customers cancel their credit card accounts. This has the potential to reduce overall churn rates, improve customer retention, and preserve customer lifetime value.
+
+The effectiveness of this action depends on both the accuracy of the churn prediction model and the relevance of the retention interventions applied to the targeted customers.
+
+### Actors Responsible for Execution
+
+The primary actors responsible for executing this action are
+
+1. The Credit Card Division Manager
+   - project sponsor and decision owner (primary client)
+2. The Credit Card Product and Management Team
+   - those responsible for retention strategy design and approval (primary client)
+3. Marketing and Customer Engagement Teams
+   - those responsible for campaign execution
+4. Customer Service and Call Center Teams
+   - those responsible for direct customer outreach
+
+These stakeholders would collectively determine how model outputs are translated into customer-facing retention strategies.
+
+### Recipient of this Action
+
+The recipients of this action are existing credit card customers who are identified by the model as being at elevated risk of churn. These customers would receive targeted retention offers intended to encourage continued engagement with the bank's credit card services.
+
+### Frequency of Executing this Action
+
+In the current project setting (historical evaluation), the action is simulated once in a retrospective manner in order to estimate potential financial impact.
+
+If deployed in practice, the action would be executed on a recurring basis (e.g. monthly or quarterly), based on how often new data is provided to retrain the predictive model and business campaign planning. The exact frequency would depend on operational capacity and business strategy.
+
+### Channels will be Used to Execute this Action
+
+The retention targeting actions may be delivered through multiple communication channels, including
+
+1. Digital channels
+   - email
+   - mobile app notifications
+   - messages to an online banking account
+2. Telephone outreach
+   - call center agents
+   - relationship managers
+3. In-person interactions
+   - branch staff
+   - financial advisors
+
+### Resource or Capacity Constraints
+
+Resource and capacity constraints have not been specified in the provided dataset and would need to be defined by the client during implementation.
+
+In practice, constraints may include the following
+
+1. Limited marketing or call center capacity
+2. Budget constraints for retention incentives
+3. Maximum number of customers that can be contacted within a campaign period
+
+These constraints imply that the optimal strategy may involve prioritizing a subset of high-risk customers rather than targeting all predicted churners.
+
+### Ethical Issues Associated With this Action {#ethics}
+
+The use of predictive churn models raises the following ethical considerations
+
+1. Sensitive attributes such as age, gender and marital status should not be used directly as the basis for targeting or exclusion decisions unless explicitly permitted and justified under applicable policies. Here, they will not be used.
+2. Retention strategies should avoid unfair or discriminatory treatment of protected groups.
+3. Customers who are unlikely to benefit from intervention (low predicted risk of churn) should not be unnecessarily targeted with aggressive marketing or incentives.
+4. In order to meet customer trust requirements, transparency (interpretability) in the use of predictive models for customer targeting should be considered.
+
+### Other Useful Info about this Action {#useful-info}
+
+This analysis assumes the following
+
+1. Model outputs are used as decision support tools for human decision-makers (i.e. the credit card manager and the management team). These outputs are not intended to be used as part of fully automated decision making systems.
+2. Required approvals for marketing campaigns, customer outreach, and incentive programs are handled internally by the bank.
+3. The effectiveness of retention interventions is not directly observed in the dataset and must be estimated indirectly through retrospective analysis, which is beyond the scope of this project.
+4. Customer response to retention actions may vary in timing, going from from immediate retention to a delayed churn decision reversal over days or weeks. This is not captured in the provided dataset and so we cannot incorporate this into development of the predictive model.
+5. Model performance is evaluated retrospectively, but any real-world deployment would require ongoing monitoring and retraining over time. With the available customer data, this is also beyond the scope of this project.

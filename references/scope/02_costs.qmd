@@ -1,0 +1,174 @@
+---
+Title: Costs
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2025-10-04
+language:
+  title-block-published: "Last Updated"
+---
+
+# Costs
+
+*This section presents an order-of-magnitude framework for estimating the financial impact of customer churn at the bank using the [provided historical credit card customer data](../scope/05_data.qmd#data-attributes).*
+
+<a id="data-limitations"></a>
+
+Since the available dataset does not contain customer profitability, retention costs, or detailed financial reporting information, the true economic impact of churn cannot be measured directly. Instead, we estimate the order-of-magnitude financial impact of churn using commonly used business metrics and reasonable assumptions derived from the credit card industry.
+
+The estimated cost of churn consists of two components
+
+1. Lost Customer Lifetime Value (CLV)
+   - this is the future value that would have been generated had a customer remained with the bank
+2. Customer Acquisition Cost (CaC)
+   - this is the cost of replacing a departed customer with a newly acquired customer
+
+The total estimated order-of-magnitude financial impact of churn can therefore be approximated as
+
+$$
+\text{Cost of Churn} = \text{Lost CLV} + \text{Replacement Cost (CaC)}
+$$
+
+The methodology described in this section was used to [estimate the order-of-magnitude financial impact of churn](../../notebooks/02_scoping.ipynb), the results of which were discussed in the [previous step](../scope/01_problem_understanding.qmd#impact-of-churn).
+
+## Replacement Cost or Customer Acquisition Cost (CaC) {#customer-acquisition-cost}
+
+The first component of churn cost is the expense incurred to replace a departed customer. This is commonly referred to as Customer Acquisition Cost (CaC) and includes expenditures associated with attracting, marketing to, onboarding, and servicing newly acquired customers.
+
+Examples include
+
+1. advertising and promotional campaigns
+2. marketing and sales personnel costs
+3. onboarding and account setup costs
+4. technology and operational expenses associated with customer acquisition
+
+Industry estimates suggest that customer acquisition costs for credit card products are typically in the range of [approximately $167 per customer](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/).
+
+For the purposes of this analysis, we assume a Customer Acquisition Cost of \$200 per acquired customer.
+
+## Customer Lifetime Value (CLV) {#customer-lifetime-value}
+
+The next component of approximating the order-of-magnitude financial impact of churn is the CLV.
+
+The two terms to estimate the CLV are total annual revenue and a tenure multiplier. The total annual revenue is the sum of all sources of credit card revenue earned by the bank per year. A CLV multiplier represents the present value of $1 of annual revenue but received over `T` years and discounted over time.
+
+In the next two sub-sections, we'll first estimate the total revenue earned by the bank and then approximate the multiplier. These two terms will then be combined to estimate the CLV.
+
+### Sources of Annual Revenue {#revenue-sources}
+
+CLV per customer is the average lifetime value retained if churned customers were convinced to stay. The bank earns fees from each customer who uses its credit card services. Each of these fees contributes to CLV. Since we don't have access to profit per customer, we need a proxy of revenue streams for a typical credit card division within a bank using the available columns in the client's provided churn data.
+
+Below are the three proxies we will use for sources of annual revenue earned by the bank from providing credit card services
+
+1. Revenue from Transaction activity (interchange fees)
+   - These are fees charged based on number of credit card transactions performed by a customer. These are captured using the `Total_Trans_Amt` (total dollar value of all credit card transactions) and `Total_Trans_Ct` (total number of credit card transactions performed) columns in the provided customer churn data. Banks typically earn a fee of 1-3% of transaction volume. Here, we'll assume this to be 2% (`r = 0.02`) for the client's bank. The interchange revenue is then estimated as
+     $$
+     \text{Interchange Revenue} = \text{Total\_Trans\_Amt} \times r
+     $$ {#eq-interchange-rev}
+2. Interest income from revolving balance
+   - These are the fees captured by the `Total_Revolving_Bal` column in the provided customer churn data. This is the portion of the spent credit card balance (the exact amount of money spent during a billing cycle) that a customer carries over from month to month instead of paying off in full. A higher revolving balance shows that the customer actively uses credit and carries debt. Active users with higher revolving balances often show a lower likelihood of churning compared to inactive users. If a customer carries a credit card balance then it rolls over to the next month and the bank earns interest of approximately [15-20% in Canada](https://www.consolidatedcreditcanada.ca/credit-card-debt/what-is-apr/) and [20-30% in the US](https://www.lendingtree.com/credit-cards/study/average-credit-card-interest-rate-in-america/) on this balance. Here, we will assume this to be 18% (`apr = 0.18`). So, the revenue earned by the client's bank from credit card interest can be estimated using
+     $$
+     \text{Interest Revenue} = \text{Total\_Revolving\_Bal} \times apr
+     $$ {#eq-interest-rev}
+3. Premium Card Value Proxy
+   - A credit card issuer can earn revenue beyond transaction-based revenue. One of these is an annual fee charged for holding the credit card. The customer pays this fee simply for maintaining the account, typically once per year. Annual fees are often associated with cards that provide enhanced benefits. For example, a premium card might charge an annual fee in exchange for benefits. Below are some examples of [discounts offered to credit card customers](https://www.investopedia.com/ask/answers/110614/what-are-some-examples-common-credit-card-reward-program-benefits.asp)
+     - [cash back](https://www.nerdwallet.com/ca/p/best/credit-cards/best-cash-back-credit-cards)
+       - this is the percentage of money back a customer gets on purchases made using a credit card (usually 1-6%)
+     - [statement credits](https://www.consumerreports.org/money/credit-cards/credit-card-benefits-you-might-not-know-about-a6135335136/)
+       - these are the discounts applied to a credit card account, such as annual credits for streaming services, dining, travel, or pre-check services
+     - retail and partner discounts
+       - these are exclusive discounts, special sales, or enhanced reward rates (e.g. 5X points instead of 1X) that are paid for with a credit card at specific retailers, restaurants, or via bank-specific shopping portals
+     - travel perks such as frequent flyer programs
+       - these are discounts on travel-related expenses paid for using a credit card, such as complimentary airport lounge access, travel insurance, hotel room upgrades, or discounts on rental cars
+     - interest free periods (or 0% APR)
+       - this is a form of discount on financing, allowing customers to pay for large purchases over time without incurring any credit card interest charges for an introductory period
+     - various others
+       - concierge services, higher rewards rates, etc.
+ 
+   A basic credit card may have no annual fee, while a premium card may have a substantial annual card value proxy fee. The actual fee depends on the specific card product and issuer. So, if a customer has a card with a $100 annual fee, the issuer could treat that $100 as an annual revenue contribution from that customer.
+
+   <a id="card-exposure-fees"></a>
+
+   Using the data available to us, we can approximate these annual fees using the `Card_Category` column (blue card, gold card, etc.). We'll assume the following nominal fee structure
+
+   - Blue = $0 Fees
+   - Silver = $50
+   - Gold = $100
+   - Platinum = $200
+
+   We will refer to this source of revenue as *Fee Revenue*.
+
+These three revenue proxies can be combined into a total estimated annual revenue per customer using
+
+$$
+\text{Annual Revenue} = \text{Interchange Revenue} + \text{Interest Revenue} + \text{Fee Revenue}
+$$ {#eq-total-annual-revenue}
+
+### CLV Multiplier {#clv-multiplier}
+
+A CLV multiplier is a factor used to convert a customer's annual revenue earned into an estimate of their total value over time. On its own, annual revenue gives us how much a customer generates in a single year, but customers typically stay with a business for multiple years.
+
+So, the multiplier is needed because of two factors
+
+1. First is the expected tenure of the customer. If a customer is likely to remain active for several years, then the customer's value is the sum of annual revenue across all those years, not just one year.
+2. Second is the time value of money. Future credit card revenues earned must be discounted because revenue received in the future is worth less than revenue received today. This adjustment reflects the time value of money, uncertainty surrounding future customer behavior, and inflation.
+
+The multiplier accounts for this by aggregating expected future revenue into a single current value. Without it, the CLV would underestimate the customer's true value because it would ignore the fact that annual revenue is earned repeatedly over multiple years the the customer has credit card services with the bank.
+
+::: {.callout-tip #historical-data collapse="true"}
+## Opportunity Cost, Risk and Inflation
+
+As mentioned above, the second multiplier factor captures the idea that a dollar earned today is worth more than a dollar earned in the future due to opportunity cost, risk, and inflation.
+
+Opportunity cost means that if the bank received money today, then the bank could reinvest these earnings back into their business operations, treasury, or as capital to generate more loans and earn returns over time. Now, if instead the bank receives that money in the future, then they have missed out on those potential earnings. As a result, money received later is effectively worth less than money received today.
+
+Risk reflects the uncertainty that future cash flows may not actually happen. A customer might cancel their credit card earlier than expected or reduce spending on the card, so future revenue is less certain.
+
+Finally, inflation reduces purchasing power over time, so the same dollar in the future will buy less than it does today.
+
+These three components explain why future cash flows must be adjusted downward when estimating their value today.
+:::
+
+For these reasons, we need to use a multiplier that effectively adds up the discounted future revenues into a single factor that can be applied to the annual revenue we [calculated earlier](#eq-total-annual-revenue).
+
+We will make the following simplifying assumptions to estimate the multiplier
+
+1. a loyalty discount factor per year of 0.9 (`d = 0.9`)
+   - this means the customer's loyalty discount is 100%-90% = 10% per year
+2. an expected remaining tenure per customer of 3 years (`T = 3`)
+
+### Estimation of CLV {#clv-calc}
+
+We'll now combine `T`, `d` and the estimated annual revenue to estimate the CLV per customer
+
+$$
+CLV_i = \sum_{t=0}^{T} (\text{Annual Revenue}_i \times d^t)
+$$ {#eq-clv}
+
+The annual revenue is constant so it can be factored out as shown below
+
+$$
+CLV_i = \text{Annual Revenue}_i \times \sum_{t=0}^{T} d^t
+$$ {#eq-clv-refactored}
+
+This can be simplified to
+
+$$
+CLV_i \approx \text{Annual Revenue}_i \times \frac{1 - d^T}{1 - d}
+$$ {#eq-clv-simplified}
+
+This means the multiplier can be extracted as
+
+$$
+Multiplier \approx \frac{1 - d^T}{1 - d}
+$$ {#eq-clv-multiplier-formula}
+
+We are starting immediately (t=0) instead of after one period. This is a common simplification in business settings where timing precision isn't critical and we want a quick, interpretable multiplier.
+
+## Key Limitations
+
+Using this CLV, we can estimate the order-of-magnitude financial impact of credit card churn at the client's bank.
+
+As [mentioned above](#data-limitations), the CLV estimation framework relies on several assumptions that are not directly observable in the provided dataset. These values are intended to produce a reasonable order-of-magnitude estimate of customer value rather than a precise financial valuation.

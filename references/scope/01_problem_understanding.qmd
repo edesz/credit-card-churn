@@ -1,0 +1,139 @@
+---
+Title: Problem Understanding
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2025-10-04
+language:
+  title-block-published: "Last Updated"
+---
+
+# Problem Understanding
+
+*This section discusses the business problem, identifies the client and quantifies the impact of the problem.*
+
+## Business Problem {#business-problem-description}
+
+A full-service U.S.-based bank provides a broad range of financial products and services to its customers, including credit card products. The manager of the bank's credit card division has observed an increasing number of customers canceling their credit card accounts and is concerned about the potential impact on customer retention, revenue, and long-term customer relationships.
+
+To better understand this issue, the manager provided our team with a random but representative sample of historical customer data for approximately 10,100 customers observed over the preceding 12-16 months. Within this sample, approximately 16% of customers canceled their credit card services.
+
+The manager would like to determine whether customer churn can be identified in advance using customer demographic, financial, and account usage characteristics. Specifically, the client would like to estimate which customers would have been most likely to cancel their credit card services and proactively evaluate whether targeted retention efforts could have reduced customer attrition.
+
+Because the available dataset is historical, we will approach this task in three steps
+
+1. We will begin by scoping out this project. During this process, we will assess the potential value of developing a churn modeling and targeting program by comparing performance metrics at the bank to those across the entire banking industry. If these metrics are found to place the bank at a competitive disadvantage relative to its peers then this would be an indicator that a predictive model could be valuable to the client.
+2. If the scoping process indicates value to the client, then our team will then begin developing the predictive churn model. Customers identified by the predictive model as being at elevated risk of churn will then be treated as hypothetical candidates for retention interventions.
+3. We will then estimate the potential business impact, costs, and benefits of offering retention incentives to these at-risk customers.
+
+Based on this retrospective assessment using historical customer data, the client will determine whether a proactive churn management strategy should be implemented for customers who are currently active and whose future churn outcomes are not yet known.
+
+::: {.callout-caution #historical-data collapse="true"}
+# Two Types of Customers Relevant to This Project
+
+**Historical customers** are those for whom the final outcome is known, including whether they ultimately churned or remained active. These customers are captured in the provided data.
+
+**Current (or live) customers** are customers who are currently active and for whom future churn outcomes are unknown. Data for these customers is not available for this project.
+:::
+
+## Business Client
+
+Customer churn can negatively affect the bank through reduced revenue, lower customer lifetime value, increased acquisition costs required to replace the departing customers, and weakened long-term customer relationships. In order to address this, the credit card division must determine how to identify customers at elevated risk of churn and how to allocate retention resources effectively.
+
+So, the primary business client for this project is the manager of the bank's credit card division and the management team responsible for customer retention strategy. The management team will use the results of this project to evaluate whether predictive analytics can support a cost-effective customer retention program and improve business outcomes for both the bank and its customers.
+
+::: {.callout-note collapse="true"}
+## Customers are Impacted Although they are not the Primary Client
+
+Customers may also be negatively affected by this problem when their financial needs evolve but are not adequately addressed through competitive products, personalized services, or timely engagement. So, a successful retention strategy could improve credit card customer satisfaction by helping the bank proactively respond to changing customer needs before at-risk customers cancel their credit card accounts. However, since we only have access to historical data, bank customers are not our direct business client for this project.
+:::
+
+## Impact of Churn {#impact-of-churn}
+
+*how many impacted people and how much?*
+
+::: {.callout-tip collapse="true"}
+## Constraints on Data Available to Make Quantitative Estimates
+
+The client, the credit card division management team, and the bank's customers are all affected by customer churn. However, because organizational and financial information about the bank is not available, the impact on employees and management cannot be quantified directly.
+:::
+
+The available data contains information only at the customer level. So, the quantitative assessment of impact in this project will only focus on the effects of churn on the bank's credit card customer portfolio.
+
+### Industry Context
+
+Industry benchmarks suggest that customer churn remains a significant challenge across the financial services sector. Average credit card churn rates are estimated to be approximately 19% ([1](https://customergauge.com/blog/average-churn-rate-by-industry), [2](https://thefinancialbrand.com/news/bank-onboarding/the-churn-challenge-four-big-ideas-for-banks-and-credit-unions-looking-to-drive-down-attrition-182528)), with some institutions experiencing [high churn rates in the range of 25%-30%](https://uxpressia.com/blog/how-to-approach-customer-churn-measurement-in-banking).
+
+### Estimated Financial Impact of Churn {#lost-clv}
+
+Customer churn reduces the future value that customers generate for the bank. To estimate this impact, we quantified the expected value lost when a customer cancels their credit card.
+
+Using the provided historical customer data, we estimated that each churned customer at this bank represents approximately \$508 of lost Customer Lifetime Value (CLV). In addition, replacing a churned customer generally requires marketing and acquisition expenditures. Assuming a Customer Acquisition Cost (CaC) of \$200 per new customer ([1](https://www.reviewtrackers.com/blog/bank-customer-retention), [2](https://firstpagesage.com/seo-blog/average-customer-acquisition-cost-cac-in-banking/)), the estimated total [loss associated with each churned customer is approximately $708](../../notebooks/02_scoping.ipynb#lost-clv-calc).
+
+Applying this estimate to the historical customer sample results in an estimated total churn-related loss of approximately \$1.15 million. This is an order-of-magnitude estimate because it depends heavily on our CLV methodology and the assumed \$200 acquisition cost.
+
+If customer churn continues at its current level, similar losses could be incurred annually. If churn is increasing, as observed by the client, then this financial impact would be expected to grow correspondingly.
+
+### Metrics to Quantify Impact of Churn {#churn-metrics}
+
+There are two metrics for which the bank is in danger of exceeding industry standards
+
+1. The historical customer sample indicates a churn rate of approximately 16%, compared with an industry benchmark of approximately 19%. While the bank currently performs somewhat better than the industry average, the client's observed *continued growth in churn* could eventually reduce this advantage and result in customer attrition rates comparable to or worse than those of its competors.
+2. Industry estimates suggest that the average credit card customer in the financial services sector generates [approximately \$808 of Customer Lifetime Value](https://focus-digital.co/average-customer-lifetime-value-for-financial-services/). Using the historical customer data, we estimated that [customers who remained active generated an average CLV of approximately \$877](../../notebooks/02_scoping.ipynb#remaining-clv-calc), which is above the industry benchmark. This result suggests that the bank's current customer portfolio remains relatively valuable. However, if higher-value customers *increasingly* leave the bank, overall customer lifetime value could again decline toward or below industry norms.
+
+In summary, the current churn rate and customer lifetime value estimates do not indicate that the bank is presently underperforming its peers. However, the client's observation that customer churn is *increasing* suggests a potential emerging risk.
+
+If this trend continues, the bank could experience
+
+1. Increased loss of customer lifetime value
+2. Higher customer acquisition costs required to replace lost customers
+3. Reduced competitiveness relative to its peers
+4. Lower long-term profitability within its credit card portfolio
+
+For these reasons, customer churn represents a meaningful business problem that warrants further investigation and evaluation of potential retention strategies.
+
+## Reason for Prioritizing Problem Now
+
+Addressing customer churn is a priority because the client has observed an increasing number of customers canceling their credit card services. Successfully addressing this problem could provide two important benefits
+
+1. Reduce or reverse the observed increase in credit card customer churn
+2. Improve customer satisfaction and retention by proactively identifying customers who may be considering canceling their credit card services and engaging them before they cancel their credit card accounts
+
+As mentioned above, although the current churn rate of approximately 16% remains below the industry average of approximately 19%, continued growth in churn could cause the bank to exceed industry norms and potentially enter the higher-risk range of 25%-30% observed at some financial institutions. Acting now may allow the bank to intervene before customer attrition reaches levels that materially affect business performance.
+
+## Existing Approaches and Their Limitations
+
+Based on the information available, the client currently lacks a systematic method for identifying which active customers are most likely to cancel their credit card services in the future. As a result, retention efforts are likely based on broad marketing campaigns, customer service interactions, managerial judgment, or customer complaints rather than data-driven estimates of churn risk. Although these approaches may help retain some customers, they do not allow the bank to prioritize its retention resources toward the credit card customers who are most likely to leave.
+
+Without a predictive capability, the bank faces several challenges
+
+1. Retention resources may be allocated inefficiently across the credit card customer base
+2. High-risk customers may not be identified until they have already decided to leave (churned)
+3. Marketing and customer service efforts may target many customers who were unlikely to churn
+4. The effectiveness and return on investment of retention activities may be difficult to measure
+
+This project seeks to address these limitations by identifying customers at elevated risk of churn and supporting more targeted retention strategies.
+
+## Other Groups or Stakeholders Involved in Scoping and Implementation
+
+Based on common banking practices, the following additional stakeholder groups would likely be involved in the successful implementation of a churn prediction and retention program
+
+### Operational Stakeholders
+
+1. Marketing team responsible for customer outreach campaigns
+2. Customer service and call center teams responsible for direct customer engagement
+3. Branch managers and financial advisors responsible for customer relationship management
+
+### Technical Stakeholders
+
+1. Data Analytics and Data Science teams responsible for model development, monitoring, and reporting
+2. IT department responsible for data infrastructure, deployment, security, and system integration
+3. Data Governance and Compliance teams responsible for data privacy, regulatory compliance, and model governance
+
+### Customers
+
+1. Current credit card customers who may be targeted for retention interventions based on model predictions
+
+These stakeholders would participate at different stages of the project, including data access, model development, operational deployment, customer outreach, and ongoing performance monitoring.

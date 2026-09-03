@@ -1,13 +1,21 @@
+---
+authors:
+  - edesz
+date: 2025-04-29
+---
+
 # Summary of Scoping Assumptions
+
+*In this section, we will list all the assumptions made during the scoping of this project.*
 
 ## Costs
 
 1. the Customer Acquisition Cost (CaC), or replacement cost, is [approximated to be 167 USD per customer](./02_costs.md#customer-acquisition-cost)
 2. the Customer Lifetime Value (CLV) can be [estimated using annual credit card revenue and a multiplier](./02_costs.md#customer-lifetime-value)
-3. there are [three main sources of annual credit-card revenue](revenue-sources)
+3. there are [three main sources of annual credit-card revenue](./02_costs.md#revenue-sources)
    - revenue from [credit card transactions](./02_costs.md#interchange-rev)
    - revenue from carrying a [revolving balance](./02_costs.md#interest-rev)
-   - revenue from fees due to a client's credit card exposure, which we approximated using the client's category of credit card (blue, silver, gold or platinum)
+   - revenue from fees due to a client's credit card exposure, which we [approximated using the client's category of credit card](./02_costs.md#card-exposure-fees) (blue, silver, gold or platinum)
 4. since clients usually have credit card services with a bank for multiple years, [a CLV multiplier](./02_costs.md#clv-multiplier) term  [was used](./02_costs.md/#clv-multiplier) to correct annual credit card revenue earned by accounting for the current value of expeced future revenue
 
 ## Actions

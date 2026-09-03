@@ -40,11 +40,13 @@ pip-delete-this-directory.txt
 htmlcov/
 tests/test-logs/
 .tox/
+.pixi/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
+pixi.lock
 *.cover
 
 # Translations
@@ -115,3 +117,6 @@ notebooks/.metaflow/*
 
 # MyST build outputs
 _build
+
+/.quarto/
+**/*.quarto_ipynb

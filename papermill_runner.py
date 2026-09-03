@@ -85,7 +85,7 @@ def main(
     nbs_dir = PROJ_ROOT / "notebooks"
     nb_dir_output = PROJ_ROOT / "executed-notebooks" / "scripted"
 
-    nb_paths = sorted(list(nbs_dir.glob("*.ipynb")))[1:]
+    nb_paths = sorted(list(nbs_dir.glob("*.ipynb")))
     # print(nb_paths)
 
     prefix_r2 = "cloud-run"
@@ -157,6 +157,18 @@ def main(
     )
 
     nb_list_all = []
+    if "00" in nb_nums:
+        np_param_00 = dict(
+            url=(
+                "https://raw.githubusercontent.com/azar-s91/dataset/refs/"
+                "heads/master/BankChurners.csv"
+            ),
+            r2_key_raw_data="BankChurners2.xlsx",
+        )
+        nb_list = [
+            {"prefix": "00", "path": str(nb_paths[0]), "params": np_param_00}
+        ]
+        nb_list_all += nb_list
     if "01" in nb_nums:
         np_param_01 = dict(
             r2_key_raw_data="BankChurners.xlsx",
@@ -169,14 +181,14 @@ def main(
             r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
         )
         nb_list = [
-            {"prefix": "01", "path": str(nb_paths[0]), "params": np_param_01}
+            {"prefix": "01", "path": str(nb_paths[1]), "params": np_param_01}
         ]
         nb_list_all += nb_list
     if "02" in nb_nums:
         nb_param_02 = copy.deepcopy(bus_params)
         nb_param_02.update(dict(prefix=f"{prefix_r2}/"))
         nb_list = [
-            {"prefix": "02", "path": str(nb_paths[1]), "params": nb_param_02}
+            {"prefix": "02", "path": str(nb_paths[2]), "params": nb_param_02}
         ]
         nb_list_all += nb_list
     if "03" in nb_nums:
@@ -188,19 +200,19 @@ def main(
             threshold_correlation=0.55,
         )
         nb_list = [
-            {"prefix": "03", "path": str(nb_paths[2]), "params": nb_param_03}
+            {"prefix": "03", "path": str(nb_paths[3]), "params": nb_param_03}
         ]
         nb_list_all += nb_list
     if "04" in nb_nums:
         nb_list = [
-            {"prefix": "04", "path": str(nb_paths[3]), "params": params}
+            {"prefix": "04", "path": str(nb_paths[4]), "params": params}
             for params in experiment_runs_params__all
         ]
         nb_list_all += nb_list
     if "05" in nb_nums:
         np_param_05 = dict(primary_metric_val="prauc", threshold_overfit=5)
         nb_list = [
-            {"prefix": "05", "path": str(nb_paths[4]), "params": np_param_05}
+            {"prefix": "05", "path": str(nb_paths[5]), "params": np_param_05}
         ]
         nb_list_all += nb_list
     if "06" in nb_nums:
@@ -213,7 +225,7 @@ def main(
             threshold_overfit=5,
         )
         nb_list = [
-            {"prefix": "06", "path": str(nb_paths[5]), "params": np_param_06}
+            {"prefix": "06", "path": str(nb_paths[6]), "params": np_param_06}
         ]
         nb_list_all += nb_list
     if "07" in nb_nums:
@@ -224,7 +236,7 @@ def main(
             r2_key_test=f"{prefix_r2}/test_data.parquet.gzip",
         )
         nb_list = [
-            {"prefix": "07", "path": str(nb_paths[6]), "params": np_param_07}
+            {"prefix": "07", "path": str(nb_paths[7]), "params": np_param_07}
         ]
         nb_list_all += nb_list
     if "08" in nb_nums:
@@ -233,7 +245,7 @@ def main(
             dict(prefix=prefix_r2, r2_key_pred="all_predictions__")
         )
         nb_list = [
-            {"prefix": "08", "path": str(nb_paths[7]), "params": bus_params}
+            {"prefix": "08", "path": str(nb_paths[8]), "params": bus_params}
         ]
         nb_list_all += nb_list
     if "09" in nb_nums:
@@ -246,13 +258,13 @@ def main(
         }
         nb_param_09["columns"] += ["model_name", "y_pred_proba", "y_pred"]
         nb_list = [
-            {"prefix": "09", "path": str(nb_paths[8]), "params": nb_param_09}
+            {"prefix": "09", "path": str(nb_paths[9]), "params": nb_param_09}
         ]
         nb_list_all += nb_list
     if "10" in nb_nums:
         nb_param_10 = dict(prefix=prefix_r2, r2_key_pred="all_predictions__")
         nb_list = [
-            {"prefix": "10", "path": str(nb_paths[9]), "params": nb_param_10}
+            {"prefix": "10", "path": str(nb_paths[10]), "params": nb_param_10}
         ]
         nb_list_all += nb_list
     if "11" in nb_nums:
@@ -266,13 +278,31 @@ def main(
             label="is_churned",
         )
         nb_list = [
-            {"prefix": "11", "path": str(nb_paths[10]), "params": nb_param_11}
+            {"prefix": "11", "path": str(nb_paths[11]), "params": nb_param_11}
         ]
         nb_list_all += nb_list
     if "12" in nb_nums:
         nb_param_12 = dict(r2_key_raw_data="BankChurners.xlsx")
         nb_list = [
-            {"prefix": "12", "path": str(nb_paths[11]), "params": nb_param_12}
+            {"prefix": "12", "path": str(nb_paths[12]), "params": nb_param_12}
+        ]
+        nb_list_all += nb_list
+    if "14" in nb_nums:
+        nb_param_14 = copy.deepcopy(bus_params)
+        nb_param_14 = {
+            k: v
+            for k, v in nb_param_14.items()
+            if k not in ["columns", "replacement_cost"]
+        }
+        nb_param_14.update(
+            dict(
+                prefix=prefix_r2,
+                r2_key_pred_prefix="all_predictions__",
+                budget=20_000,
+            )
+        )
+        nb_list = [
+            {"prefix": "14", "path": str(nb_paths[14]), "params": nb_param_14}
         ]
         nb_list_all += nb_list
 

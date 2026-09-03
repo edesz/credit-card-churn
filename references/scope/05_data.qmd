@@ -1,0 +1,167 @@
+---
+Title: Data
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2025-10-04
+language:
+  title-block-published: "Last Updated"
+---
+
+# Data Sources
+
+*This section covers*
+
+1. *Available internal and external data sources*
+2. *Additional information about available data that would be relevant to pursuing the project's goal*
+
+## Data
+
+### Available Internal or External Datasets {#internal-external-data}
+
+The project uses a single internal dataset provided by the client. The dataset contains historical information for approximately 10,100 credit card customers, including customer characteristics, account information, transaction behavior, and a known churn outcome.
+
+No additional internal or external datasets are available for this project, and no data linkage activities are planned.
+
+### Attributes Provided in the Data Source {#data-attributes}
+
+Credit card customer information was collected during an observation period of approximately ~12-16 months, along with a subsequent outcome indicating whether the customer ultimately retained or canceled their credit card services during a subsequent time period.
+
+Because the outcome occurs after the observation period, the dataset is suitable for evaluating whether historical customer characteristics can be used to predict future churn behavior.
+
+The available attributes (columns in the dataset) can be grouped into the following categories
+
+1. Customer Identifier
+   - `CLIENTNUM`
+2. Demographic Attributes
+   - `Age`
+     - Age of the customer
+   - `Gender`
+     - Male or Female
+   - `Education_Level`
+     - Education category
+   - `Dependent_count`
+     - Number of dependents
+   - `Marital_Status`
+     - Married, Single, etc.
+   - `Income_Category`
+     - Income bucket
+2. Customer Relationship Attributes
+   - `Total_Relationship_Count`
+     - Number of products held with the bank
+   - `Card_Category`
+     - Type of credit card (Blue, Silver, Gold, Platinum)
+3. Account and Credit Attributes
+   - `Credit_Limit`
+     - Credit limit on the card
+   - `Total_Revolving_Bal`
+     - Credit card calance carried
+   - `Avg_Open_To_Buy`
+     - Average available credit
+   - `Avg_Utilization_Ratio`
+     - Ratio of Credit card balance to credit card limit
+4. Customer Interaction Attributes
+   - `Contacts_Count_12_mon`
+     - Contacts with the bank in the past year
+   - `Months_Inactive_12_mon`
+     - Number of months inactive in the past year
+5. Transaction Behavior Attributes
+   - `Total_Trans_Amt`
+     - otal transaction amount in the last 12-16 months
+   - `Total_Trans_Ct`
+     - Total transaction count in the last 12-16 months
+   - `Total_Amt_Chng_Q4_Q1`
+     - Change in credit card transaction amount (Q4 over Q1)
+   - `Total_Ct_Chng_Q4_Q1`
+     - Change in credit card transaction count (Q4 over Q1)
+6. Outcome Variable
+   - `Attrition_Flag`
+     - whether the customer canceled their credit card services or not
+     - values are
+       - *Existing Customer*
+         - this indicates a the customer kept their credit card through the historical period of time covering the data
+       - *Attrited Customer*
+         - this indicates customer canceled their credit card by the end of the period of time covering the data
+     - this is the target variable
+
+### Level of Granularity of the Data
+
+The dataset is provided as tabular data at the individual customer level, with each record (row) representing a single customer. This level of granularity is appropriate for identifying individual customers who may be at elevated risk of churn.
+
+### Period of Time Covered by the Data Source
+
+As mentioned above, in the data, customer characteristics and transaction behavior were aggregated over an observation period of approximately 12-16 months. This duration is beneficial because customer credit card usage often exhibits seasonal patterns ([1](https://www.rbc.com/en/thought-leadership/economics/featured-insights/rbc-consumer-spending-tracker/), [2](https://www.consumerfinance.gov/about-us/blog/aggregate-credit-card-borrowing-exhibits-end-year-seasonal-patterns-which-vary-across-different-sets-consumers/), [3](https://libertystreeteconomics.newyorkfed.org/2021/11/credit-card-trends-begin-to-normalize-after-pandemic-paydown/), [4](https://www.experian.com/blogs/insights/holiday-consumer-credit-card-spending/#:~:text=Tis%27%20the%20season%20for%20hefty%20consumer%20credit%20card%20spending%20%2D%20Experian%20Insights.)). Examples of common seasonal effects include
+
+1. Increased spending during holiday periods
+2. Reduced post-holiday spending as customers repay holiday debt
+3. Back-to-school spending periods
+4. Seasonal fluctuations in discretionary spending
+
+So, a period spanning at least one full year increases the likelihood that annual spending cycles, payment behavior, and customer engagement trends are represented within the data.
+
+### Frequency of Subsequent Data Collection or Updates
+
+The dataset contains a historical snapshot and will not be updated during the course of this project.
+
+Because the project evaluates historical churn outcomes retrospectively, no ongoing data collection or refresh process is required.
+
+### Unique Identifiers in the Data that link it to Other Data Sources
+
+The dataset contains a unique customer identifier (`CLIENTNUM`) that could potentially be used to link customer records to other internal banking systems.
+
+No additional data sources are available for integration within the scope of this project. So, the identifier will be used only for record uniqueness and quality assurance purposes.
+
+### Owner of the Data
+
+As mentioned in the [business problem](../scope/01_problem_understanding.qmd#business-problem-description), the dataset was provided by the manager of the credit card division, who serves as the primary business stakeholder and project sponsor.
+
+### Storage Medium for the Data
+
+The data was provided as a single Microsoft Excel (`.xlsx`) file.
+
+### Additional Useful Information Associated with this Data Source
+
+The client indicated that the dataset represents a sample of the bank's credit card customer population and was provided for the purpose of evaluating customer churn.
+
+### Ethical Issues Associated with Using this Data Source
+
+Below are the ethical and governance considerations that apply to the use of this dataset.
+
+#### **Privacy and Security**
+
+1. Customer information will be treated as confidential.
+2. Access will be restricted to authorized project personnel.
+3. The data will not be publicly distributed.
+4. The dataset will be securely deleted according to the client's data retention policies upon project completion.
+
+#### **Data Quality and Bias**
+
+1. No known data collection issues or biases were communicated to our project team.
+2. The possibility of sampling bias, measurement bias, historical process bias, or unobserved customer characteristics cannot be ruled out in the provided data.
+3. The dataset reflects historical customer behavior and may not fully represent future customer populations or changing market conditions.
+
+### Additional Data Desired in an Ideal Scenario
+
+Several additional data sources could improve the ability to understand, predict, and mitigate customer churn.
+
+#### **Retention Intervention History**
+
+Information regarding previous retention campaigns, customer outreach efforts, incentive offers, and their outcomes would allow the effectiveness of our team's recommended retention strategies to be evaluated directly.
+
+#### **Customer Service Interactions**
+
+Detailed customer support records, complaints, satisfaction surveys, and call-center interactions could provide additional signals regarding customer dissatisfaction and their risk of churn.
+
+#### **Product Holdings and Banking Relationships**
+
+Information about other banking products held by customers, such as mortgages, loans, savings accounts, and investment products, could improve our team's understanding of overall customer engagement and customer loyalty.
+
+#### **Time-Stamped Transaction Data**
+
+Dates and times are missing in the provided data. Access to credit card transaction histories with explicit dates would enable the analysis of behavioral trends over time and support more sophisticated temporal modeling approaches.
+
+#### **Longer Historical Observation Periods**
+
+Additional years of historical customer data would allow the stability of churn patterns to be evaluated across changing economic conditions and customer lifecycles. This would improve the confidence in the generalizability of the our best predictive models.

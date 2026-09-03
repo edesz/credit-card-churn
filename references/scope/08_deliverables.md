@@ -1,3 +1,9 @@
+---
+authors:
+  - edesz
+date: 2025-04-29
+---
+
 # Project Deliverables
 
 ## Objective
@@ -8,7 +14,7 @@ This section lists the contents to be provided to the client.
 
 ### Analysis
 
-All source code used in this project will be [provided in a Github repository](#https://github.com/edesz/credit-card-churn).
+All source code used in this project will be [provided in a Github repository](https://github.com/edesz/credit-card-churn).
 
 ### Data Preparation
 

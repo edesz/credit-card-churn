@@ -15,8 +15,14 @@ jlab:
 ## Run notebooks
 nbs:
 	@echo "+ $@"
-	@pixi run nbs -- 10,11,12
+	@pixi run nbs -- 01,02,03,04,05,06,07,09,10,12
 .PHONY: nbs
+
+## Preview documentation
+preview:
+	@echo "+ $@"
+	@pixi run preview
+.PHONY: preview
 
 ## Run data validation with Pandera
 dval:
@@ -47,6 +53,24 @@ pixi2conda:
 	@echo "+ $@"
 	@pixi workspace export conda-environment --environment notebooks > environment.yml
 .PHONY: pixi2conda
+
+## Preview documentation locally with Quarto
+quarto-preview:
+	@echo "+ $@"
+	@pixi run quarto-preview
+.PHONY: quarto-preview
+
+## Render documentation locally with Quarto
+quarto-render:
+	@echo "+ $@"
+	@pixi run quarto-render
+.PHONY: quarto-render
+
+## Prepare Github Actions configuration for Quarto
+quarto-publish-gh-pages:
+	@echo "+ $@"
+	@pixi run quarto-publish-gh-pages
+.PHONY: quarto-publish-gh-pages
 
 #################################################################################
 # PROJECT RULES                                                                 #

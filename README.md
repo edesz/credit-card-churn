@@ -6,9 +6,9 @@
 
 ## About
 
-Use ML to identify credit card customers at a bank who are at risk of churning, for retrospective targeting.
+Use ML to identify credit card customers at a bank who are at risk of churning and make recommendations for proactive targeting.
 
-Read the project scope [here](./references/scope/01_problem_understanding.md).
+Read the project scope [here](https://edesz.github.io/credit-card-churn/references/scope/01_problem_understanding.md).
 
 ## Getting Started
 
@@ -46,8 +46,12 @@ jlab                Run Jupyterlab
 mlval               Run ML Validation experiments with Metaflow 
 nbs                 Run notebooks 
 pixi-upgrade        Upgrade conda package versions with pxi 
-pixi2conda          Export pixi environment config to conda .yml
-tests               Run unit tests with Pytest
+pixi2conda          Export pixi environment config to conda .yml 
+preview             Preview documentation 
+quarto-preview      Preview documentation locally with Quarto 
+quarto-publish-gh-pages Prepare Github Actions configuration for Quarto 
+quarto-render       Render documentation locally with Quarto 
+tests               Run unit tests with Pytest 
 ```
 
 ## Sections
@@ -118,7 +122,7 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 
 1. GitHub Issues: https://github.com/edesz/credit-card-churn/issues
 
-## 📦 Project Structure
+## Project Structure
 
 ```bash
 ├── data
@@ -133,10 +137,17 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 │       └── schema.py
 ├── docs
 │   ├── env_template.txt              <- example of .env file with R2 credentials.
-│   └── R2_SETUP_GUIDE.md             <- Guide to use Python to connect to team resources on R2 bucket.
+│   ├── R2_SETUP_GUIDE.md             <- Guide to use Python to connect to team 
+│   └── styles                        <- HTML style files.
 ├── executed-notebooks                <- Executed Jupyter notebooks.
 ├── LICENSE                           <- Open-source license.
 ├── Makefile                          <- Makefile with convenience commands like `make jlab` or `make tests`.
+├── models                            <- Trained and serialized models, model predictions, or model summaries
+│   ├── 01
+│   ├── 02
+│   ├── 03
+│   ├── 04
+│   └── 05
 ├── CODE_OF_CONDUCT.md                <- Define expected participant behaviour.
 ├── PROJECT_SUMMARY.md
 ├── README.md                         <- The top-level README for developers using this project.
@@ -144,8 +155,8 @@ Below is the [shared repository workflow](https://uoftcoders.github.io/studyGrou
 ├── papermill_runner.py               <- Programmatic execution of notebooks.
 ├── pyproject.toml                    <- Python configuration file for managing Python environments.
 ├── pytest.ini                        <- Pytest configuration file for running unit tests.
+├── _quarto.yml                       <- Configuration for documentation with Quarto.
 ├── references                        <- Documentation for project scoping.
-├── environment.yml                   <- Conda packages needed for interactive analysis with MyBinder.
 ├── requirements.txt                  <- Python packages needed for scripted analysis.
 ├── ruff.toml                         <- Configuration for code linting and formatting.
 ├── scripts

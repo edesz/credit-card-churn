@@ -1,0 +1,74 @@
+---
+Title: Goals
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2025-10-04
+language:
+  title-block-published: "Last Updated"
+---
+
+# Goals
+
+*This section discusses the goals for this project.*
+
+## Business Goals and Constraints
+
+The primary objective of this project is to evaluate whether customer churn can be reduced through the use of predictive analytics and targeted retention strategies.
+
+Because the available data is historical, the project will not directly intervene on the client's current credit card customers. Instead, it will estimate the potential business value that could have been achieved had at-risk customers been identified and targeted before canceling their credit card services.
+
+The project has three business goals, which we will discuss in detail next.
+
+### Goal 1 - Reduce Customer Churn
+
+The primary goal of our project is to reduce the number of customers who cancel their credit card services by
+
+1. identifying customers who show characteristics associated with future churn
+2. evaluating whether retention interventions could have altered the future churn outcome
+
+**Goal Type:** Effectiveness
+
+### Goal 2 - Improve Retention Resource Allocation
+
+Retention activities require time, personnel, and financial resources. The project seeks to determine whether predictive analytics can help the bank prioritize retention efforts toward customers who are most likely to churn (at-risk customers) rather than distributing resources uniformly across the entire customer base.
+
+**Goal Type:** Efficiency
+
+### Goal 3 - Preserve Customer Lifetime Value
+
+Customer churn reduces future revenue and often requires additional expenses to replace lost customers. The project seeks to estimate the extent to which a targeted retention strategy could preserve customer lifetime value and reduce customer acquisition costs.
+
+**Goal Type:** Effectiveness
+
+## Constraints
+
+Below are the constraints that limit the scope of our analysis and conclusions that can be drawn from this project
+
+1. The available dataset contains only historical customer records and does not include current customers.
+2. No historical information is available regarding retention campaigns, customer outreach activities, or intervention outcomes.
+3. The project cannot directly measure whether a retention offer would have changed a customer's decision to cancel their credit card services.
+4. [Estimates of financial impact](../scope/02_costs.qmd) depend on assumptions regarding customer lifetime value, customer acquisition costs, and the effectiveness of hypothetical retention interventions. We made these estimates based on background research, but they are still estimates.
+5. The dataset represents a sample of customers rather than the bank's complete customer population.
+
+As a result, our project estimates the potential value of a predictive retention program rather than directly measuring its real-world effectiveness.
+
+## Tradeoffs Across Project Goals {#goals-tradeoffs}
+
+Most of the project's goals are complementary. However, below are some of the tradeoffs.
+
+### Effectiveness versus Efficiency (type of Goal)
+
+A retention strategy that attempts to contact every customer who may churn could potentially reduce more churn. However, it would also incur significantly higher costs. By comparison, a highly targeted strategy may be more efficient but it could miss some customers who cancel their credit card services.
+
+### Customer Retention versus Intervention Costs
+
+Increasing the number or value of retention offers may improve the rate of retaining credit card customers. However, it may also increase operational and financial costs. So, the client must balance the expected value preserved from retaining the at-risk customers against the cost of implementing this intervention.
+
+### Customer Experience versus Targeting Accuracy
+
+Aggressive outreach campaigns may improve retention among some customers but [they could negatively affect customers who were unlikely to churn and do not wish to receive additional marketing offers](https://www.forbes.com/sites/georgedeeb/2022/07/06/stop-using-suicidal-marketing-tactics/). So, the client must balance intervention effectiveness with customer experience.
+
+Because our project uses historical data, the impact of these three tradeoffs cannot be directly measured.

@@ -1,10 +1,43 @@
 ---
-authors:
-  - edesz
+Title: Team Contributions
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
 date: 2025-04-24
+language:
+  title-block-published: "Last Updated"
 ---
 
 # Team Member Contributions
+
+## Team Member Roles
+
+Below are our team members' roles for this project, following the [Contributor Role Taxonomy](https://credit.niso.org/)
+
+1. edesz
+   - Conceptualization
+   - Data curation
+   - Formal analysis
+   - Investigation
+   - Methodology
+   - Project administration
+   - Supervision
+   - Software
+   - Validation
+   - Visualization
+   - Writing - original draft
+2. sinderpreet31
+   - Formal analysis
+   - Software
+   - Methodology
+   - Visualization
+3. IlkhamFY
+   - Formal analysis
+   - Methodology
+   - Software
+   - Writing - review & editing
 
 ## High-Level Summary
 
@@ -41,6 +74,8 @@ Github Profile: [link](https://github.com/edesz)
      - ML model interpretability
 5. Data Validation
      - development of data model in Python to validate raw customer data
+6. Dashboard with Recommendations
+     - development of dashboard using the Panel framework in Python to deliver recommendations for targeting strategies to the client
 
 ### sinderpreet31
 
@@ -69,15 +104,15 @@ Github Profile: [link](https://github.com/IlkhamFY)
 
 ## Code Implementation
 
-This section contains the notebooks that were developed as part of the first four [implementation phases above](#implementation-phases).
+This section contains the notebooks that were developed by team members as part of the first four [implementation phases above](../overview/01_approach.qmd#implementation-phases).
 
 ### Project Scoping
 
-The `02_scoping.ipynb` notebook ([link](../../notebooks/02_scoping.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/02_scoping.ipynb)) was used to perform quantitative analysis to [scope out this project](./01_approach.md#scoping). It estimated the quantitative impact of credit card churn to quantify the problem facing the client using two KPIs.
+The `02_scoping.ipynb` notebook ([link](../../notebooks/02_scoping.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/02_scoping.ipynb)) was used to perform quantitative analysis to [scope out this project](../overview/01_approach.qmd#scoping). It estimated the quantitative impact of credit card churn to quantify the problem facing the client using two KPIs.
 
 ### Analysis
 
-The following notebooks were developed as part of the [Analysis](./01_approach.md#analysis) phase
+The following notebooks were developed as part of the [Analysis](../overview/01_approach.qmd#analysis) phase
 
 1. Preprocess and Split Raw Data
    - create train, validation and test splits
@@ -95,7 +130,7 @@ The following notebooks were developed as part of the [Analysis](./01_approach.m
 
 ### ML Model Development
 
-The notebooks below are part of [stream 1](./01_approach.md#stream-1) of the ML Model Development phase
+The notebooks below were written by team members as part of [stream 1](../overview/01_approach.qmd#stream-1) of the ML Model Development phase
 
 1. ML Validation - Cost-Sensitive Learning
    - develop a parameterized workflow to run ML experiments using linear models and tree-based models with the [Metaflow](https://metaflow.org/) framework
@@ -120,9 +155,9 @@ The notebooks below are part of [stream 1](./01_approach.md#stream-1) of the ML 
    - `10_get_at_risk_customer_profiles.ipynb` ([link](../../notebooks/10_get_at_risk_customer_profiles.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/10_get_at_risk_customer_profiles.ipynb))
 7. Interpret Best Machine Learning Model
    - use SHAP to globally explain predictions made by the best ML model when using the best features identified during model validation in step 1. above, separately for customers predicted to churn and be retained
-   - `11_interpret_model_predictions.ipynb` ([link](../../notebooks/11_interpret_model_predictions_no_outputs.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/11_interpret_model_predictions_no_outputs.ipynb))
+   - `11_interpret_model_predictions.ipynb` ([link](../../notebooks/11_interpret_model_predictions.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/11_interpret_model_predictions.ipynb))
 
-The `13_production_ml_pipeline.ipynb` notebook ([link](../../notebooks/13_production_ml_pipeline.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/13_production_ml_pipeline.ipynb)) implements the end-to-end pipeline developed during [stream 2](./01_approach.md#stream-2) of the ML Model Development phase. It contains the following
+The `13_production_ml_pipeline.ipynb` notebook ([link](../../notebooks/13_production_ml_pipeline.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/13_production_ml_pipeline.ipynb)) implements the end-to-end pipeline developed during [stream 2](../overview/01_approach.qmd#stream-2) of the ML Model Development phase. It contains the following
 
 1. comprehensive ML pipeline with `XGBoost`, `LightGBM`, `RandomForest`
 2. SHAP interpretability, CLV calculator, ROI optimization
@@ -136,4 +171,4 @@ It provides a production-ready infrastructure with the following custom Python m
 
 ### Data Validation
 
-The `12_validate_data.ipynb` notebook ([link](../../notebooks/12_validate_data.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/12_validate_data.ipynb)) used a custom data model to [validate the raw credit card customer data](./01_approach.md#data-validation). It used the Python `pandera` package to develop the data schema.
+The `12_validate_data.ipynb` notebook ([link](../../notebooks/12_validate_data.ipynb), [view](https://nbviewer.org/github/edesz/credit-card-churn/blob/main/notebooks/12_validate_data.ipynb)) used a custom data model to [validate the raw credit card customer data](../overview/01_approach.qmd#data-validation). It used the Python `pandera` package to develop the data schema.

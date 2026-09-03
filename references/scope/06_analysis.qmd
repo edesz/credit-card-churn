@@ -1,0 +1,216 @@
+---
+Title: Analysis
+author:
+  - name: "edesz"
+    orcid: "0000-0001-9039-5496"
+    attributes:
+      github: "edesz"
+date: 2026-05-09
+language:
+  title-block-published: "Last Updated"
+---
+
+# Analysis
+
+*In this section, we w ill specify the analysis that should be performed in this project in order to inform the actions that will achieve the defined goal.*
+
+## Type of Analysis - Description, Detection, Prediction, or Behavior Change
+
+This project involves predictive analysis.
+
+Using historical customer characteristics, account information, and credit card usage behavior, we will develop machine learning models that estimate the probability that a customer will cancel their credit card services during a future period.
+
+These predictions will be used to identify customers at elevated risk of churn and to prioritize them for potential retention interventions.
+
+Because the available data is historical, the analysis will be used to retrospectively estimate the potential business value of a targeted retention strategy. If the results demonstrate sufficient business value to the client, then a similar approach could subsequently be applied to current customers whose future churn outcomes are currently unknown.
+
+## Purpose of Analysis
+
+The purpose of this analysis is to determine whether historical customer data contains sufficient predictive information to identify customers at elevated risk of future churn.
+
+More specifically, the analysis seeks to answer the following business question
+
+> Which customers are most likely to cancel their credit card services in the future, and can these customers be identified accurately enough to support a targeted retention strategy?
+
+The output of the analysis will be a predicted probability of churn for each customer. These probabilities will be used to rank customers according to their estimated churn risk and to identify cohorts of customers that may be suitable candidates for retention interventions.
+
+In addition to generating churn predictions, the analysis will produce model explanations that help characterize the customer attributes and behavioral patterns most strongly associated with churn. These insights will support the design of data-driven retention strategies and provide business stakeholders with a better understanding of the factors contributing to predicted customer attrition (churn or no churn).
+
+## Action Informed by this Analysis
+
+The primary action informed by this analysis is the prioritization of customers for the client's retention efforts.
+
+The analysis will identify customers who are at elevated risk of canceling their credit card services in the future and rank them according to their predicted churn risk. This ranking will allow the bank to focus retention resources on customers who are most likely to churn rather than applying broad retention campaigns across its entire customer base.
+
+In addition to identifying at-risk customers, the analysis will characterize the behavioral and account-related attributes associated with churn. These insights can be used to design targeted retention strategies for different customer segments and to better understand the underlying factors contributing to customer attrition.
+
+Because the available data is historical, no current customers will actually be contacted as part of this project. Instead, the analysis will be used to retrospectively estimate the potential business value of a targeted retention strategy. If the client determines that our estimated benefits are sufficient, then a similar approach could subsequently be applied to current customers whose future churn outcomes are not yet known.
+
+## Validation of this Analysis using Existing Historical Data
+
+*How will you validate this analysis using existing data?*
+
+The validation methodology should reflect how the predictive model would ultimately be used in practice. During deployment, the model will be applied to customers whose future churn outcomes are not yet known. Therefore, the validation process must estimate how accurately the model is expected to perform on previously unseen customers.
+
+Because historical customer data with known outcomes is available, model development will be conducted in two stages
+
+1. Validation, in which multiple modeling approaches are compared and the best-performing solution is selected.
+2. Evaluation, in which the selected solution is assessed on previously unseen customer data to estimate its expected real-world performance.
+
+The objective of the validation phase is to identify the combination of
+
+1. predictive features
+2. feature preprocessing strategy, and
+3. ML algorithm
+
+that produces the strongest predictive performance while maintaining good generalization to unseen customers.
+
+### Evaluation Phase {#evaluation-phase}
+
+In the *evaluation phase*, the performance of the best combination of data pre-processing, features and ML model is evaluated on the test data - the 20% split that has not been used so far. We can do this since the data, even though it is historical, has changed between these two phases. The customers in the validation split of each of the five *folds* from the validation phase are different from the customers in the 20% test split.
+
+### Validation Phase
+
+As mentioned above, we will use the validation phase to compare candidate machine learning solutions and identify the best-performing approach.
+
+Multiple experiments will be conducted in which the following components are varied
+
+1. the subset of customer features used for modeling
+2. the preprocessing strategy applied to those features, and
+3. the ML algorithm used to estimate churn risk
+
+Each experiment represents a complete modeling pipeline consisting of feature selection, preprocessing, model training, probability estimation, and decision-threshold optimization.
+
+To reduce the risk of overfitting and obtain a robust estimate of performance, [nested cross-validation](https://jmlr.csail.mit.edu/papers/volume11/cawley10a/cawley10a.pdf) will be used. The inner cross-validation loop is used to optimize the classification decision threshold, while the outer cross-validation loop is used to estimate model performance on unseen data.
+
+The results from all experiments will be compared using predefined machine learning performance metrics (discussed in the next section). The experiment that demonstrates the best overall performance will be selected for further evaluation.
+
+## Validation Metrics
+
+### Business Constraints
+
+In a customer churn use-case, the following types of errors in ML model predictions are important considerations
+
+1. False Negative (missed churner)
+   - a false negative occurs when the model fails to identify a customer who actually churns and who we should have reached out to with targeted offers. For the client, losing a customer who actually in the future churned means losing future revenue. This is the most important type of error for the current use-case. This makes it essential to correctly identify as many potential churners as possible, even if some non-churners are flagged (false positive).
+2. False Positive (wrongly flagged churner)
+   - this is also an error but, as per the above, this is the less costly of the two types of errors. We unnecessarily contact a customer who did not cancel their credit card services, and maybe offer a discount.
+3. Precision
+   - out of those customers predicted to churn, how many were true churners?
+   - interpretation for churn
+     - when we flag someone as high-risk, how often are we right?
+4. Recall
+   - out of all true churners, how many did we correctly predict?
+   - interpretation for churn
+     - how many churners are we capturing?
+
+### Candidate ML Metrics
+
+There are two possible choices for primary scoring metric to choose from
+
+1. Recall (catching churners) is more important than Precision (avoiding unnecessary offers). The **F2-score** explicitly encodes this by valuing Recall more. It is a natural metric for churn problems where Recall matters more than Precision.
+2. **PR AUC** is the area under the precision-recall curve ([1](https://arize.com/blog/what-is-pr-auc/), [2](https://www.deepchecks.com/glossary/pr-auc/)). It focuses on the model's ability to identify the positive class without erroneously categorizing negative instances as positive.
+
+### Constraints During Imbalanced ML Model Training
+
+When ML models are trained on imbalanced data, they are biased towards the majority class (no churn). Unfortunately, this leads to large errors for the minority class (churn) and, as discussed above, this is of more interest here. The default classification decision threshold is set to 0.5 and is not optimal for imbalanced data such as churn. So, [this decision threshold needs to be tuned for imbalanced classification problems](https://pubs.acs.org/doi/10.1021/acs.jcim.1c00160). For this reason, decision threshold tuning is important and will be performed on the training data. The best threshold will be used during evaluation on the test data.
+
+### Final Choice of ML Metrics {#choice-of-metrics}
+
+The decision threshold for each candidate model was optimized using F2-score. It places greater emphasis on recall than precision. It balances catching churners (Recall) versus avoiding false positives (Precision), but it weights catching churners more heavily. Also, it is easy to explain to non-technical stakeholders. The business objective places greater importance on identifying potential churners than avoiding unnecessary outreach. F2-Score aligns with the business objective because failing to identify a future churner is generally more costly than contacting a customer who would have remained with the bank.
+
+Candidate models were compared primarily using PR AUC, which evaluates ranking performance across all possible decision thresholds and provides a threshold-independent measure of predictive quality.
+
+For the selected model, threshold-dependent metrics such as F2-score and Recall were also reported to evaluate the performance of the final targeting strategy.
+
+## Inference {#inference-phase}
+
+The *inference* phase will involve using the the best ML model to predict the probability of customer churn (soft labels) and outcome (hard labels) for all available customers (~10,100 customers).
+
+<a id="model-interpretability"></a>
+
+We will use SHAP (Shapely Additive Explanations) to identify the primary ML features that most heavily influence whether a customer is likely to stay or churn. [SHAP is a game theory approach used to explain the output of ML models](https://arxiv.org/abs/1705.07874). It assigns an importance value (i.e. a SHAP value) to each feature for a specific prediction. It breaks down predictions into the sum of feature contributions, providing both local, instance-level explanations and global, model-level insights. Here, we will focus on global insights at the model level. Our targeting recommendations will not be on a per-customer basis. So, by viewing the aggregated impact of features, we can ensure the ML model prioritizes variables that make sense from a banking perspective.
+
+This analysis helps assess whether the model's predictions are driven by customer behaviors that are plausible and interpretable from a business perspective.
+
+## Ethical Issues with Performing Analysis
+
+*What are some ethical issues associated with conducting this analysis?*
+
+Although the dataset does not contain direct personally identifiable information and will not be linked to external data sources, several ethical considerations remain
+
+1. Demographic variables such as age, gender, income category, marital status, and education level may influence model predictions and should be monitored for unintended bias.
+2. Retention strategies informed by the model should be applied fairly across customer groups.
+3. As [discussed in the actions informed by meeting this projects goals](../scope/04_actions.qmd#useful-info), model outputs should be used to support business decision-making rather than as fully automated decisions.
+4. As [discussed in the tradeoffs in the project's goals](../scope/03_goals.qmd#goals-tradeoffs), customers should not be unfairly disadvantaged as a result of predictive targeting.
+
+Issues 1. and 2. were also mentioned when [discussing ethics related to the client's actions that will be informed if the goals are met](../scope/04_actions.qmd#ethics).
+
+These considerations should be reviewed before any production deployment.
+
+## Appendix
+
+:::{.callout-tip collapsed="true"}
+## Benefit of Action
+
+Because we want to intervene before a customer churns, we would predict the likelihood of churn for every customer. We would use these predictions to rank customers based on the risk (probability) of future churn and prioritize them for intervention.
+
+These customers would then be characterized to understand their attributes.
+
+In this way, the action informed by this analysis (i.e. identifying the cohort of customers to target) can be better informed using a data-driven approach and would ultimately increase revenue for the client by allowing targeted interventions rather than broad, less effective strategies.
+:::
+
+:::{.callout-note #data-prep-fwd-looking-target collapsed="true"}
+## Assumptions about Data Preparation
+
+We assume the data has been accurately prepared to support predicting *future* credit card churn
+
+1. Compute the customer attributes using a trailing ~12-16 month time window for each customer
+2. Determine the customer outcome using a **certain period in the future** relative to the time window during which customer attributes were extracted. If the cutomer churned during this future time window, then the `Attrition_Flag` (`"Attrited_Customer"`) is set to 1, else it is set to 0 (`"Existing_Customer"`).
+:::
+
+:::{.callout-note #model-validation collapsed="true"}
+## Validation Phase Details
+
+Below is a detailed walkthrough for the *validation phase*
+
+1. use customer data that was collected during trailing 12-16 month window
+2. split this data into training data and test data, using an 80:20 random split
+   - the training data split would be used to run ML experiments to find the best ML model, etc.
+   - the test data would be used to evaluate the performance of the best ML model and other inputs that were varied during each experiment run
+3. experiments would be run by dividing the training data (the 80% split) into five *folds*
+   - each fold has its own training and validation splits
+   - train the ML model on the training split of each fold and predict and score the validation split of that same fold
+   - get the average score across all five folds
+
+Using this workflow, we will aim to achieve the following
+
+1. determine the best data pre-procecessing techniques in order to prepare the data to be passed to a ML model
+2. select the best (most predictive) features
+3. get the best ML model
+
+The best experiment is the one which gives the highest average score across all five folds for this combination of three inputs.
+:::
+
+:::{.callout-note #model-evaluation collapsed="true"}
+## Evaluation Phase Details
+
+During evaluation, we will use the test data split to evaluate the following
+
+1. Check business usefulness to determine if the model outperforms a random model (random customer targeting) using interpretable metrics like Uplift and Gain.
+2. Check for concept drift (i.e. predictive performance or model generalization) by comparing the change in ML evaluation metrics on the unseen data during validation versus during evaluation.
+3. Check for bias or variance (evidence of overfitting or underfitting) which indicate underfitting (high bias) or overfitting (high variance).
+4. Check for prediction drift using statistical hypothesis tests of the predicted probabilities of the test data.
+5. Check for data drift using statistical hypothesis tests of the features in the test data.
+
+If all these test pass then the model's predictions are reliable and we can use the model's predictions during the inference phase as a basis for making recommendations to the client for how to best target the at-risk customers.
+:::
+
+:::{.callout-note #business-metrics-usage collapsed="true"}
+## Use of Business Metrics
+
+Inference predictions (soft and hard labels) will be used in the following two ways
+
+1. We will estimate business metrics - net savings and return on investment (ROI) - from targeting the top *N* customers. Since this is historical data, we will use the true outcomes to estimate the error in the predicted business metrics from targeting these top *N* customers. The details of estimating and using the reporting business metrics are discussed in the next step.
+2. We will use the predicted probabilities and one of these business metrics to make recommendations for the cohort (at-risk customers) to target and targeting strategies.
+:::
