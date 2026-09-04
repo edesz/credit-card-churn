@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="edesz">
-<meta name="author" content="ilkham">
+<meta name="author" content="IlkhamFY">
 <meta name="author" content="sinderpreet31">
 <meta name="dcterms.date" content="2026-09-04">
 
@@ -53,9 +53,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-dbb8c4ae07f41d0bbe22dfb21d2592fc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-fa1841b6d5796961b5baa00a347523b1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-dbb8c4ae07f41d0bbe22dfb21d2592fc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-a735f3583f5918a91d136fcc9a88ca2e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-b65030afd2116ac5121c28c5d6986c75.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-a735f3583f5918a91d136fcc9a88ca2e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -307,6 +307,25 @@ cookieconsent.run({
   </li>  
     </ul>
   </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-areas-of-focus" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Areas of Focus</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-areas-of-focus">    
+        <li>
+    <a class="dropdown-item" href="./index.html#problem-and-scope">
+ <span class="dropdown-text">Problem and Scope</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./index.html#machine-learning">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./index.html#data-engineering">
+ <span class="dropdown-text">Data Engineering</span></a>
+  </li>  
+    </ul>
+  </li>
   <li class="nav-item">
     <a class="nav-link" href="./index.html#project-disclaimer"> 
 <span class="menu-text">Disclaimer</span></a>
@@ -535,6 +554,13 @@ cookieconsent.run({
   <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome</a></li>
   <li><a href="#our-task" id="toc-our-task" class="nav-link" data-scroll-target="#our-task">Our Task</a></li>
   <li><a href="#our-teams-approach" id="toc-our-teams-approach" class="nav-link" data-scroll-target="#our-teams-approach">Our Team’s Approach</a></li>
+  <li><a href="#hints-for-reading-this-documentation" id="toc-hints-for-reading-this-documentation" class="nav-link" data-scroll-target="#hints-for-reading-this-documentation">Hints for Reading this Documentation</a>
+  <ul>
+  <li><a href="#problem-and-scope" id="toc-problem-and-scope" class="nav-link" data-scroll-target="#problem-and-scope">Business Problem and Project Scope</a></li>
+  <li><a href="#machine-learning" id="toc-machine-learning" class="nav-link" data-scroll-target="#machine-learning">Programming for Machine Learning</a></li>
+  <li><a href="#data-engineering" id="toc-data-engineering" class="nav-link" data-scroll-target="#data-engineering">Data Engineering</a></li>
+  </ul></li>
+  <li><a href="#project-disclaimer" id="toc-project-disclaimer" class="nav-link" data-scroll-target="#project-disclaimer">Disclaimer</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/edesz/credit-card-churn/edit/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/edesz/credit-card-churn/blob/main/index.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li><li><a href="https://github.com/edesz/credit-card-churn/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -556,7 +582,7 @@ cookieconsent.run({
     <div class="quarto-title-meta-heading">Authors</div>
     <div class="quarto-title-meta-contents">
              <p>edesz </p>
-             <p>ilkham </p>
+             <p>IlkhamFY </p>
              <p>sinderpreet31 </p>
           </div>
   </div>
@@ -603,7 +629,7 @@ cookieconsent.run({
 </ul></li>
 <li><a href="./notebooks/12_validate_data.html">Data Validation</a>
 <ul>
-<li>we developed a data model to validate the raw customer data for use in ML development</li>
+<li>we developed a data model to validate the raw customer data for use in ML development. It was used to validate the existing credit card customer data and to validate live customer data should the client proceed to deploy our solution to production.</li>
 <li>we used the <a href="https://pandera.readthedocs.io/en/stable/">Pandera data validation framework</a> to develop the data model</li>
 </ul></li>
 <li><a href="./tests">Unit Testing</a>
@@ -612,39 +638,22 @@ cookieconsent.run({
 <li>we consolidated our unit tests under the <code>tests</code> folder on <a href="https://github.com/edesz/credit-card-churn">our team’s Github repository</a></li>
 </ul></li>
 </ol>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Usage Hints
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<h4 id="business-problem-and-project-scope" class="anchored">Business Problem and Project Scope</h4>
-<p>If you would like to learn about the details of the business problem, how we scoped this project and the insights we extracted from the raw credit card customer data then we recommend starting with our <a href="./references/overview/00_overview.html">project overview</a> and the <a href="./references/overview/01_approach.html">approach</a> we settled on as as a team. This would build a solid background for you to then read through the Project Scoping and Exploratory Data Analysis steps.</p>
-<h4 id="programming-for-machine-learning" class="anchored">Programming for Machine Learning</h4>
-<p>If you are viewing this documentation to also learn about our team’s analysis techniques or review detailed Python code, then we recommend looking through the Machine Learning Development, Data Validation and Unit Testing steps from above. Our team’s <a href="https://github.com/edesz/credit-card-churn">Github repository</a> may also be a useful resource.</p>
+<h2 id="hints-for-reading-this-documentation" class="anchored">Hints for Reading this Documentation</h2>
+<h4 id="problem-and-scope" class="anchored">Business Problem and Project Scope</h4>
+<p>If you would like to learn about the details of the business problem we solved, how we scoped this project and the insights we extracted from the raw credit card customer data, then we recommend starting with our <a href="./references/overview/00_overview.html">project overview</a> and the <a href="./references/overview/01_approach.html">approach</a> we settled on as as a team.</p>
+<p>Next, we recommend you read through the Project Scoping step. We strictly prioritized scoping the project beforehand in order to establish clear guardrails to ensure our subsequent quantitative analysis remained targeted and meaningful. We found that the scope allowed us to identify a highly impactful problem that was also readily solvable.</p>
+<p>Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client’s credit card customer data that we worked with.</p>
+<h4 id="machine-learning" class="anchored">Programming for Machine Learning</h4>
+<p>If you are viewing this documentation to also learn about our team’s quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.</p>
+<p>The development workflow we followed consisted of <a href="https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/">ML model validation</a> on a subset of all available historical customer data and <a href="https://www.ibm.com/think/topics/model-evaluation">evaluation</a> on a held-out subset of data which was not used in model training. Next, we performed <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;opi=89978449&amp;url=https://cloud.google.com/discover/what-is-ai-inference">inference</a> with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and make retention recommendadtions per segment.</p>
+<p>The <a href="https://github.com/edesz/credit-card-churn/notebooks">interactive Python notebooks on our Github repository</a> may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.</p>
 <h4 id="data-engineering" class="anchored">Data Engineering</h4>
-<p>If you would like to learn more about how we developed the data model in Python and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.</p>
-</div>
-</div>
-<p><a id="project-disclaimer"></a></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Disclaimer
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<p>If you would like to learn more about how we developed the data model with Pandera in order to validate the bank’s raw credit card customer data in Python, and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.</p>
+<p>We wrote unit tests to verify that the custom Python modules that our team implemented for this project worked as intended. Our tests are found in the <a href="https://github.com/edesz/credit-card-churn/tree/main/tests"><code>tests</code> folder on our Github repository</a>. We tested 14 the 22 custom Python modules.</p>
+<p>The data model is defined in <code>data_models/staging</code>, but a full walkthrough of the data model design and logic is explained in the <a href="./notebooks/12_validate_data.html">Python notebook in the data validation step</a>.</p>
+<h2 id="project-disclaimer" class="anchored">Disclaimer</h2>
 <p>While this churn prediction project utilizes a hypothetical scenario, our team approached it within the constraints and guardrails of a real-world client consultation in a live production environment.</p>
 <p>In the end-to-end five step workflow above, we incorporated realistic business constraints such as customer acquisition costs, retention budget limits, and model interpretability requirements to make a practical business impact.</p>
-</div>
-</div>
 
 
 
