@@ -50,7 +50,7 @@ In order to complete this task, we divided this project into the following five 
 
 ## Hints for Reading this Documentation
 
-#### Business Problem and Project Scope {#problem-and-scope}
+### Business Problem and Project Scope {#problem-and-scope}
 
 If you would like to learn about the details of the business problem we solved, how we scoped this project and the insights we extracted from the raw credit card customer data, then we recommend starting with our [project overview](references/overview/00_overview.qmd) and the [approach](references/overview/01_approach.qmd) we settled on as as a team.
 
@@ -58,7 +58,7 @@ Next, we recommend you read through the Project Scoping step. We strictly priori
 
 Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client's credit card customer data that we worked with.
 
-#### Programming for Machine Learning {#machine-learning}
+### Programming for Machine Learning {#machine-learning}
 
 If you are viewing this documentation to also learn about our team's quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.
 
@@ -66,7 +66,7 @@ The development workflow we followed consisted of [ML model validation](https://
 
 The [interactive Python notebooks on our Github repository](https://github.com/edesz/credit-card-churn/notebooks) may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.
 
-#### Data Engineering {#data-engineering}
+### Data Engineering {#data-engineering}
 
 If you would like to learn more about how we developed the data model with Pandera in order to validate the bank's raw credit card customer data in Python, and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.
 

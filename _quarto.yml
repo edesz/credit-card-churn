@@ -38,12 +38,6 @@ website:
     left:
       - text: Home
         href: index.qmd
-      - text: Our Team
-        menu:
-          - text: Roles
-            href: references/overview/02_team_contributions.qmd#project-roles
-          - text: Contributions
-            href: references/overview/02_team_contributions.qmd#project-contributions
       - text: Areas of Focus
         menu:
           - text: Problem and Scope
@@ -52,6 +46,12 @@ website:
             href: index.qmd#machine-learning
           - text: Data Engineering
             href: index.qmd#data-engineering
+      - text: Our Team
+        menu:
+          - text: Roles
+            href: references/overview/02_team_contributions.qmd#project-roles
+          - text: Contributions
+            href: references/overview/02_team_contributions.qmd#project-contributions
       - text: Disclaimer
         href: index.qmd#project-disclaimer
     right:
