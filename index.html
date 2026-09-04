@@ -372,8 +372,8 @@ cookieconsent.run({
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
       <a href="./index.html" class="sidebar-logo-link">
-      <img src="./docs/CCChurn_logo.jpeg" alt="CCChurn Logo Image" class="sidebar-logo light-content py-0 d-lg-inline d-none">
-      <img src="./docs/CCChurn_logo.jpeg" alt="CCChurn Logo Image" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      <img src="./docs/images/CCChurn_logo.jpeg" alt="CCChurn Logo Image" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="./docs/images/CCChurn_logo.jpeg" alt="CCChurn Logo Image" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
       </a>
       </div>
     <div class="sidebar-menu-container"> 
@@ -522,6 +522,12 @@ cookieconsent.run({
  <span class="menu-text">ML Inference</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./notebooks/10_get_at_risk_customer_profiles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Profiling Recommendations</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -642,10 +648,10 @@ cookieconsent.run({
 <h3 id="problem-and-scope" class="anchored">Business Problem and Project Scope</h3>
 <p>If you would like to learn about the details of the business problem we solved, how we scoped this project and the insights we extracted from the raw credit card customer data, then we recommend starting with our <a href="./references/overview/00_overview.html">project overview</a> and the <a href="./references/overview/01_approach.html">approach</a> we settled on as as a team.</p>
 <p>Next, we recommend you read through the Project Scoping step. We strictly prioritized scoping the project beforehand in order to establish clear guardrails to ensure our subsequent quantitative analysis remained targeted and meaningful. We found that the scope allowed us to identify a highly impactful problem that was also readily solvable.</p>
-<p>Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client’s credit card customer data that we worked with.</p>
+<p>Finally, take a look through the Exploratory Data Analysis step to visually understand the bank’s credit card customer data.</p>
 <h3 id="machine-learning" class="anchored">Programming for Machine Learning</h3>
 <p>If you are viewing this documentation to also learn about our team’s quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.</p>
-<p>The development workflow we followed consisted of <a href="https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/">ML model validation</a> on a subset of all available historical customer data and <a href="https://www.ibm.com/think/topics/model-evaluation">evaluation</a> on a held-out subset of data which was not used in model training. Next, we performed <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;opi=89978449&amp;url=https://cloud.google.com/discover/what-is-ai-inference">inference</a> with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and make retention recommendadtions per segment.</p>
+<p>The development workflow we followed consisted of <a href="https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/">ML model validation</a> on a subset of all available historical customer data and <a href="https://www.ibm.com/think/topics/model-evaluation">evaluation</a> on a held-out subset of data which was not used in model training. Next, we performed <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;opi=89978449&amp;url=https://cloud.google.com/discover/what-is-ai-inference">inference</a> with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and made retention recommendadtions per segment to the client using characteristics of customers in the segment.</p>
 <p>The <a href="https://github.com/edesz/credit-card-churn/notebooks">interactive Python notebooks on our Github repository</a> may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.</p>
 <h3 id="data-engineering" class="anchored">Data Engineering</h3>
 <p>If you would like to learn more about how we developed the data model with Pandera in order to validate the bank’s raw credit card customer data in Python, and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.</p>
