@@ -85,7 +85,7 @@ website:
 
   sidebar:
     title: "Churn Insights and Recommendations"
-    logo: docs/images/CCChurn_logo.jpeg
+    logo: docs/images/CCChurn_logo.png
     logo-alt: "CCChurn Logo Image"
     pinned: true
     aligned: center
