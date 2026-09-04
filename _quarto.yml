@@ -14,6 +14,7 @@ project:
     - "notebooks/05_get_best_validation_experiment.ipynb"
     - "notebooks/06_evaluate.ipynb"
     - "notebooks/07_inference.ipynb"
+    - "notebooks/10_get_at_risk_customer_profiles.ipynb"
     - "notebooks/12_validate_data.ipynb"
     - CODE_OF_CONDUCT.md
     - LICENSE.md
@@ -83,7 +84,7 @@ website:
     prefs-text: "Cookie Preferences"
 
   sidebar:
-    logo: docs/CCChurn_logo.jpeg
+    logo: docs/images/CCChurn_logo.jpeg
     logo-alt: "CCChurn Logo Image"
     title: Churn Insights
     pinned: true
@@ -135,6 +136,8 @@ website:
             href: notebooks/06_evaluate.ipynb
           - text: ML Inference
             href: notebooks/07_inference.ipynb
+          - text: Profiling Recommendations
+            href: notebooks/10_get_at_risk_customer_profiles.ipynb
       - section: "Data Validation"
         contents:
           - text: Data Validation Model

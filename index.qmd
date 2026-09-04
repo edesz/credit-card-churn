@@ -56,13 +56,13 @@ If you would like to learn about the details of the business problem we solved, 
 
 Next, we recommend you read through the Project Scoping step. We strictly prioritized scoping the project beforehand in order to establish clear guardrails to ensure our subsequent quantitative analysis remained targeted and meaningful. We found that the scope allowed us to identify a highly impactful problem that was also readily solvable.
 
-Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client's credit card customer data that we worked with.
+Finally, take a look through the Exploratory Data Analysis step to visually understand the bank's credit card customer data.
 
 ### Programming for Machine Learning {#machine-learning}
 
 If you are viewing this documentation to also learn about our team's quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.
 
-The development workflow we followed consisted of [ML model validation](https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/) on a subset of all available historical customer data and [evaluation](https://www.ibm.com/think/topics/model-evaluation) on a held-out subset of data which was not used in model training. Next, we performed [inference](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://cloud.google.com/discover/what-is-ai-inference) with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and make retention recommendadtions per segment.
+The development workflow we followed consisted of [ML model validation](https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/) on a subset of all available historical customer data and [evaluation](https://www.ibm.com/think/topics/model-evaluation) on a held-out subset of data which was not used in model training. Next, we performed [inference](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://cloud.google.com/discover/what-is-ai-inference) with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and made retention recommendadtions per segment to the client using characteristics of customers in the segment.
 
 The [interactive Python notebooks on our Github repository](https://github.com/edesz/credit-card-churn/notebooks) may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.
 
