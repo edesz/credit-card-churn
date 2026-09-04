@@ -293,21 +293,6 @@ cookieconsent.run({
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-our-team" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Our Team</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-our-team">    
-        <li>
-    <a class="dropdown-item" href="./references/overview/02_team_contributions.html#project-roles">
- <span class="dropdown-text">Roles</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./references/overview/02_team_contributions.html#project-contributions">
- <span class="dropdown-text">Contributions</span></a>
-  </li>  
-    </ul>
-  </li>
-  <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-areas-of-focus" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Areas of Focus</span>
     </a>
@@ -323,6 +308,21 @@ cookieconsent.run({
         <li>
     <a class="dropdown-item" href="./index.html#data-engineering">
  <span class="dropdown-text">Data Engineering</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-our-team" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Our Team</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-our-team">    
+        <li>
+    <a class="dropdown-item" href="./references/overview/02_team_contributions.html#project-roles">
+ <span class="dropdown-text">Roles</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./references/overview/02_team_contributions.html#project-contributions">
+ <span class="dropdown-text">Contributions</span></a>
   </li>  
     </ul>
   </li>
@@ -639,15 +639,15 @@ cookieconsent.run({
 </ul></li>
 </ol>
 <h2 id="hints-for-reading-this-documentation" class="anchored">Hints for Reading this Documentation</h2>
-<h4 id="problem-and-scope" class="anchored">Business Problem and Project Scope</h4>
+<h3 id="problem-and-scope" class="anchored">Business Problem and Project Scope</h3>
 <p>If you would like to learn about the details of the business problem we solved, how we scoped this project and the insights we extracted from the raw credit card customer data, then we recommend starting with our <a href="./references/overview/00_overview.html">project overview</a> and the <a href="./references/overview/01_approach.html">approach</a> we settled on as as a team.</p>
 <p>Next, we recommend you read through the Project Scoping step. We strictly prioritized scoping the project beforehand in order to establish clear guardrails to ensure our subsequent quantitative analysis remained targeted and meaningful. We found that the scope allowed us to identify a highly impactful problem that was also readily solvable.</p>
 <p>Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client’s credit card customer data that we worked with.</p>
-<h4 id="machine-learning" class="anchored">Programming for Machine Learning</h4>
+<h3 id="machine-learning" class="anchored">Programming for Machine Learning</h3>
 <p>If you are viewing this documentation to also learn about our team’s quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.</p>
 <p>The development workflow we followed consisted of <a href="https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/">ML model validation</a> on a subset of all available historical customer data and <a href="https://www.ibm.com/think/topics/model-evaluation">evaluation</a> on a held-out subset of data which was not used in model training. Next, we performed <a href="https://www.google.com/url?sa=t&amp;source=web&amp;rct=j&amp;opi=89978449&amp;url=https://cloud.google.com/discover/what-is-ai-inference">inference</a> with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and make retention recommendadtions per segment.</p>
 <p>The <a href="https://github.com/edesz/credit-card-churn/notebooks">interactive Python notebooks on our Github repository</a> may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.</p>
-<h4 id="data-engineering" class="anchored">Data Engineering</h4>
+<h3 id="data-engineering" class="anchored">Data Engineering</h3>
 <p>If you would like to learn more about how we developed the data model with Pandera in order to validate the bank’s raw credit card customer data in Python, and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.</p>
 <p>We wrote unit tests to verify that the custom Python modules that our team implemented for this project worked as intended. Our tests are found in the <a href="https://github.com/edesz/credit-card-churn/tree/main/tests"><code>tests</code> folder on our Github repository</a>. We tested 14 the 22 custom Python modules.</p>
 <p>The data model is defined in <code>data_models/staging</code>, but a full walkthrough of the data model design and logic is explained in the <a href="./notebooks/12_validate_data.html">Python notebook in the data validation step</a>.</p>
