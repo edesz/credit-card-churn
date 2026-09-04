@@ -38,7 +38,6 @@ website:
     left:
       - text: Home
         href: index.qmd
-        target: _blank
       - text: Our Team
         menu:
           - text: Roles
