@@ -84,9 +84,9 @@ website:
     prefs-text: "Cookie Preferences"
 
   sidebar:
+    title: "Churn Insights and Recommendations"
     logo: docs/images/CCChurn_logo.jpeg
     logo-alt: "CCChurn Logo Image"
-    title: Churn Insights
     pinned: true
     aligned: center
     style: "docked"
