@@ -44,6 +44,14 @@ website:
             href: references/overview/02_team_contributions.qmd#project-roles
           - text: Contributions
             href: references/overview/02_team_contributions.qmd#project-contributions
+      - text: Areas of Focus
+        menu:
+          - text: Problem and Scope
+            href: index.qmd#problem-and-scope
+          - text: Machine Learning
+            href: index.qmd#machine-learning
+          - text: Data Engineering
+            href: index.qmd#data-engineering
       - text: Disclaimer
         href: index.qmd#project-disclaimer
     right:

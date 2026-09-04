@@ -6,7 +6,7 @@ author:
   - name: "edesz"
     attributes:
       github: "edesz"
-  - name: "ilkham"
+  - name: "IlkhamFY"
     attributes:
       github: "IlkhamFY"
   - name: "sinderpreet31"
@@ -42,34 +42,40 @@ In order to complete this task, we divided this project into the following five 
    - we trained ML models to predict customer churn, performing model validation, evaluation and inference using [Scikit Learn](https://scikit-learn.org/stable/) and [XGBoost](https://xgboost.readthedocs.io/en/stable/index.html) with [MetaFlow](https://metaflow.org/) for orchestrating model development
    - we used predictions of the best ML model to estimate net savings and combined this with our model's predicted probability of churn to segment the customers in the raw data and make targeting recommendations per customer segment
 4. [Data Validation](notebooks/12_validate_data.ipynb)
-   - we developed a data model to validate the raw customer data for use in ML development
+   - we developed a data model to validate the raw customer data for use in ML development. It was used to validate the existing credit card customer data and to validate live customer data should the client proceed to deploy our solution to production.
    - we used the [Pandera data validation framework](https://pandera.readthedocs.io/en/stable/) to develop the data model
 5. [Unit Testing](./tests)
    - we wrote unit tests with the [PyTest framework](https://docs.pytest.org/en/stable/) to test the functionality of the custom Python modules that our team developed to implement steps 1. to 4. above
    - we consolidated our unit tests under the `tests` folder on [our team's Github repository](https://github.com/edesz/credit-card-churn)
 
-:::{.callout-tip}
-## Usage Hints
+## Hints for Reading this Documentation
 
-#### Business Problem and Project Scope
+#### Business Problem and Project Scope {#problem-and-scope}
 
-If you would like to learn about the details of the business problem, how we scoped this project and the insights we extracted from the raw credit card customer data then we recommend starting with our [project overview](references/overview/00_overview.qmd) and the [approach](references/overview/01_approach.qmd) we settled on as as a team. This would build a solid background for you to then read through the Project Scoping and Exploratory Data Analysis steps.
+If you would like to learn about the details of the business problem we solved, how we scoped this project and the insights we extracted from the raw credit card customer data, then we recommend starting with our [project overview](references/overview/00_overview.qmd) and the [approach](references/overview/01_approach.qmd) we settled on as as a team.
 
-#### Programming for Machine Learning
+Next, we recommend you read through the Project Scoping step. We strictly prioritized scoping the project beforehand in order to establish clear guardrails to ensure our subsequent quantitative analysis remained targeted and meaningful. We found that the scope allowed us to identify a highly impactful problem that was also readily solvable.
 
-If you are viewing this documentation to also learn about our team's analysis techniques or review detailed Python code, then we recommend looking through the Machine Learning Development, Data Validation and Unit Testing steps from above. Our team's [Github repository](https://github.com/edesz/credit-card-churn) may also be a useful resource.
+Finally, take a look through the Exploratory Data Analysis step to visually understand the attributes of the client's credit card customer data that we worked with.
 
-#### Data Engineering
+#### Programming for Machine Learning {#machine-learning}
 
-If you would like to learn more about how we developed the data model in Python and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.
-:::
+If you are viewing this documentation to also learn about our team's quantitative analysis techniques or review the Python code that we implemented during the development and use of a predictive churn model, then we recommend looking through the Machine Learning Development step from above.
 
-<a id="project-disclaimer"></a>
+The development workflow we followed consisted of [ML model validation](https://www.comet.com/site/blog/building-reliable-machine-learning-models-with-cross-validation/) on a subset of all available historical customer data and [evaluation](https://www.ibm.com/think/topics/model-evaluation) on a held-out subset of data which was not used in model training. Next, we performed [inference](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://cloud.google.com/discover/what-is-ai-inference) with the best ML model to make predictions of risk of customer churn on all available data. Finally, we used the inference predictions to estimate net savings, segment customers and make retention recommendadtions per segment.
 
-:::{.callout-note}
-## Disclaimer
+The [interactive Python notebooks on our Github repository](https://github.com/edesz/credit-card-churn/notebooks) may also be a useful resource to explore how we walked through each step of the ML lifecycle in source code.
+
+#### Data Engineering {#data-engineering}
+
+If you would like to learn more about how we developed the data model with Pandera in order to validate the bank's raw credit card customer data in Python, and to review the unit tests we wrote with PyTest, then we can recommend going through the Data Validation and Unit Testing steps.
+
+We wrote unit tests to verify that the custom Python modules that our team implemented for this project worked as intended. Our tests are found in the [`tests` folder on our Github repository](https://github.com/edesz/credit-card-churn/tree/main/tests). We tested 14 the 22 custom Python modules.
+
+The data model is defined in `data_models/staging`, but a full walkthrough of the data model design and logic is explained in the [Python notebook in the data validation step](notebooks/12_validate_data.ipynb).
+
+## Disclaimer {#project-disclaimer}
 
 While this churn prediction project utilizes a hypothetical scenario, our team approached it within the constraints and guardrails of a real-world client consultation in a live production environment.
 
 In the end-to-end five step workflow above, we incorporated realistic business constraints such as customer acquisition costs, retention budget limits, and model interpretability requirements to make a practical business impact.
-:::
