@@ -23,10 +23,41 @@ website:
   back-to-top-navigation: true
   reader-mode: true
   open-graph: true
+  search:
+    location: navbar
+    show-item-context: true
+    type: overlay
   title: Credit-Card Churn Modeling and Targeting
   site-url: https://edesz.github.io/credit-card-churn
   repo-url: https://github.com/edesz/credit-card-churn
   repo-actions: [edit, source, issue]
+
+  navbar:
+    title: Credit Card Churn Modeling
+    search: true
+    left:
+      - text: Home
+        href: index.qmd
+        target: _blank
+      - text: Our Team
+        menu:
+          - text: Roles
+            href: references/overview/02_team_contributions.qmd#project-roles
+          - text: Contributions
+            href: references/overview/02_team_contributions.qmd#project-contributions
+      - text: Disclaimer
+        href: index.qmd#project-disclaimer
+    right:
+      - text: License
+        href: LICENSE.md
+        icon: bi-file-earmark-text-fill
+      - text: Code of Conduct
+        href: CODE_OF_CONDUCT.md
+        icon: bi-people-fill
+    tools:
+      - icon: github
+        href: https://github.com/edesz/credit-card-churn
+        target: _blank
 
   page-footer:
     left:
@@ -45,21 +76,15 @@ website:
     prefs-text: "Cookie Preferences"
 
   sidebar:
+    logo: docs/CCChurn_logo.jpeg
+    logo-alt: "CCChurn Logo Image"
     title: Churn Insights
     pinned: true
     aligned: center
-    tools:
-      - icon: globe
-        href: https://edesz.github.io/credit-card-churn
-        text: "Homepage"
-        target: _blank
-      - icon: github
-        href: https://github.com/edesz/credit-card-churn
-        target: _blank
     style: "docked"
-    search: true
+    search: false
     collapse: true
-    collapse-level: 1
+    collapse-level: 2
     contents:
       - text: "Welcome"
         href: index.qmd
@@ -69,7 +94,7 @@ website:
             href: references/overview/00_overview.qmd
           - text: Approach
             href: references/overview/01_approach.qmd
-          - text: Team Member Contributions
+          - text: Team Contributions
             href: references/overview/02_team_contributions.qmd
       - section: "Project Scoping"
         contents:
@@ -117,7 +142,7 @@ execute:
 format:
   html:
     grid:
-      sidebar-width: 350px
+      sidebar-width: 250px
     smooth-scroll: true
     code-overflow: wrap
     code-fold: false

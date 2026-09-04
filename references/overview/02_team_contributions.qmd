@@ -10,9 +10,11 @@ language:
   title-block-published: "Last Updated"
 ---
 
-# Team Member Contributions
+# Team Contributions
 
 ## Team Member Roles
+
+<a id="project-roles"></id>
 
 Below are our team members' roles for this project, following the [Contributor Role Taxonomy](https://credit.niso.org/)
 
@@ -41,7 +43,9 @@ Below are our team members' roles for this project, following the [Contributor R
 
 ## High-Level Summary
 
-A high-level summary of the contributions of each team member to this project is presented below.
+<a id="project-contributions"></id>
+
+A high-level summary of the contributions of each team member to this project is presented below
 
 ### edesz
 

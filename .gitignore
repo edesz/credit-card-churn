@@ -115,8 +115,8 @@ notebooks/.metaflow/*
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-# MyST build outputs
-_build
+# Quarto build outputs
+_site
 
 /.quarto/
 **/*.quarto_ipynb
