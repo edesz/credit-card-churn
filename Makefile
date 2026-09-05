@@ -54,6 +54,12 @@ pixi2conda:
 	@pixi workspace export conda-environment --environment notebooks > environment.yml
 .PHONY: pixi2conda
 
+## Remove background from documentation logo
+remove-image-background:
+	@echo "+ $@"
+	@pixi run remove-image-background
+.PHONY: remove-image-background
+
 ## Preview documentation locally with Quarto
 quarto-preview:
 	@echo "+ $@"

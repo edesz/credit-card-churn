@@ -90,6 +90,15 @@ pytest = ">=9.1.1,<10"
 coverage = ">=7.16.0,<8"
 pytest-html = ">=4.2.0,<5"
 
+[tool.pixi.feature.ibgremover.dependencies]
+python = "3.12.10.*"
+
+[tool.pixi.feature.ibgremover.pypi-dependencies]
+# create an image background remover feature
+typer = ">=0.27.2,<0.28"
+pillow = ">=12.3.0,<13"
+typing-extensions = ">=4.16.0,<5"
+
 [tool.pixi.feature.docs.dependencies]
 # create an (empty) docs feature
 
@@ -104,6 +113,8 @@ notebooks = { features = ['default', "notebooks"], solve-group = "notebooks" }
 nbrunner = { features = ["default", "nbrunner"], solve-group = "nbrunner" }
 # test env inherits default feature and unit-test feature to run pytest
 test = { features = ["default", "test"], solve-group = "default" }
+# define ibgremover feature with no solve group
+ibgremover = { features = ["ibgremover"], no-default-feature = true }
 # define website env with no solve-group and only docs feature
 docs = { features = ["docs"], no-default-feature = true }
 
@@ -137,6 +148,18 @@ nbs = { cmd = """
     """, description="""\
     Run notebooks with papermill\
     """, default-environment = "nbrunner" }
+
+[tool.pixi.feature.ibgremover.tasks]
+# trim whitespace and remove background from documentation logo
+remove-image-background = { cmd = """
+    python preprocess_image.py \
+        preprocess \
+        docs/images/image.jpeg \
+        --output docs/images/CCChurn_logo.png \
+        --tolerance 130
+        """, description="""\
+    Remove background from an image\
+    """, default-environment = "ibgremover" }
 
 [tool.pixi.feature.docs.tasks]
 # preview using Quarto

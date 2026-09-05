@@ -4,9 +4,10 @@
 """Test pygments utilities."""
 
 import builtins
-from unittest.mock import mock_open
+from unittest.mock import mock_open, patch
 
 import src.utils.display_utils as du
+from src.utils.display_utils import markdown_highlight_filtered
 
 
 def test_pygments_highlight_basic(monkeypatch, sample_code):
@@ -138,3 +139,245 @@ def test_example_usage(monkeypatch, sample_code):
     )
 
     assert calls["count"] == 1
+
+
+def test_excludes_individual_line():
+    """Excludes a single line specified by its zero-based index."""
+    source = (
+        "def hello():\n"
+        "    print('hello')\n"
+        "    print('unwanted')\n"
+        "    return True\n"
+    )
+
+    expected = (
+        "```python\n"
+        "def hello():\n"
+        "    print('hello')\n"
+        "    return True\n"
+        "```"
+    )
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [2])
+
+    mock_display.assert_called_once()
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_excludes_line_range():
+    """Excludes all lines within a specified zero-based range."""
+    source = (
+        "def hello():\n"
+        "    print('one')\n"
+        "    print('two')\n"
+        "    print('three')\n"
+        "    return True\n"
+    )
+
+    expected = "```python\n" "def hello():\n" "    return True\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [(1, 4)])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_excludes_single_element_tuple():
+    """Excludes a line specified by a single-element tuple."""
+    source = "def hello():\n" "    print('hello')\n" "    print('unwanted')\n"
+
+    expected = "```python\n" "def hello():\n" "    print('hello')\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [(2,)])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_combines_integer_and_range_exclusions():
+    """Combines individual line and range exclusions."""
+    source = "line 0\n" "line 1\n" "line 2\n" "line 3\n" "line 4\n" "line 5\n"
+
+    expected = "```python\n" "line 0\n" "line 3\n" "line 5\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [1, (2, 3), (4, 5)])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_dedents_common_leading_indentation():
+    """Removes common leading indentation from the source code."""
+    source = (
+        "    def hello():\n" "        print('hello')\n" "        return True\n"
+    )
+
+    expected = (
+        "```python\n"
+        "def hello():\n"
+        "    print('hello')\n"
+        "    return True\n"
+        "```"
+    )
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_strips_leading_and_trailing_newlines():
+    """Removes leading and trailing newlines from the rendered code."""
+    source = "\n\n    print('hello')\n\n"
+
+    expected = "```python\n" "print('hello')\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_empty_source():
+    """Renders an empty source file as an empty Python code block."""
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=""),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == "```python\n\n```"
+
+
+def test_opens_file_as_utf8():
+    """Opens the source file in read mode using UTF-8 encoding."""
+    source = "print('hello')\n"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ) as mock_file,
+        patch("src.utils.display_utils.display"),
+    ):
+        markdown_highlight_filtered("example.py", [])
+
+    mock_file.assert_called_once_with(
+        "example.py",
+        "r",
+        encoding="utf-8",
+    )
+
+
+def test_ignores_empty_tuple():
+    """Ignores an empty tuple in the unwanted ranges."""
+    source = "line 0\n" "line 1\n" "line 2\n"
+
+    expected = "```python\n" "line 0\n" "line 1\n" "line 2\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [()])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_ignores_tuple_with_more_than_two_elements():
+    """Ignores tuples containing more than two elements."""
+    source = "line 0\n" "line 1\n" "line 2\n"
+
+    expected = "```python\n" "line 0\n" "line 1\n" "line 2\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", [(0, 1, 2)])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected
+
+
+def test_ignores_non_integer_non_tuple_item():
+    """Ignores unwanted range items that are not integers or tuples."""
+    source = "line 0\n" "line 1\n" "line 2\n"
+
+    expected = "```python\n" "line 0\n" "line 1\n" "line 2\n" "```"
+
+    with (
+        patch(
+            "src.utils.display_utils.open",
+            mock_open(read_data=source),
+        ),
+        patch("src.utils.display_utils.display") as mock_display,
+    ):
+        markdown_highlight_filtered("example.py", ["invalid"])
+
+    markdown_object = mock_display.call_args.args[0]
+
+    assert markdown_object.data == expected

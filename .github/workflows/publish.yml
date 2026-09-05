@@ -1,13 +1,16 @@
+name: Quarto Publish
+
 on:
   workflow_dispatch:
-  push:
-    branches: main
-
-name: Quarto Publish
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    # Run only if triggered manually (workflow_dispatch) OR if CI succeeded
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write
     steps:

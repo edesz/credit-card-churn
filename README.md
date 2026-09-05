@@ -51,6 +51,7 @@ preview             Preview documentation
 quarto-preview      Preview documentation locally with Quarto 
 quarto-publish-gh-pages Prepare Github Actions configuration for Quarto 
 quarto-render       Render documentation locally with Quarto 
+remove-image-background Remove background from documentation logo 
 tests               Run unit tests with Pytest 
 ```
 
